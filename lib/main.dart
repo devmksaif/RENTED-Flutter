@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'login_screen.dart'; // import your separate screen file
 import 'register_screen.dart';
 void main() {
@@ -13,6 +14,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
+      theme: ThemeData(
+        fontFamily: GoogleFonts.poppins().fontFamily,
+        primarySwatch: Colors.green,
+      ),
       initialRoute: '/', // starting screen
       routes: {
         '/': (context) => const HomeScreen(),
