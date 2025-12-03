@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart'; // import your separate screen file
-import 'register_screen.dart';
+import 'home.dart';
+import 'pages/favorites_page.dart';
+import 'pages/chat_list_page.dart';
+import 'pages/profile_page.dart';
+import 'components/custom_bottom_nav_bar.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -12,32 +16,45 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      initialRoute: '/', // starting screen
-      routes: {
-        '/': (context) => const HomeScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen()
-      },
+      title: 'RENTED',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        useMaterial3: true,
+      ),
+      home: const MainNavigationPage(),
     );
   }
 }
 
-// Home Screen
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class MainNavigationPage extends StatefulWidget {
+  const MainNavigationPage({super.key});
+
+  @override
+  State<MainNavigationPage> createState() => _MainNavigationPageState();
+}
+
+class _MainNavigationPageState extends State<MainNavigationPage> {
+  int _currentIndex = 0;
+
+  late final List<Widget> pages = [
+    const MyHomePage(),
+    const FavoritesPage(),
+    const ChatListPage(),
+    const ProfilePage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Home Page")),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/login');
-          },
-          child: const Text("Go to Login"),
-        ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: pages,
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+        },
       ),
     );
   }
