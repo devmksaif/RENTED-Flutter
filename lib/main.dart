@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'login_screen.dart'; // import your separate screen file
-import 'register_screen.dart';
+import 'package:rented/login_screen.dart';
+import 'package:rented/register_screen.dart';
+import 'home.dart';
+import 'pages/favorites_page.dart';
+import 'pages/chat_list_page.dart';
+import 'pages/profile_page.dart';
+import 'components/custom_bottom_nav_bar.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -14,36 +19,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        fontFamily: GoogleFonts.poppins().fontFamily,
-        primarySwatch: Colors.green,
-      ),
       initialRoute: '/', // starting screen
       routes: {
-        '/': (context) => const HomeScreen(),
+        '/': (context) => const MyHomePage(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen()
+        
       },
     );
   }
 }
-
-// Home Screen
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Home Page")),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/login');
-          },
-          child: const Text("Go to Login"),
-        ),
-      ),
-    );
-  }
-}
+ 
