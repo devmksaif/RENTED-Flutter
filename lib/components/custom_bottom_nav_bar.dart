@@ -23,14 +23,8 @@ class CustomBottomNavBar extends StatelessWidget {
       elevation: 8,
       type: BottomNavigationBarType.fixed,
       items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.favorite),
-          label: 'Favorites',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favorites'),
         BottomNavigationBarItem(
           icon: Icon(Icons.chat_bubble_outline),
           label: 'Chats',

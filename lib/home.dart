@@ -1,15 +1,53 @@
 import 'package:flutter/material.dart';
-import 'pages/product_details_page.dart';
-import 'pages/search_page.dart';
-import 'pages/new_listing_step1_page.dart';
-import 'pages/notifications_page.dart';
-import 'pages/profile_page.dart';
-import 'models/new_listing_model.dart';
-import 'components/product_card.dart';
-import 'data/mock_data.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'models/product.dart';
+import 'models/api_error.dart';
+import 'services/product_service.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final ProductService _productService = ProductService();
+  List<Product> _products = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final products = await _productService.getProducts(page: 1, perPage: 20);
+      if (mounted) {
+        setState(() {
+          _products = products;
+          _isLoading = false;
+        });
+      }
+    } on ApiError catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        if (e.statusCode == 401) {
+          Navigator.pushReplacementNamed(context, '/login');
+        } else {
+          Fluttertoast.showToast(msg: e.message, backgroundColor: Colors.red);
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +73,7 @@ class MyHomePage extends StatelessWidget {
                           width: double.infinity,
                           height: double.infinity,
                         ),
-                        Container(
-                          color: Colors.green.withOpacity(0.7),
-                        ),
+                        Container(color: Colors.green.withOpacity(0.7)),
                       ],
                     ),
                   ),
@@ -45,7 +81,10 @@ class MyHomePage extends StatelessWidget {
                     children: [
                       Container(
                         color: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
                         child: Row(
                           children: [
                             Row(
@@ -75,29 +114,32 @@ class MyHomePage extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF4CAF50),
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(24),
                                 ),
                                 elevation: 0,
                               ),
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => NewListingStep1Page(listing: NewListing()),
-                                  ),
-                                );
+                                Navigator.pushNamed(context, '/add-product');
                               },
                               child: Text('+  List Item'),
                             ),
                             const SizedBox(width: 16),
                             IconButton(
-                              icon: Icon(Icons.notifications, color: Colors.grey, size: 28),
+                              icon: Icon(
+                                Icons.notifications,
+                                color: Colors.grey,
+                                size: 28,
+                              ),
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => NotificationsPage()),
+                                // TODO: Implement notifications screen
+                                Fluttertoast.showToast(
+                                  msg: 'Notifications coming soon',
+                                  backgroundColor: Colors.blue,
                                 );
                               },
                             ),
@@ -105,10 +147,7 @@ class MyHomePage extends StatelessWidget {
                               icon: Icon(Icons.account_circle),
                               color: Color(0xFF4CAF50),
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => ProfilePage()),
-                                );
+                                Navigator.pushNamed(context, '/profile');
                               },
                             ),
                           ],
@@ -140,7 +179,10 @@ class MyHomePage extends StatelessWidget {
                             const SizedBox(height: 32),
                             Container(
                               width: 400,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(32),
@@ -158,7 +200,10 @@ class MyHomePage extends StatelessWidget {
                                   Expanded(
                                     child: Text(
                                       'What are you looking for?',
-                                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                   ElevatedButton(
@@ -168,13 +213,17 @@ class MyHomePage extends StatelessWidget {
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(24),
                                       ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
                                       elevation: 0,
                                     ),
                                     onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => SearchPage()),
+                                      // TODO: Implement search functionality
+                                      Fluttertoast.showToast(
+                                        msg: 'Search coming soon',
+                                        backgroundColor: Colors.blue,
                                       );
                                     },
                                     child: Text('Search'),
@@ -187,7 +236,13 @@ class MyHomePage extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Popular:', style: TextStyle(color: Colors.white, fontSize: 16)),
+                                Text(
+                                  'Popular:',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
                                 const SizedBox(width: 12),
                                 _PopularTag(text: 'Cameras'),
                                 _PopularTag(text: 'Bikes'),
@@ -208,38 +263,161 @@ class MyHomePage extends StatelessWidget {
           // Scrollable listed items
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    alignment: WrapAlignment.center,
-                    children: mockProducts.map((product) {
-                      return ProductCard(
-                        product: product,
-                        onViewDetails: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ProductDetailsPage(product: product)),
+            sliver: _isLoading
+                ? SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF4CAF50),
+                        ),
+                      ),
+                    ),
+                  )
+                : _products.isEmpty
+                ? SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Text(
+                          'No products available',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : SliverList(
+                    delegate: SliverChildListDelegate([
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        alignment: WrapAlignment.center,
+                        children: _products.map((product) {
+                          return _buildProductCard(product);
+                        }).toList(),
+                      ),
+                    ]),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductCard(Product product) {
+    return Container(
+      width: 300,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            '/product-detail',
+            arguments: product.id,
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product Image
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
+              ),
+              child: Container(
+                height: 200,
+                width: double.infinity,
+                color: Colors.grey[100],
+                child: product.thumbnail.isNotEmpty
+                    ? Image.network(
+                        product.thumbnail,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey[400],
+                          size: 48,
+                        ),
+                      )
+                    : Icon(
+                        Icons.inventory_2_outlined,
+                        color: Colors.grey[400],
+                        size: 48,
+                      ),
+              ),
+            ),
+            // Product Info
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    product.category.name,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(
+                        '\$${product.pricePerDay}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF4CAF50),
+                        ),
+                      ),
+                      const Text(
+                        '/day',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                      const Spacer(),
+                      // TODO: Implement favorites functionality
+                      IconButton(
+                        icon: Icon(
+                          Icons.favorite_border,
+                          color: Colors.grey[400],
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          // TODO: Add to favorites
+                          Fluttertoast.showToast(
+                            msg: 'Favorites coming soon',
+                            backgroundColor: Colors.blue,
                           );
                         },
-                        onRent: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('${product.title} added to cart!')),
-                          );
-                        },
-                        onFavoriteChanged: (isFav) {
-                          // Handle favorite
-                        },
-                      );
-                    }).toList(),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -8,7 +8,9 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = mockCurrentUser;
-    final userListings = mockProducts.where((p) => p.owner.id == user.id).toList();
+    final userListings = mockProducts
+        .where((p) => p.owner.id == user.id)
+        .toList();
 
     return Scaffold(
       body: CustomScrollView(
@@ -27,7 +29,9 @@ class ProfilePage extends StatelessWidget {
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: Container(color: Color(0xFF4CAF50).withOpacity(0.9)),
+                      child: Container(
+                        color: Color(0xFF4CAF50).withOpacity(0.9),
+                      ),
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 24),
@@ -65,9 +69,15 @@ class ProfilePage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _StatCard(label: 'Items Listed', value: '${user.itemsListed}'),
+                      _StatCard(
+                        label: 'Items Listed',
+                        value: '${user.itemsListed}',
+                      ),
                       _StatCard(label: 'Rating', value: '${user.rating}'),
-                      _StatCard(label: 'Reviews', value: '${(user.rating * 10).toInt()}'),
+                      _StatCard(
+                        label: 'Reviews',
+                        value: '${(user.rating * 10).toInt()}',
+                      ),
                     ],
                   ),
                   SizedBox(height: 24),
@@ -78,11 +88,18 @@ class ProfilePage extends StatelessWidget {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
-                  Text(user.bio, style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                  Text(
+                    user.bio,
+                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  ),
                   SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Color(0xFF4CAF50), size: 18),
+                      Icon(
+                        Icons.location_on,
+                        color: Color(0xFF4CAF50),
+                        size: 18,
+                      ),
                       SizedBox(width: 8),
                       Text(user.location, style: TextStyle(fontSize: 14)),
                     ],
@@ -98,12 +115,16 @@ class ProfilePage extends StatelessWidget {
                             backgroundColor: Color(0xFF4CAF50),
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             elevation: 0,
                           ),
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Calling ${user.name}...')),
+                              SnackBar(
+                                content: Text('Calling ${user.name}...'),
+                              ),
                             );
                           },
                           icon: Icon(Icons.phone),
@@ -117,12 +138,18 @@ class ProfilePage extends StatelessWidget {
                             backgroundColor: Color(0xFF4CAF50),
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             elevation: 0,
                           ),
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Opening chat with ${user.name}...')),
+                              SnackBar(
+                                content: Text(
+                                  'Opening chat with ${user.name}...',
+                                ),
+                              ),
                             );
                           },
                           icon: Icon(Icons.chat_bubble),
@@ -141,7 +168,10 @@ class ProfilePage extends StatelessWidget {
                   SizedBox(height: 16),
                   if (userListings.isEmpty)
                     Center(
-                      child: Text('No listings yet', style: TextStyle(color: Colors.grey)),
+                      child: Text(
+                        'No listings yet',
+                        style: TextStyle(color: Colors.grey),
+                      ),
                     )
                   else
                     ...userListings.map((product) {
@@ -156,18 +186,32 @@ class ProfilePage extends StatelessWidget {
                           child: ListTile(
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.asset(product.images[0], width: 60, fit: BoxFit.cover),
+                              child: Image.asset(
+                                product.images[0],
+                                width: 60,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            title: Text(product.title, style: TextStyle(fontWeight: FontWeight.w600)),
+                            title: Text(
+                              product.title,
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
                             subtitle: Text('\$${product.price}/day'),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.edit, color: Color(0xFF4CAF50)),
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Color(0xFF4CAF50),
+                                  ),
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Edit feature coming soon')),
+                                      SnackBar(
+                                        content: Text(
+                                          'Edit feature coming soon',
+                                        ),
+                                      ),
                                     );
                                   },
                                 ),
@@ -175,7 +219,11 @@ class ProfilePage extends StatelessWidget {
                                   icon: Icon(Icons.delete, color: Colors.red),
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('${product.title} deleted')),
+                                      SnackBar(
+                                        content: Text(
+                                          '${product.title} deleted',
+                                        ),
+                                      ),
                                     );
                                   },
                                 ),
@@ -185,7 +233,8 @@ class ProfilePage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ProductDetailsPage(product: product),
+                                  builder: (context) =>
+                                      ProductDetailsPage(product: product),
                                 ),
                               );
                             },
@@ -215,13 +264,14 @@ class _StatCard extends StatelessWidget {
       children: [
         Text(
           value,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF4CAF50)),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF4CAF50),
+          ),
         ),
         SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
       ],
     );
   }

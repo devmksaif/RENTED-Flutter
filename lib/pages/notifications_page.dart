@@ -21,7 +21,10 @@ class NotificationsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Notifications',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -31,11 +34,19 @@ class NotificationsPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.notifications_off, size: 64, color: Colors.grey[300]),
+                  Icon(
+                    Icons.notifications_off,
+                    size: 64,
+                    color: Colors.grey[300],
+                  ),
                   SizedBox(height: 16),
                   Text(
                     'No notifications',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                    ),
                   ),
                 ],
               ),
@@ -49,7 +60,9 @@ class NotificationsPage extends StatelessWidget {
                 return Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey[200]!),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -73,19 +86,28 @@ class NotificationsPage extends StatelessWidget {
                           children: [
                             Text(
                               notif['title'] as String,
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             SizedBox(height: 4),
                             Text(
                               notif['message'] as String,
-                              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[600],
+                              ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             SizedBox(height: 4),
                             Text(
                               timeAgo,
-                              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[500],
+                              ),
                             ),
                           ],
                         ),

@@ -68,7 +68,10 @@ class ProfilePage extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       name,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       username,
@@ -177,9 +180,7 @@ Widget _buildInfoCard(
     child: Row(
       children: [
         if (icon != null)
-          Container(
-            child: Icon(icon, color: Color(0xFF4CAF50)),
-          ),
+          Container(child: Icon(icon, color: Color(0xFF4CAF50))),
         if (icon != null) const SizedBox(width: 12),
         Expanded(
           child: Text(
@@ -188,10 +189,7 @@ Widget _buildInfoCard(
           ),
         ),
         if (actionLabel != null)
-          TextButton(
-            onPressed: () {},
-            child: Text(actionLabel),
-          ),
+          TextButton(onPressed: () {}, child: Text(actionLabel)),
       ],
     ),
   );

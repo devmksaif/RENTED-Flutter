@@ -43,7 +43,10 @@ class NewListingStep3Page extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Review Listing', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Review Listing',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -69,7 +72,10 @@ class NewListingStep3Page extends StatelessWidget {
             ),
             SizedBox(height: 32),
 
-            Text('Review Your Listing', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              'Review Your Listing',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 24),
 
             // Preview Card
@@ -78,7 +84,12 @@ class NewListingStep3Page extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.grey[200]!),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 4)],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 4,
+                  ),
+                ],
               ),
               clipBehavior: Clip.hardEdge,
               child: Column(
@@ -86,8 +97,15 @@ class NewListingStep3Page extends StatelessWidget {
                 children: [
                   if (listing.images.isNotEmpty)
                     ClipRRect(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                      child: Image.asset(listing.images[0], height: 200, width: double.infinity, fit: BoxFit.cover),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                      child: Image.asset(
+                        listing.images[0],
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -96,7 +114,10 @@ class NewListingStep3Page extends StatelessWidget {
                       children: [
                         Text(
                           listing.title,
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         SizedBox(height: 8),
                         Text(
@@ -114,10 +135,20 @@ class NewListingStep3Page extends StatelessWidget {
                         SizedBox(height: 16),
                         Text(
                           'Description',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                          ),
                         ),
                         SizedBox(height: 6),
-                        Text(listing.description, style: TextStyle(fontSize: 13, color: Colors.grey[700])),
+                        Text(
+                          listing.description,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[700],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -160,11 +191,19 @@ class NewListingStep3Page extends StatelessWidget {
                       backgroundColor: Colors.grey[200],
                       foregroundColor: Colors.black,
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       elevation: 0,
                     ),
                     onPressed: () => Navigator.pop(context),
-                    child: Text('Back', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text(
+                      'Back',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(width: 12),
@@ -174,11 +213,19 @@ class NewListingStep3Page extends StatelessWidget {
                       backgroundColor: Color(0xFF4CAF50),
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       elevation: 0,
                     ),
                     onPressed: () => publishListing(context),
-                    child: Text('Publish Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text(
+                      'Publish Now',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -223,7 +270,10 @@ class _ProgressStep extends StatelessWidget {
           ),
         ),
         SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+        ),
       ],
     );
   }
@@ -241,10 +291,21 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey,
+            ),
+          ),
           SizedBox(width: 8),
           Expanded(
-            child: Text(value, style: TextStyle(fontSize: 12, color: Colors.grey[700]), overflow: TextOverflow.ellipsis),
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

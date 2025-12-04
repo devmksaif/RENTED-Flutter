@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:rented/login_screen.dart';
-import 'package:rented/register_screen.dart';
-import 'home.dart';
-import 'pages/favorites_page.dart';
-import 'pages/chat_list_page.dart';
-import 'pages/profile_page.dart';
-import 'components/custom_bottom_nav_bar.dart';
+import 'config/app_theme.dart';
+import 'login_screen.dart';
+import 'register_screen.dart';
+import 'screens/main_navigation.dart';
+import 'screens/profile_screen.dart';
+import 'screens/product_detail_screen.dart';
+import 'screens/add_product_screen.dart';
+import 'screens/my_products_screen.dart';
+import 'screens/my_rentals_screen.dart';
+import 'screens/my_purchases_screen.dart';
+import 'screens/verification_screen.dart';
+import 'screens/favorites_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,15 +23,31 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      initialRoute: '/', // starting screen
+      title: 'RENTED',
+      theme: AppTheme.lightTheme,
+      initialRoute: '/login',
       routes: {
-        '/': (context) => const MyHomePage(),
         '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen()
-        
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) => const MainNavigation(),
+        '/profile': (context) => const ProfileScreen(),
+        '/add-product': (context) => const AddProductScreen(),
+        '/my-products': (context) => const MyProductsScreen(),
+        '/my-rentals': (context) => const MyRentalsScreen(),
+        '/my-purchases': (context) => const MyPurchasesScreen(),
+        '/verification': (context) => const VerificationScreen(),
+        '/favorites': (context) => const FavoritesScreen(),
+      },
+      onGenerateRoute: (settings) {
+        // Handle product detail route with arguments
+        if (settings.name == '/product-detail') {
+          final productId = settings.arguments as int;
+          return MaterialPageRoute(
+            builder: (context) => ProductDetailScreen(productId: productId),
+          );
+        }
+        return null;
       },
     );
   }
 }
- 

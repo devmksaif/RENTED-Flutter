@@ -17,7 +17,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Settings',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -105,27 +108,27 @@ class _SettingsPageState extends State<SettingsPage> {
               title: 'Terms of Service',
               icon: Icons.description,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Terms of Service')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Terms of Service')));
               },
             ),
             _SettingsTile(
               title: 'Privacy Policy',
               icon: Icons.privacy_tip,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Privacy Policy')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Privacy Policy')));
               },
             ),
             _SettingsTile(
               title: 'Contact Support',
               icon: Icons.help,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('support@rented.com')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('support@rented.com')));
               },
             ),
             Divider(),
@@ -140,7 +143,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     elevation: 0,
                   ),
                   onPressed: () {
@@ -148,7 +153,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       SnackBar(content: Text('Logout coming soon')),
                     );
                   },
-                  child: Text('Logout', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  child: Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
             ),
@@ -172,7 +180,11 @@ class _SectionTitle extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Text(
         title,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF4CAF50)),
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF4CAF50),
+        ),
       ),
     );
   }

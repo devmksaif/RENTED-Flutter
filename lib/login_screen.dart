@@ -1,117 +1,71 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
-import 'package:google_sign_in/google_sign_in.dart';
-import 'dart:convert'; // for JSON encoding/decoding
+import 'services/auth_service.dart';
+import 'models/api_error.dart';
+import 'config/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreen();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
-class _LoginScreen extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormBuilderState>();
-  final apiLogin = "https://rented-backend-api-production.up.railway.app/api/login";
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  Future<void> postData(String login, String password) async {
-    final url = Uri.parse(apiLogin);
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  bool _isLoading = false;
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _performLogin() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'login': login,
-          'password': password
-        }),
+      await _authService.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
       );
 
-      if (response.statusCode == 200) {
-        Fluttertoast.showToast(msg: "Login successful! Welcome back.",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } else if (response.statusCode == 401) {
-        Fluttertoast.showToast(msg: "Invalid email/phone or password. Please try again.",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } else if (response.statusCode >= 500) {
-        Fluttertoast.showToast(msg: "Server error. Please try again later.",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } else {
-        Fluttertoast.showToast(msg: "Login failed. Please check your connection and try again.",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      }
-    } catch (e) {
-      Fluttertoast.showToast(msg: "Network error. Please check your internet connection.",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    }
-  }
-
-  void _performLogin() {
-    if (_formKey.currentState?.saveAndValidate() ?? false) {
-      final formData = _formKey.currentState!.value;
-      final login = formData['login'] as String;
-      final password = formData['password'] as String;
-      postData(login, password);
-    }
-  }
-
-  Future<void> _signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        // User canceled the sign-in
-        return;
-      }
-      // Here, you can send the idToken or accessToken to your backend for verification
-      // For now, we'll assume the backend can handle OAuth, or use the email to login
-      // Since the API requires login and password, perhaps call postData with email and a special password
-      // But for demo, just show success
-      Fluttertoast.showToast(msg: "Logged in with Google! Welcome, ${googleUser.displayName}.",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: "Login successful! Welcome back.",
           backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0);
-      // Optionally, navigate to home or call API
-      // postData(googleUser.email, 'oauth'); // if backend supports
-    } catch (e) {
-      Fluttertoast.showToast(msg: "Google sign-in failed. Please try again.",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+        );
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } on ApiError catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        Fluttertoast.showToast(msg: e.message, backgroundColor: Colors.red);
+      }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // 🔹 Top left splash
+          // Top left splash
           Positioned(
             top: -80,
             left: -80,
@@ -119,12 +73,12 @@ class _LoginScreen extends State<LoginScreen> {
               width: 200,
               height: 200,
               decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.3),
+                color: AppTheme.primaryGreen.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(150),
               ),
             ),
           ),
-          // 🔹 Bottom right splash
+          // Bottom right splash
           Positioned(
             bottom: -100,
             right: -100,
@@ -132,40 +86,40 @@ class _LoginScreen extends State<LoginScreen> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.2),
+                color: AppTheme.primaryGreen.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(200),
               ),
             ),
           ),
-          // 🔹 Login form
+          // Login form
           Center(
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: FormBuilder(
+                child: Form(
                   key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // 🔹 Heading
+                      // Heading
                       Text(
                         "Welcome Back!",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green[700],
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.darkGreen,
+                            ),
                       ),
                       const SizedBox(height: 20),
-                      // 🔹 Image with rounded corners & shadow
+                      // Image
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.green.withValues(alpha: 0.2),
+                              color: AppTheme.primaryGreen.withOpacity(0.2),
                               blurRadius: 20,
-                              offset: Offset(0, 10),
+                              offset: const Offset(0, 10),
                             ),
                           ],
                         ),
@@ -176,19 +130,32 @@ class _LoginScreen extends State<LoginScreen> {
                             width: 400,
                             height: 250,
                             fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              width: 400,
+                              height: 250,
+                              color: Colors.grey[200],
+                              child: const Icon(
+                                Icons.image,
+                                size: 64,
+                                color: Colors.grey,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 30),
-                      // 🔹 Email field
+                      // Email field
                       SizedBox(
                         width: 400,
-                        child: FormBuilderTextField(
-                          name: 'login',
+                        child: TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            hintText: "Email or phone",
-                            prefixIcon:
-                            const Icon(Icons.people_outlined, color: Colors.grey),
+                            hintText: "Email",
+                            prefixIcon: const Icon(
+                              Icons.email_outlined,
+                              color: Colors.grey,
+                            ),
                             filled: true,
                             fillColor: Colors.grey[100],
                             border: OutlineInputBorder(
@@ -198,23 +165,41 @@ class _LoginScreen extends State<LoginScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'This field is required';
+                              return 'Email is required';
+                            }
+                            if (!value.contains('@')) {
+                              return 'Please enter a valid email';
                             }
                             return null;
                           },
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // 🔹 Password field
+                      // Password field
                       SizedBox(
                         width: 400,
-                        child: FormBuilderTextField(
-                          name: 'password',
-                          obscureText: true,
+                        child: TextFormField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             hintText: "Password",
-                            prefixIcon:
-                            const Icon(Icons.lock_outlined, color: Colors.grey),
+                            prefixIcon: const Icon(
+                              Icons.lock_outlined,
+                              color: Colors.grey,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
                             filled: true,
                             fillColor: Colors.grey[100],
                             border: OutlineInputBorder(
@@ -224,75 +209,51 @@ class _LoginScreen extends State<LoginScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'This field is required';
+                              return 'Password is required';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters';
                             }
                             return null;
                           },
                         ),
                       ),
                       const SizedBox(height: 40),
-                      // 🔹 Sign in button
+                      // Sign in button
                       SizedBox(
                         width: 300,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: _performLogin,
+                          onPressed: _isLoading ? null : _performLogin,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
+                            backgroundColor: AppTheme.primaryGreen,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             elevation: 5,
                           ),
-                          child: const Text(
-                            "Sign In",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // 🔹 Divider
-                      Row(
-                        children: [
-                          Expanded(child: Divider(color: Colors.grey[400])),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text("or", style: TextStyle(color: Colors.grey[600])),
-                          ),
-                          Expanded(child: Divider(color: Colors.grey[400])),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      // 🔹 Google Sign-In button
-                      SizedBox(
-                        width: 300,
-                        height: 50,
-                        child: OutlinedButton(
-                          onPressed: _signInWithGoogle,
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.grey[300]!),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "G",
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue),
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                "Sign in with Google",
-                                style: TextStyle(fontSize: 16, color: Colors.black),
-                              ),
-                            ],
-                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : const Text(
+                                  "Sign In",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 15),
-                      // 🔹 Register link
+                      // Register link
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -307,7 +268,7 @@ class _LoginScreen extends State<LoginScreen> {
                               "Create one",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.green,
+                                color: AppTheme.primaryGreen,
                               ),
                             ),
                           ),

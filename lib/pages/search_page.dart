@@ -17,8 +17,20 @@ class _SearchPageState extends State<SearchPage> {
   String selectedSort = 'Relevant';
   late List<Product> filteredProducts;
 
-  final List<String> categories = ['All', 'Tools & Equipment', 'Sports & Outdoors', 'Electronics', 'Home & Garden'];
-  final List<String> sortOptions = ['Relevant', 'Newest', 'Price: Low to High', 'Price: High to Low', 'Most Popular'];
+  final List<String> categories = [
+    'All',
+    'Tools & Equipment',
+    'Sports & Outdoors',
+    'Electronics',
+    'Home & Garden',
+  ];
+  final List<String> sortOptions = [
+    'Relevant',
+    'Newest',
+    'Price: Low to High',
+    'Price: High to Low',
+    'Most Popular',
+  ];
 
   @override
   void initState() {
@@ -30,9 +42,15 @@ class _SearchPageState extends State<SearchPage> {
   void filterProducts() {
     setState(() {
       filteredProducts = mockProducts.where((product) {
-        bool matchesSearch = product.title.toLowerCase().contains(searchController.text.toLowerCase()) ||
-            product.description.toLowerCase().contains(searchController.text.toLowerCase());
-        bool matchesCategory = selectedCategory == 'All' || product.category == selectedCategory;
+        bool matchesSearch =
+            product.title.toLowerCase().contains(
+              searchController.text.toLowerCase(),
+            ) ||
+            product.description.toLowerCase().contains(
+              searchController.text.toLowerCase(),
+            );
+        bool matchesCategory =
+            selectedCategory == 'All' || product.category == selectedCategory;
         return matchesSearch && matchesCategory;
       }).toList();
 
@@ -59,7 +77,10 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Search',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -79,7 +100,10 @@ class _SearchPageState extends State<SearchPage> {
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide(color: Colors.grey[300]!),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
@@ -118,7 +142,14 @@ class _SearchPageState extends State<SearchPage> {
                       }
                     },
                     items: sortOptions.map((sort) {
-                      return DropdownMenuItem(value: sort, child: Text(sort, maxLines: 1, overflow: TextOverflow.ellipsis));
+                      return DropdownMenuItem(
+                        value: sort,
+                        child: Text(
+                          sort,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
                     }).toList(),
                   ),
                 ),
@@ -135,17 +166,28 @@ class _SearchPageState extends State<SearchPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.search_off, size: 64, color: Colors.grey[300]),
+                        Icon(
+                          Icons.search_off,
+                          size: 64,
+                          color: Colors.grey[300],
+                        ),
                         SizedBox(height: 16),
                         Text(
                           'No items found',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
                   )
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: Wrap(
                       spacing: 16,
                       runSpacing: 16,
@@ -155,12 +197,19 @@ class _SearchPageState extends State<SearchPage> {
                           onViewDetails: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => ProductDetailsPage(product: product)),
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ProductDetailsPage(product: product),
+                              ),
                             );
                           },
                           onRent: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('${product.title} added to cart!')),
+                              SnackBar(
+                                content: Text(
+                                  '${product.title} added to cart!',
+                                ),
+                              ),
                             );
                           },
                           onFavoriteChanged: (isFav) {

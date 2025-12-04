@@ -47,7 +47,10 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.chat.user.name, style: TextStyle(color: Colors.black)),
+        title: Text(
+          widget.chat.user.name,
+          style: TextStyle(color: Colors.black),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -66,14 +69,21 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Align(
-                    alignment: msg.isOwn ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: msg.isOwn
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                     child: Container(
-                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.7,
+                      ),
                       decoration: BoxDecoration(
                         color: msg.isOwn ? Color(0xFF4CAF50) : Colors.grey[200],
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       child: Text(
                         msg.text,
                         style: TextStyle(
@@ -104,7 +114,10 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
                         borderRadius: BorderRadius.circular(24),
                         borderSide: BorderSide(color: Colors.grey[300]!),
                       ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
                   ),
                 ),

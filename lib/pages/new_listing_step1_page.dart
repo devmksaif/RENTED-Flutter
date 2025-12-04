@@ -16,7 +16,13 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
   late TextEditingController descriptionController;
   late TextEditingController priceController;
 
-  final List<String> categories = ['Electronics', 'Tools & Equipment', 'Sports & Outdoors', 'Home & Garden', 'Other'];
+  final List<String> categories = [
+    'Electronics',
+    'Tools & Equipment',
+    'Sports & Outdoors',
+    'Home & Garden',
+    'Other',
+  ];
   final List<String> conditions = ['Like New', 'Good', 'Fair', 'For Parts'];
   final List<String> priceTypes = ['per day', 'per week', 'per month'];
 
@@ -24,8 +30,12 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
   void initState() {
     super.initState();
     titleController = TextEditingController(text: widget.listing.title);
-    descriptionController = TextEditingController(text: widget.listing.description);
-    priceController = TextEditingController(text: widget.listing.price > 0 ? '${widget.listing.price}' : '');
+    descriptionController = TextEditingController(
+      text: widget.listing.description,
+    );
+    priceController = TextEditingController(
+      text: widget.listing.price > 0 ? '${widget.listing.price}' : '',
+    );
   }
 
   @override
@@ -37,10 +47,12 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
   }
 
   void saveAndNext() {
-    if (titleController.text.isEmpty || descriptionController.text.isEmpty || priceController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill all fields')),
-      );
+    if (titleController.text.isEmpty ||
+        descriptionController.text.isEmpty ||
+        priceController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Please fill all fields')));
       return;
     }
 
@@ -50,7 +62,9 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => NewListingStep2Page(listing: widget.listing)),
+      MaterialPageRoute(
+        builder: (context) => NewListingStep2Page(listing: widget.listing),
+      ),
     );
   }
 
@@ -58,7 +72,10 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('New Listing', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          'New Listing',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -85,23 +102,36 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
             SizedBox(height: 32),
 
             // Title
-            Text('Title', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            Text(
+              'Title',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
             SizedBox(height: 8),
             TextField(
               controller: titleController,
               decoration: InputDecoration(
                 hintText: 'What are you renting?',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
               ),
             ),
             SizedBox(height: 20),
 
             // Category
-            Text('Category', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            Text(
+              'Category',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
             SizedBox(height: 8),
             DropdownButtonFormField(
-              value: widget.listing.category.isEmpty ? categories[0] : widget.listing.category,
+              value: widget.listing.category.isEmpty
+                  ? categories[0]
+                  : widget.listing.category,
               onChanged: (value) {
                 setState(() => widget.listing.category = value ?? '');
               },
@@ -109,22 +139,35 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
                 return DropdownMenuItem(value: cat, child: Text(cat));
               }).toList(),
               decoration: InputDecoration(
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
               ),
             ),
             SizedBox(height: 20),
 
             // Description
-            Text('Description', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            Text(
+              'Description',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
             SizedBox(height: 8),
             TextField(
               controller: descriptionController,
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: 'Describe the condition and features...',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
               ),
             ),
             SizedBox(height: 20),
@@ -137,15 +180,26 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Price', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text(
+                        'Price',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       SizedBox(height: 8),
                       TextField(
                         controller: priceController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           prefixText: '\$ ',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
                         ),
                       ),
                     ],
@@ -157,19 +211,35 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Duration', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text(
+                        'Duration',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       SizedBox(height: 8),
                       DropdownButtonFormField(
                         value: widget.listing.priceType,
                         onChanged: (value) {
-                          setState(() => widget.listing.priceType = value ?? 'per day');
+                          setState(
+                            () => widget.listing.priceType = value ?? 'per day',
+                          );
                         },
                         items: priceTypes.map((type) {
-                          return DropdownMenuItem(value: type, child: Text(type, maxLines: 1));
+                          return DropdownMenuItem(
+                            value: type,
+                            child: Text(type, maxLines: 1),
+                          );
                         }).toList(),
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 12,
+                          ),
                         ),
                       ),
                     ],
@@ -180,7 +250,10 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
             SizedBox(height: 20),
 
             // Condition
-            Text('Condition', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            Text(
+              'Condition',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
             SizedBox(height: 8),
             DropdownButtonFormField(
               value: widget.listing.condition,
@@ -191,8 +264,13 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
                 return DropdownMenuItem(value: cond, child: Text(cond));
               }).toList(),
               decoration: InputDecoration(
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
               ),
             ),
             SizedBox(height: 32),
@@ -205,11 +283,16 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
                   backgroundColor: Color(0xFF4CAF50),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 0,
                 ),
                 onPressed: saveAndNext,
-                child: Text('Next: Photos & Location', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                child: Text(
+                  'Next: Photos & Location',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
           ],
@@ -252,7 +335,10 @@ class _ProgressStep extends StatelessWidget {
           ),
         ),
         SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+        ),
       ],
     );
   }

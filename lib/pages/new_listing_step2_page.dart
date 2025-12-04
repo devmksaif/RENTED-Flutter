@@ -41,9 +41,9 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
 
   void saveAndNext() {
     if (locationController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter location')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Please enter location')));
       return;
     }
 
@@ -51,7 +51,9 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => NewListingStep3Page(listing: widget.listing)),
+      MaterialPageRoute(
+        builder: (context) => NewListingStep3Page(listing: widget.listing),
+      ),
     );
   }
 
@@ -59,7 +61,10 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('New Listing', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          'New Listing',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -86,7 +91,10 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
             SizedBox(height: 32),
 
             // Photos Section
-            Text('Photos', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(
+              'Photos',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 16),
 
             if (widget.listing.images.isEmpty)
@@ -101,7 +109,11 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.image_not_supported, size: 48, color: Colors.grey),
+                    Icon(
+                      Icons.image_not_supported,
+                      size: 48,
+                      color: Colors.grey,
+                    ),
                     SizedBox(height: 8),
                     Text('No photos yet', style: TextStyle(color: Colors.grey)),
                   ],
@@ -111,14 +123,21 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
               GridView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
                 itemCount: widget.listing.images.length,
                 itemBuilder: (context, index) {
                   return Stack(
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(widget.listing.images[index], fit: BoxFit.cover),
+                        child: Image.asset(
+                          widget.listing.images[index],
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       Positioned(
                         top: 4,
@@ -131,7 +150,11 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
                               shape: BoxShape.circle,
                             ),
                             padding: EdgeInsets.all(4),
-                            child: Icon(Icons.close, color: Colors.white, size: 16),
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 16,
+                            ),
                           ),
                         ),
                       ),
@@ -163,15 +186,23 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
             SizedBox(height: 32),
 
             // Location Section
-            Text('Location', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(
+              'Location',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 16),
             TextField(
               controller: locationController,
               decoration: InputDecoration(
                 hintText: 'Enter location',
                 prefixIcon: Icon(Icons.location_on, color: Color(0xFF4CAF50)),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
               ),
             ),
 
@@ -207,11 +238,19 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
                       backgroundColor: Colors.grey[200],
                       foregroundColor: Colors.black,
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       elevation: 0,
                     ),
                     onPressed: () => Navigator.pop(context),
-                    child: Text('Back', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text(
+                      'Back',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(width: 12),
@@ -221,11 +260,19 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
                       backgroundColor: Color(0xFF4CAF50),
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       elevation: 0,
                     ),
                     onPressed: saveAndNext,
-                    child: Text('Review', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text(
+                      'Review',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -270,7 +317,10 @@ class _ProgressStep extends StatelessWidget {
           ),
         ),
         SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+        ),
       ],
     );
   }

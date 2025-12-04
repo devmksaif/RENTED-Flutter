@@ -9,7 +9,10 @@ class ChatListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chats', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Chats',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -65,7 +68,9 @@ class ChatListPage extends StatelessWidget {
                           chat.user.name,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: chat.unread ? FontWeight.w700 : FontWeight.w600,
+                            fontWeight: chat.unread
+                                ? FontWeight.w700
+                                : FontWeight.w600,
                           ),
                         ),
                         SizedBox(height: 4),

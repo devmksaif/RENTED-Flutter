@@ -74,7 +74,9 @@ class _ProductCardState extends State<ProductCard> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                      boxShadow: [
+                        BoxShadow(color: Colors.black12, blurRadius: 4),
+                      ],
                     ),
                     padding: EdgeInsets.all(6),
                     child: Icon(
@@ -97,7 +99,11 @@ class _ProductCardState extends State<ProductCard> {
           const SizedBox(height: 4),
           Text(
             '\$${widget.product.price.toStringAsFixed(2)}',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF4CAF50)),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF4CAF50),
+            ),
           ),
           const SizedBox(height: 4),
           Container(
@@ -118,14 +124,19 @@ class _ProductCardState extends State<ProductCard> {
                 children: List.generate(
                   5,
                   (index) => Icon(
-                    index < widget.product.rating.toInt() ? Icons.star : Icons.star_border,
+                    index < widget.product.rating.toInt()
+                        ? Icons.star
+                        : Icons.star_border,
                     color: Color(0xFF4CAF50),
                     size: 14,
                   ),
                 ),
               ),
               const SizedBox(width: 2),
-              Text('(${widget.product.reviews})', style: TextStyle(fontSize: 10, color: Colors.grey)),
+              Text(
+                '(${widget.product.reviews})',
+                style: TextStyle(fontSize: 10, color: Colors.grey),
+              ),
             ],
           ),
           const SizedBox(height: 6),
@@ -157,7 +168,9 @@ class _ProductCardState extends State<ProductCard> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF4CAF50),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     minimumSize: Size(0, 28),
                     elevation: 0,
@@ -172,7 +185,9 @@ class _ProductCardState extends State<ProductCard> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF4CAF50),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     minimumSize: Size(0, 28),
                     elevation: 0,

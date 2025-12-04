@@ -48,7 +48,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
+                    boxShadow: [
+                      BoxShadow(color: Colors.black12, blurRadius: 6),
+                    ],
                   ),
                   child: IconButton(
                     icon: Icon(Icons.arrow_back, color: Colors.black),
@@ -79,7 +81,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               children: [
                                 Text(
                                   product.title,
-                                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 SizedBox(height: 8),
                                 Text(
@@ -101,27 +106,42 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       Row(
                         children: [
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Color(0xFFE8F5E9),
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Color(0xFF4CAF50), width: 1),
+                              border: Border.all(
+                                color: Color(0xFF4CAF50),
+                                width: 1,
+                              ),
                             ),
                             child: Text(
                               product.category,
-                              style: TextStyle(color: Color(0xFF4CAF50), fontWeight: FontWeight.w500),
+                              style: TextStyle(
+                                color: Color(0xFF4CAF50),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                           SizedBox(width: 8),
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Color(0xFFFFF9C4),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               product.condition,
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ],
@@ -135,7 +155,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             children: List.generate(
                               5,
                               (index) => Icon(
-                                index < product.rating.toInt() ? Icons.star : Icons.star_border,
+                                index < product.rating.toInt()
+                                    ? Icons.star
+                                    : Icons.star_border,
                                 color: Color(0xFF4CAF50),
                                 size: 18,
                               ),
@@ -144,7 +166,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           SizedBox(width: 8),
                           Text(
                             '${product.rating} (${product.reviews} reviews)',
-                            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                            ),
                           ),
                         ],
                       ),
@@ -155,7 +180,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         children: [
                           Icon(Icons.location_on, color: Color(0xFF4CAF50)),
                           SizedBox(width: 8),
-                          Text(product.location, style: TextStyle(fontSize: 14)),
+                          Text(
+                            product.location,
+                            style: TextStyle(fontSize: 14),
+                          ),
                         ],
                       ),
                       SizedBox(height: 24),
@@ -163,16 +191,27 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       // Description
                       Text(
                         'Description',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       SizedBox(height: 8),
                       GestureDetector(
-                        onTap: () => setState(() => showFullDescription = !showFullDescription),
+                        onTap: () => setState(
+                          () => showFullDescription = !showFullDescription,
+                        ),
                         child: Text(
                           product.description,
-                          style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.6),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                            height: 1.6,
+                          ),
                           maxLines: showFullDescription ? null : 3,
-                          overflow: showFullDescription ? TextOverflow.visible : TextOverflow.ellipsis,
+                          overflow: showFullDescription
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
                         ),
                       ),
                       if (product.description.length > 100)
@@ -180,7 +219,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
                             showFullDescription ? 'Show less' : 'Show more',
-                            style: TextStyle(color: Color(0xFF4CAF50), fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              color: Color(0xFF4CAF50),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       SizedBox(height: 32),
@@ -188,7 +230,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       // Owner Card
                       Text(
                         'Rental Owner',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       SizedBox(height: 12),
                       Container(
@@ -196,7 +241,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: Colors.grey[200]!),
-                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 4)],
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              blurRadius: 4,
+                            ),
+                          ],
                         ),
                         padding: EdgeInsets.all(16),
                         child: Column(
@@ -205,32 +255,48 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               children: [
                                 CircleAvatar(
                                   radius: 32,
-                                  backgroundImage: AssetImage(product.owner.avatar),
+                                  backgroundImage: AssetImage(
+                                    product.owner.avatar,
+                                  ),
                                 ),
                                 SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         product.owner.name,
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       SizedBox(height: 4),
                                       Row(
                                         children: [
-                                          Icon(Icons.star, color: Color(0xFF4CAF50), size: 16),
+                                          Icon(
+                                            Icons.star,
+                                            color: Color(0xFF4CAF50),
+                                            size: 16,
+                                          ),
                                           SizedBox(width: 4),
                                           Text(
                                             '${product.owner.rating} rating',
-                                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
                                           ),
                                         ],
                                       ),
                                       SizedBox(height: 4),
                                       Text(
                                         product.owner.location,
-                                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -240,7 +306,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             SizedBox(height: 16),
                             Text(
                               product.owner.bio,
-                              style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                              ),
                             ),
                             SizedBox(height: 16),
                             Row(
@@ -250,13 +319,23 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Color(0xFF4CAF50),
                                       foregroundColor: Colors.white,
-                                      padding: EdgeInsets.symmetric(vertical: 10),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                       elevation: 0,
                                     ),
                                     onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Calling ${product.owner.name}...')),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Calling ${product.owner.name}...',
+                                          ),
+                                        ),
                                       );
                                     },
                                     icon: Icon(Icons.phone, size: 18),
@@ -269,13 +348,23 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Color(0xFF4CAF50),
                                       foregroundColor: Colors.white,
-                                      padding: EdgeInsets.symmetric(vertical: 10),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                       elevation: 0,
                                     ),
                                     onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Opening chat with ${product.owner.name}...')),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Opening chat with ${product.owner.name}...',
+                                          ),
+                                        ),
                                       );
                                     },
                                     icon: Icon(Icons.chat_bubble, size: 18),
@@ -302,7 +391,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, -2),
+                  ),
+                ],
               ),
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
@@ -313,7 +408,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         backgroundColor: Color(0xFF4CAF50),
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 0,
                       ),
                       onPressed: () {
@@ -321,7 +418,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           SnackBar(content: Text('Added to rental cart!')),
                         );
                       },
-                      child: Text('Rent Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      child: Text(
+                        'Rent Now',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(width: 12),

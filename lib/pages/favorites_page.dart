@@ -31,7 +31,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorites', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Favorites',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -41,11 +44,19 @@ class _FavoritesPageState extends State<FavoritesPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.favorite_border, size: 64, color: Colors.grey[300]),
+                  Icon(
+                    Icons.favorite_border,
+                    size: 64,
+                    color: Colors.grey[300],
+                  ),
                   SizedBox(height: 16),
                   Text(
                     'No favorites yet',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                    ),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -67,12 +78,17 @@ class _FavoritesPageState extends State<FavoritesPage> {
                     onViewDetails: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ProductDetailsPage(product: product)),
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ProductDetailsPage(product: product),
+                        ),
                       );
                     },
                     onRent: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${product.title} added to cart!')),
+                        SnackBar(
+                          content: Text('${product.title} added to cart!'),
+                        ),
                       );
                     },
                     onFavoriteChanged: (isFav) {

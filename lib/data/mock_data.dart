@@ -58,7 +58,8 @@ List<Product> mockProducts = [
     location: 'Tunis',
     rating: 4.8,
     reviews: 24,
-    description: 'Heavy-duty cordless drill. Perfect for construction, carpentry, and DIY projects. Includes battery and charger.',
+    description:
+        'Heavy-duty cordless drill. Perfect for construction, carpentry, and DIY projects. Includes battery and charger.',
     condition: 'Like New',
     owner: mockUser1,
   ),
@@ -71,7 +72,8 @@ List<Product> mockProducts = [
     location: 'Tunis',
     rating: 4.6,
     reviews: 18,
-    description: 'Trek mountain bike, 21-speed. Great condition. Perfect for trails and roads.',
+    description:
+        'Trek mountain bike, 21-speed. Great condition. Perfect for trails and roads.',
     condition: 'Good',
     owner: mockUser2,
   ),
@@ -84,7 +86,8 @@ List<Product> mockProducts = [
     location: 'Sfax',
     rating: 4.9,
     reviews: 45,
-    description: 'Canon EOS 80D DSLR camera with lenses. Professional quality photos and videos.',
+    description:
+        'Canon EOS 80D DSLR camera with lenses. Professional quality photos and videos.',
     condition: 'Like New',
     owner: mockUser3,
   ),
@@ -97,7 +100,8 @@ List<Product> mockProducts = [
     location: 'Ariana',
     rating: 4.5,
     reviews: 12,
-    description: 'Contemporary gray sofa. Comfortable and spacious. Perfect for living rooms.',
+    description:
+        'Contemporary gray sofa. Comfortable and spacious. Perfect for living rooms.',
     condition: 'Like New',
     owner: mockUser1,
   ),
@@ -110,7 +114,8 @@ List<Product> mockProducts = [
     location: 'Tunis',
     rating: 4.7,
     reviews: 15,
-    description: 'Ergonomic aluminum laptop stand. Adjustable height. Great for office setup.',
+    description:
+        'Ergonomic aluminum laptop stand. Adjustable height. Great for office setup.',
     condition: 'Like New',
     owner: mockUser2,
   ),
@@ -123,7 +128,8 @@ List<Product> mockProducts = [
     location: 'Sfax',
     rating: 4.4,
     reviews: 22,
-    description: '4-person camping tent. Waterproof and easy to setup. Perfect for outdoor adventures.',
+    description:
+        '4-person camping tent. Waterproof and easy to setup. Perfect for outdoor adventures.',
     condition: 'Good',
     owner: mockUser3,
   ),
@@ -136,7 +142,8 @@ List<Product> mockProducts = [
     location: 'Ariana',
     rating: 4.6,
     reviews: 28,
-    description: 'High-back gaming chair with lumbar support. Comfortable for long hours.',
+    description:
+        'High-back gaming chair with lumbar support. Comfortable for long hours.',
     condition: 'Like New',
     owner: mockUser1,
   ),
@@ -149,7 +156,8 @@ List<Product> mockProducts = [
     location: 'Tunis',
     rating: 4.8,
     reviews: 52,
-    description: 'Premium noise-cancelling wireless headphones. 30-hour battery life.',
+    description:
+        'Premium noise-cancelling wireless headphones. 30-hour battery life.',
     condition: 'Like New',
     owner: mockUser2,
   ),
@@ -175,7 +183,8 @@ List<Product> mockProducts = [
     location: 'Ariana',
     rating: 4.7,
     reviews: 33,
-    description: 'Programmable coffee maker. 12-cup capacity. Auto-shutoff feature.',
+    description:
+        'Programmable coffee maker. 12-cup capacity. Auto-shutoff feature.',
     condition: 'Good',
     owner: mockUser1,
   ),
@@ -190,9 +199,24 @@ List<Chat> mockChats = [
     time: DateTime.now().subtract(Duration(minutes: 5)),
     unread: true,
     messages: [
-      ChatMessage(id: '1', text: 'Hi, is the drill still available?', time: DateTime.now().subtract(Duration(minutes: 30)), isOwn: false),
-      ChatMessage(id: '2', text: 'Yes, it is! Interested?', time: DateTime.now().subtract(Duration(minutes: 25)), isOwn: true),
-      ChatMessage(id: '3', text: 'Can you deliver tomorrow?', time: DateTime.now().subtract(Duration(minutes: 5)), isOwn: false),
+      ChatMessage(
+        id: '1',
+        text: 'Hi, is the drill still available?',
+        time: DateTime.now().subtract(Duration(minutes: 30)),
+        isOwn: false,
+      ),
+      ChatMessage(
+        id: '2',
+        text: 'Yes, it is! Interested?',
+        time: DateTime.now().subtract(Duration(minutes: 25)),
+        isOwn: true,
+      ),
+      ChatMessage(
+        id: '3',
+        text: 'Can you deliver tomorrow?',
+        time: DateTime.now().subtract(Duration(minutes: 5)),
+        isOwn: false,
+      ),
     ],
   ),
   Chat(
@@ -202,8 +226,18 @@ List<Chat> mockChats = [
     time: DateTime.now().subtract(Duration(hours: 2)),
     unread: false,
     messages: [
-      ChatMessage(id: '1', text: 'The bike arrived in perfect condition', time: DateTime.now().subtract(Duration(hours: 3)), isOwn: false),
-      ChatMessage(id: '2', text: 'Great! Enjoy riding!', time: DateTime.now().subtract(Duration(hours: 2)), isOwn: true),
+      ChatMessage(
+        id: '1',
+        text: 'The bike arrived in perfect condition',
+        time: DateTime.now().subtract(Duration(hours: 3)),
+        isOwn: false,
+      ),
+      ChatMessage(
+        id: '2',
+        text: 'Great! Enjoy riding!',
+        time: DateTime.now().subtract(Duration(hours: 2)),
+        isOwn: true,
+      ),
     ],
   ),
 ];

@@ -84,7 +84,9 @@ class _ImageCarouselState extends State<ImageCarousel> {
                 height: 8,
                 margin: EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
-                  color: _currentPage == index ? Color(0xFF4CAF50) : Colors.white70,
+                  color: _currentPage == index
+                      ? Color(0xFF4CAF50)
+                      : Colors.white70,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
