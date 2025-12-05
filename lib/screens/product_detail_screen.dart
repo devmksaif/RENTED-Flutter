@@ -343,13 +343,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
     }
 
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: theme.brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -365,11 +368,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => _contactOwner(),
-                  icon: const Icon(Icons.chat_bubble_outline),
-                  label: const Text('Contact Owner'),
+                  icon: Icon(Icons.chat_bubble_outline),
+                  label: Text('Contact Owner'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: const BorderSide(color: AppTheme.primaryGreen),
+                    side: BorderSide(color: AppTheme.primaryGreen),
+                    foregroundColor: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
               ),

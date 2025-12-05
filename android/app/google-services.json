@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "800134630980",
+    "project_id": "rented-73580",
+    "storage_bucket": "rented-73580.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800134630980:android:3c1721e4c54009525fb611",
+        "android_client_info": {
+          "package_name": "com.example.rented"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhHAyLywPr_gEeQdQ2OSP8BxhDAFaCs4M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -332,16 +332,24 @@ class _ProfileScreenState extends State<ProfileScreen>
     Color? textColor,
     Color? iconColor,
   }) {
+    final theme = Theme.of(context);
     return ListTile(
-      leading: Icon(icon, color: iconColor ?? AppTheme.primaryText),
+      leading: Icon(
+        icon,
+        color: iconColor ?? theme.textTheme.bodyLarge?.color,
+      ),
       title: Text(
         title,
         style: TextStyle(
-          color: textColor ?? AppTheme.primaryText,
+          color: textColor ?? theme.textTheme.bodyLarge?.color,
           fontWeight: FontWeight.w500,
         ),
       ),
-      trailing: trailing ?? const Icon(Icons.chevron_right),
+      trailing: trailing ??
+          Icon(
+            Icons.chevron_right,
+            color: theme.hintColor,
+          ),
       onTap: onTap,
     );
   }
