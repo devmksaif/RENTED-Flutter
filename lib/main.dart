@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'config/app_theme.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
@@ -11,9 +12,29 @@ import 'screens/my_rentals_screen.dart';
 import 'screens/my_purchases_screen.dart';
 import 'screens/verification_screen.dart';
 import 'screens/favorites_screen.dart';
+import 'screens/edit_profile_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/help_screen.dart';
+import 'screens/notifications_screen.dart';
+import 'screens/splash_screen.dart';
+import 'screens/rentals_screen.dart';
+import 'screens/rental_detail_screen.dart';
+import 'screens/forgot_password_screen.dart';
+import 'screens/reset_password_screen.dart';
+import 'screens/conversations_screen.dart';
+import 'screens/chat_screen.dart';
+import 'screens/disputes_screen.dart';
+import 'screens/dispute_detail_screen.dart';
+import 'screens/my_reviews_screen.dart';
+import 'providers/product_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => ProductProvider())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -25,8 +46,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'RENTED',
       theme: AppTheme.lightTheme,
-      initialRoute: '/login',
+      initialRoute: '/',
       routes: {
+        '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const MainNavigation(),
@@ -37,6 +59,15 @@ class MyApp extends StatelessWidget {
         '/my-purchases': (context) => const MyPurchasesScreen(),
         '/verification': (context) => const VerificationScreen(),
         '/favorites': (context) => const FavoritesScreen(),
+        '/edit-profile': (context) => const EditProfileScreen(),
+        '/settings': (context) => const SettingsScreen(),
+        '/help': (context) => const HelpScreen(),
+        '/notifications': (context) => const NotificationsScreen(),
+        '/rentals': (context) => const RentalsScreen(),
+        '/forgot-password': (context) => const ForgotPasswordScreen(),
+        '/conversations': (context) => const ConversationsScreen(),
+        '/disputes': (context) => const DisputesScreen(),
+        '/my-reviews': (context) => const MyReviewsScreen(),
       },
       onGenerateRoute: (settings) {
         // Handle product detail route with arguments
@@ -44,6 +75,37 @@ class MyApp extends StatelessWidget {
           final productId = settings.arguments as int;
           return MaterialPageRoute(
             builder: (context) => ProductDetailScreen(productId: productId),
+          );
+        }
+        // Handle rental detail route with arguments
+        if (settings.name == '/rental-detail') {
+          final rentalId = settings.arguments as int;
+          return MaterialPageRoute(
+            builder: (context) => RentalDetailScreen(rentalId: rentalId),
+          );
+        }
+        // Handle reset password route with arguments
+        if (settings.name == '/reset-password') {
+          final args = settings.arguments as Map<String, String>;
+          return MaterialPageRoute(
+            builder: (context) => ResetPasswordScreen(
+              email: args['email']!,
+              token: args['token']!,
+            ),
+          );
+        }
+        // Handle chat route with arguments
+        if (settings.name == '/chat') {
+          final conversationId = settings.arguments as int;
+          return MaterialPageRoute(
+            builder: (context) => ChatScreen(conversationId: conversationId),
+          );
+        }
+        // Handle dispute detail route with arguments
+        if (settings.name == '/dispute-detail') {
+          final disputeId = settings.arguments as int;
+          return MaterialPageRoute(
+            builder: (context) => DisputeDetailScreen(disputeId: disputeId),
           );
         }
         return null;

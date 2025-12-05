@@ -179,8 +179,7 @@ Widget _buildInfoCard(
     ),
     child: Row(
       children: [
-        if (icon != null)
-          Container(child: Icon(icon, color: Color(0xFF4CAF50))),
+        if (icon != null) Icon(icon, color: Color(0xFF4CAF50)),
         if (icon != null) const SizedBox(width: 12),
         Expanded(
           child: Text(

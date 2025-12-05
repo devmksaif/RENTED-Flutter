@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'services/auth_service.dart';
+import 'services/session_manager.dart';
 import 'models/api_error.dart';
 import 'config/app_theme.dart';
 
@@ -18,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final AuthService _authService = AuthService();
+  final SessionManager _sessionManager = SessionManager();
 
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -42,12 +44,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      await _authService.register(
+      final authResponse = await _authService.register(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text,
         passwordConfirmation: _confirmPasswordController.text,
       );
+
+      // Update session manager with user data
+      await _sessionManager.updateSession(authResponse.user);
 
       if (mounted) {
         Fluttertoast.showToast(
@@ -80,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               width: 200,
               height: 200,
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.3),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(150),
               ),
             ),
@@ -93,7 +98,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.2),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(200),
               ),
             ),
@@ -124,7 +129,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: AppTheme.primaryGreen.withOpacity(0.2),
+                              color: AppTheme.primaryGreen.withValues(
+                                alpha: 0.2,
+                              ),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),

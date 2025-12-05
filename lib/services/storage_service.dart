@@ -5,17 +5,30 @@ import '../models/user.dart';
 class StorageService {
   static const String _tokenKey = 'auth_token';
   static const String _userKey = 'user_data';
+  static const String _loginTimeKey = 'login_time';
 
   /// Save authentication token
   Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
+    // Save login timestamp
+    await prefs.setInt(_loginTimeKey, DateTime.now().millisecondsSinceEpoch);
   }
 
   /// Get authentication token
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);
+  }
+
+  /// Get login timestamp
+  Future<DateTime?> getLoginTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    final timestamp = prefs.getInt(_loginTimeKey);
+    if (timestamp != null) {
+      return DateTime.fromMillisecondsSinceEpoch(timestamp);
+    }
+    return null;
   }
 
   /// Save user data

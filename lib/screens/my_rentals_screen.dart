@@ -4,6 +4,7 @@ import '../models/rental.dart';
 import '../models/api_error.dart';
 import '../services/rental_service.dart';
 import '../config/app_theme.dart';
+import '../mixins/refresh_on_focus_mixin.dart';
 
 class MyRentalsScreen extends StatefulWidget {
   const MyRentalsScreen({super.key});
@@ -12,7 +13,8 @@ class MyRentalsScreen extends StatefulWidget {
   State<MyRentalsScreen> createState() => _MyRentalsScreenState();
 }
 
-class _MyRentalsScreenState extends State<MyRentalsScreen> {
+class _MyRentalsScreenState extends State<MyRentalsScreen>
+    with WidgetsBindingObserver, RefreshOnFocusMixin {
   final RentalService _rentalService = RentalService();
   List<Rental> _rentals = [];
   bool _isLoading = true;
@@ -21,6 +23,12 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
   void initState() {
     super.initState();
     _loadRentals();
+  }
+
+  @override
+  Future<void> onRefresh() async {
+    // Refresh rentals when screen comes into focus
+    await _loadRentals();
   }
 
   Future<void> _loadRentals() async {
@@ -124,8 +132,8 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
         onTap: () {
           Navigator.pushNamed(
             context,
-            '/product-detail',
-            arguments: rental.product.id,
+            '/rental-detail',
+            arguments: rental.id,
           );
         },
         child: Padding(

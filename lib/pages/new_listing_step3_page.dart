@@ -35,7 +35,12 @@ class NewListingStep3Page extends StatelessWidget {
 
     // Navigate back to home after a delay
     Future.delayed(Duration(seconds: 2), () {
-      Navigator.popUntil(context, (route) => route.isFirst);
+      // Use try-catch to handle potential context issues
+      try {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      } catch (e) {
+        // Context no longer valid, widget disposed
+      }
     });
   }
 
@@ -86,7 +91,7 @@ class NewListingStep3Page extends StatelessWidget {
                 border: Border.all(color: Colors.grey[200]!),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 4,
                   ),
                 ],

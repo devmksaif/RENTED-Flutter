@@ -30,7 +30,7 @@ class ProfilePage extends StatelessWidget {
                   children: [
                     Positioned.fill(
                       child: Container(
-                        color: Color(0xFF4CAF50).withOpacity(0.9),
+                        color: Color(0xFF4CAF50).withValues(alpha: 0.9),
                       ),
                     ),
                     Padding(
@@ -241,7 +241,7 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
                 ],
               ),
             ),

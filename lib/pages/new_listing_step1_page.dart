@@ -129,7 +129,7 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
             ),
             SizedBox(height: 8),
             DropdownButtonFormField(
-              value: widget.listing.category.isEmpty
+              initialValue: widget.listing.category.isEmpty
                   ? categories[0]
                   : widget.listing.category,
               onChanged: (value) {
@@ -220,7 +220,7 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
                       ),
                       SizedBox(height: 8),
                       DropdownButtonFormField(
-                        value: widget.listing.priceType,
+                        initialValue: widget.listing.priceType,
                         onChanged: (value) {
                           setState(
                             () => widget.listing.priceType = value ?? 'per day',
@@ -256,7 +256,7 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
             ),
             SizedBox(height: 8),
             DropdownButtonFormField(
-              value: widget.listing.condition,
+              initialValue: widget.listing.condition,
               onChanged: (value) {
                 setState(() => widget.listing.condition = value ?? 'Like New');
               },

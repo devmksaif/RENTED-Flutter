@@ -243,7 +243,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           border: Border.all(color: Colors.grey[200]!),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
+                              color: Colors.black.withValues(alpha: 0.06),
                               blurRadius: 4,
                             ),
                           ],

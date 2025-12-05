@@ -4,6 +4,7 @@ import '../models/product.dart';
 import '../models/api_error.dart';
 import '../services/product_service.dart';
 import '../config/app_theme.dart';
+import '../mixins/refresh_on_focus_mixin.dart';
 
 class MyProductsScreen extends StatefulWidget {
   const MyProductsScreen({super.key});
@@ -12,7 +13,8 @@ class MyProductsScreen extends StatefulWidget {
   State<MyProductsScreen> createState() => _MyProductsScreenState();
 }
 
-class _MyProductsScreenState extends State<MyProductsScreen> {
+class _MyProductsScreenState extends State<MyProductsScreen>
+    with WidgetsBindingObserver, RefreshOnFocusMixin {
   final ProductService _productService = ProductService();
   List<Product> _products = [];
   bool _isLoading = true;
@@ -21,6 +23,12 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
   void initState() {
     super.initState();
     _loadProducts();
+  }
+
+  @override
+  Future<void> onRefresh() async {
+    // Refresh products when screen comes into focus
+    await _loadProducts();
   }
 
   Future<void> _loadProducts() async {
@@ -90,7 +98,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withOpacity(0.1),
+              color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -145,7 +153,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -284,8 +292,14 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                     _deleteProduct(product);
                   } else if (value == 'toggle') {
                     _toggleAvailability(product);
+                  } else if (value == 'edit') {
+                    // Navigate to edit product screen
+                    Navigator.pushNamed(
+                      context,
+                      '/edit-product',
+                      arguments: product.id,
+                    ).then((_) => _loadProducts());
                   }
-                  // TODO: Handle edit
                 },
               ),
             ],

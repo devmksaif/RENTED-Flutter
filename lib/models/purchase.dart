@@ -7,6 +7,7 @@ class Purchase {
   final User buyer;
   final String purchasePrice;
   final String status; // pending, completed, cancelled
+  final bool? deliveryRequired; // delivery_required from database
   final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -17,6 +18,7 @@ class Purchase {
     required this.buyer,
     required this.purchasePrice,
     required this.status,
+    this.deliveryRequired,
     this.notes,
     required this.createdAt,
     required this.updatedAt,
@@ -29,6 +31,7 @@ class Purchase {
       buyer: User.fromJson(json['buyer']),
       purchasePrice: json['purchase_price'].toString(),
       status: json['status'],
+      deliveryRequired: json['delivery_required'],
       notes: json['notes'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
@@ -42,6 +45,7 @@ class Purchase {
       'buyer': buyer.toJson(),
       'purchase_price': purchasePrice,
       'status': status,
+      'delivery_required': deliveryRequired,
       'notes': notes,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),

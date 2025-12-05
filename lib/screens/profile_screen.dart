@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../config/app_theme.dart';
 import '../models/user.dart';
 import '../models/api_error.dart';
 import '../services/auth_service.dart';
+import '../services/session_manager.dart';
+import '../mixins/refresh_on_focus_mixin.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,8 +13,10 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>
+    with WidgetsBindingObserver, RefreshOnFocusMixin {
   final AuthService _authService = AuthService();
+  final SessionManager _sessionManager = SessionManager();
   User? _user;
   bool _isLoading = true;
 
@@ -21,6 +24,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _loadUser();
+  }
+
+  @override
+  Future<void> onRefresh() async {
+    // Refresh user profile when screen comes into focus
+    await _loadUser();
   }
 
   Future<void> _loadUser() async {
@@ -67,14 +76,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (confirm == true) {
       try {
         await _authService.logout();
+        // Clear session manager
+        await _sessionManager.clearSession();
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/login');
         }
       } catch (e) {
-        Fluttertoast.showToast(
-          msg: 'Logout failed. Please try again.',
-          backgroundColor: Colors.red,
-        );
+        // Even if API logout fails, clear session locally
+        await _sessionManager.clearSession();
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/login');
+        }
       }
     }
   }
@@ -88,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              // TODO: Navigate to edit profile
+              Navigator.pushNamed(context, '/edit-profile');
             },
           ),
         ],
@@ -121,14 +133,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.white,
-                  child: Text(
-                    _user!.name[0].toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.primaryGreen,
-                    ),
-                  ),
+                  backgroundImage: _user!.avatarUrl != null && _user!.avatarUrl!.isNotEmpty
+                      ? NetworkImage(_user!.avatarUrl!)
+                      : null,
+                  child: _user!.avatarUrl == null || _user!.avatarUrl!.isEmpty
+                      ? Text(
+                          _user!.name[0].toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primaryGreen,
+                          ),
+                        )
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -171,11 +188,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: 'Favorites',
             onTap: () => Navigator.pushNamed(context, '/favorites'),
           ),
+          _buildMenuItem(
+            icon: Icons.reviews,
+            title: 'My Reviews',
+            onTap: () => Navigator.pushNamed(context, '/my-reviews'),
+          ),
+          _buildMenuItem(
+            icon: Icons.chat_bubble_outline,
+            title: 'Messages',
+            onTap: () => Navigator.pushNamed(context, '/conversations'),
+          ),
+          _buildMenuItem(
+            icon: Icons.gavel,
+            title: 'Disputes',
+            onTap: () => Navigator.pushNamed(context, '/disputes'),
+          ),
           const Divider(),
           _buildMenuItem(
             icon: Icons.verified_user,
             title: 'Verification Status',
-            onTap: () => Navigator.pushNamed(context, '/verification'),
+            onTap: () async {
+              final result = await Navigator.pushNamed(
+                context,
+                '/verification',
+              );
+              // Reload user data if verification status changed
+              if (result == true && mounted) {
+                _loadUser();
+              }
+            },
             trailing: _user!.isVerified
                 ? const Icon(Icons.check_circle, color: Colors.green)
                 : const Icon(Icons.pending, color: Colors.orange),
@@ -183,16 +224,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildMenuItem(
             icon: Icons.settings,
             title: 'Settings',
-            onTap: () {
-              // TODO: Navigate to settings
-            },
+            onTap: () => Navigator.pushNamed(context, '/settings'),
           ),
           _buildMenuItem(
             icon: Icons.help_outline,
             title: 'Help & Support',
-            onTap: () {
-              // TODO: Navigate to help
-            },
+            onTap: () => Navigator.pushNamed(context, '/help'),
           ),
           const Divider(),
           _buildMenuItem(

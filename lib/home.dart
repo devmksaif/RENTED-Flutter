@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'models/product.dart';
 import 'models/api_error.dart';
 import 'services/product_service.dart';
+import 'services/favorite_service.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -13,8 +14,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final ProductService _productService = ProductService();
+  final FavoriteService _favoriteService = FavoriteService();
   List<Product> _products = [];
+  List<Product> _displayedProducts = [];
   bool _isLoading = true;
+  String? _selectedCategoryFilter;
 
   @override
   void initState() {
@@ -32,6 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (mounted) {
         setState(() {
           _products = products;
+          _displayedProducts = products;
           _isLoading = false;
         });
       }
@@ -73,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: double.infinity,
                           height: double.infinity,
                         ),
-                        Container(color: Colors.green.withOpacity(0.7)),
+                        Container(color: Colors.green.withValues(alpha: 0.7)),
                       ],
                     ),
                   ),
@@ -136,11 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 size: 28,
                               ),
                               onPressed: () {
-                                // TODO: Implement notifications screen
-                                Fluttertoast.showToast(
-                                  msg: 'Notifications coming soon',
-                                  backgroundColor: Colors.blue,
-                                );
+                                Navigator.pushNamed(context, '/notifications');
                               },
                             ),
                             IconButton(
@@ -220,10 +221,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                       elevation: 0,
                                     ),
                                     onPressed: () {
-                                      // TODO: Implement search functionality
-                                      Fluttertoast.showToast(
-                                        msg: 'Search coming soon',
-                                        backgroundColor: Colors.blue,
+                                      // Navigate to search or show search dialog
+                                      showSearch(
+                                        context: context,
+                                        delegate: ProductSearchDelegate(),
                                       );
                                     },
                                     child: Text('Search'),
@@ -244,10 +245,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                _PopularTag(text: 'Cameras'),
-                                _PopularTag(text: 'Bikes'),
-                                _PopularTag(text: 'Tools'),
-                                _PopularTag(text: 'Furniture'),
+                                _PopularTag(
+                                  text: 'Cameras',
+                                  onTap: () => _filterByCategory('Cameras'),
+                                ),
+                                _PopularTag(
+                                  text: 'Bikes',
+                                  onTap: () => _filterByCategory('Bikes'),
+                                ),
+                                _PopularTag(
+                                  text: 'Tools',
+                                  onTap: () => _filterByCategory('Tools'),
+                                ),
+                                _PopularTag(
+                                  text: 'Furniture',
+                                  onTap: () => _filterByCategory('Furniture'),
+                                ),
                               ],
                             ),
                           ],
@@ -274,7 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   )
-                : _products.isEmpty
+                : _displayedProducts.isEmpty
                 ? SliverToBoxAdapter(
                     child: Center(
                       child: Padding(
@@ -295,7 +308,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         spacing: 16,
                         runSpacing: 16,
                         alignment: WrapAlignment.center,
-                        children: _products.map((product) {
+                        children: _displayedProducts.map((product) {
                           return _buildProductCard(product);
                         }).toList(),
                       ),
@@ -315,7 +328,7 @@ class _MyHomePageState extends State<MyHomePage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -396,18 +409,40 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                       const Spacer(),
-                      // TODO: Implement favorites functionality
-                      IconButton(
-                        icon: Icon(
-                          Icons.favorite_border,
-                          color: Colors.grey[400],
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          // TODO: Add to favorites
-                          Fluttertoast.showToast(
-                            msg: 'Favorites coming soon',
-                            backgroundColor: Colors.blue,
+                      FutureBuilder<bool>(
+                        future: _favoritesService.isFavorite(product.id),
+                        builder: (context, snapshot) {
+                          final isFavorite = snapshot.data ?? false;
+                          return IconButton(
+                            icon: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: isFavorite ? Colors.red : Colors.grey[400],
+                              size: 20,
+                            ),
+                            onPressed: () async {
+                              try {
+                                final newFavoriteStatus =
+                                    await _favoriteService.toggleFavorite(
+                                  product.id,
+                                );
+                                setState(() {}); // Refresh UI
+                                Fluttertoast.showToast(
+                                  msg: newFavoriteStatus
+                                      ? 'Added to favorites'
+                                      : 'Removed from favorites',
+                                  backgroundColor: newFavoriteStatus
+                                      ? Colors.green
+                                      : Colors.orange,
+                                );
+                              } catch (e) {
+                                Fluttertoast.showToast(
+                                  msg: 'Failed to update favorite',
+                                  backgroundColor: Colors.red,
+                                );
+                              }
+                            },
                           );
                         },
                       ),
@@ -423,23 +458,236 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+// Product Search Delegate
+class ProductSearchDelegate extends SearchDelegate<String> {
+  final ProductService _productService = ProductService();
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, '');
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return FutureBuilder<List<Product>>(
+      future: _searchProducts(query),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xFF4CAF50)),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                Text(
+                  'Error loading results',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final products = snapshot.data ?? [];
+        final displayedProducts = _selectedCategoryFilter == null
+            ? products
+            : products.where((product) {
+                return product.category.name
+                    .toLowerCase()
+                    .contains(_selectedCategoryFilter!.toLowerCase());
+              }).toList();
+
+        if (displayedProducts.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                Text(
+                  'No results found for "$query"',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: displayedProducts.length,
+          itemBuilder: (context, index) {
+            final product = displayedProducts[index];
+            return Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    color: Colors.grey[200],
+                    child: product.thumbnail.isNotEmpty
+                        ? Image.network(
+                            product.thumbnail,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey[400],
+                            ),
+                          )
+                        : Icon(
+                            Icons.inventory_2_outlined,
+                            color: Colors.grey[400],
+                          ),
+                  ),
+                ),
+                title: Text(
+                  product.title,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  '\$${product.pricePerDay}/day • ${product.category.name}',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/product-detail',
+                    arguments: product.id,
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<List<Product>> _searchProducts(String searchQuery) async {
+    if (searchQuery.isEmpty) return [];
+
+    try {
+      // Get all products and filter by search query
+      final products = await _productService.getProducts(page: 1, perPage: 50);
+      return products
+          .where(
+            (product) =>
+                product.title.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ) ||
+                product.category.name.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ) ||
+                product.description.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ),
+          )
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestions = query.isEmpty
+        ? [
+            'Electronics',
+            'Photography',
+            'Sports Equipment',
+            'Music Instruments',
+          ]
+        : [
+                'Electronics',
+                'Photography',
+                'Sports Equipment',
+                'Music Instruments',
+              ]
+              .where((item) => item.toLowerCase().contains(query.toLowerCase()))
+              .toList();
+
+    return ListView.builder(
+      itemCount: suggestions.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          leading: const Icon(Icons.search),
+          title: Text(suggestions[index]),
+          onTap: () {
+            query = suggestions[index];
+            showResults(context);
+          },
+        );
+      },
+    );
+  }
+}
+
+  void _filterByCategory(String categoryName) {
+    setState(() {
+      if (_selectedCategoryFilter == categoryName) {
+        // If already selected, clear filter
+        _selectedCategoryFilter = null;
+        _displayedProducts = _products;
+      } else {
+        // Filter products by category name
+        _selectedCategoryFilter = categoryName;
+        _displayedProducts = _products.where((product) {
+          return product.category.name
+              .toLowerCase()
+              .contains(categoryName.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+}
+
 class _PopularTag extends StatelessWidget {
   final String text;
-  const _PopularTag({required this.text});
+  final VoidCallback? onTap;
+  const _PopularTag({required this.text, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.5)),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'home_screen.dart';
 import 'favorites_screen.dart';
 import 'my_products_screen.dart';
 import 'profile_screen.dart';
+import 'conversations_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -17,6 +18,7 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const FavoritesScreen(),
+    const ConversationsScreen(),
     const MyProductsScreen(),
     const ProfileScreen(),
   ];
@@ -30,7 +32,7 @@ class _MainNavigationState extends State<MainNavigation> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -42,6 +44,8 @@ class _MainNavigationState extends State<MainNavigation> {
             setState(() {
               _currentIndex = index;
             });
+            // Refresh favorites screen when tab is selected
+            // The RefreshOnFocusMixin will handle the refresh automatically
           },
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
@@ -63,6 +67,11 @@ class _MainNavigationState extends State<MainNavigation> {
               label: 'Favorites',
             ),
             BottomNavigationBarItem(
+              icon: Icon(Icons.chat_bubble_outline),
+              activeIcon: Icon(Icons.chat_bubble),
+              label: 'Messages',
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.inventory_2_outlined),
               activeIcon: Icon(Icons.inventory_2),
               label: 'My Products',
@@ -75,7 +84,7 @@ class _MainNavigationState extends State<MainNavigation> {
           ],
         ),
       ),
-      floatingActionButton: _currentIndex == 2
+      floatingActionButton: _currentIndex == 3
           ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.pushNamed(context, '/add-product');

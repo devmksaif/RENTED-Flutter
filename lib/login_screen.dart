@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'services/auth_service.dart';
+import 'services/session_manager.dart';
+import 'services/social_auth_service.dart';
 import 'models/api_error.dart';
 import 'config/app_theme.dart';
 
@@ -16,9 +18,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
+  final SessionManager _sessionManager = SessionManager();
+  final SocialAuthService _socialAuthService = SocialAuthService();
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _isLoadingGoogle = false;
 
   @override
   void dispose() {
@@ -37,10 +42,13 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await _authService.login(
+      final authResponse = await _authService.login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+
+      // Update session manager with user data
+      await _sessionManager.updateSession(authResponse.user);
 
       if (mounted) {
         Fluttertoast.showToast(
@@ -73,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
               width: 200,
               height: 200,
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.3),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(150),
               ),
             ),
@@ -86,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.2),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(200),
               ),
             ),
@@ -117,7 +125,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: AppTheme.primaryGreen.withOpacity(0.2),
+                              color: AppTheme.primaryGreen.withValues(
+                                alpha: 0.2,
+                              ),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -253,6 +263,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 15),
+                      // Forgot password link
+                      TextButton(
+                        onPressed: () =>
+                            Navigator.pushNamed(context, "/forgot-password"),
+                        child: const Text(
+                          "Forgot Password?",
+                          style: TextStyle(
+                            color: AppTheme.primaryGreen,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       // Register link
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -275,6 +297,55 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
+                      // Divider
+                      Row(
+                        children: [
+                          Expanded(child: Divider(color: Colors.grey[300])),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              'OR',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ),
+                          Expanded(child: Divider(color: Colors.grey[300])),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      // Google Sign In Button
+                      SizedBox(
+                        width: 300,
+                        height: 50,
+                        child: OutlinedButton.icon(
+                          onPressed: _isLoadingGoogle ? null : _signInWithGoogle,
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Colors.grey[300]!),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: _isLoadingGoogle
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : Image.asset(
+                                  'assets/images/google_logo.png',
+                                  width: 20,
+                                  height: 20,
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.g_mobiledata,
+                                    size: 24,
+                                  ),
+                                ),
+                          label: const Text(
+                            'Sign in with Google',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -284,5 +355,39 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoadingGoogle = true;
+    });
+
+    try {
+      // Get Google OAuth URL
+      final authUrl = await _socialAuthService.getGoogleAuthUrl();
+      
+      // In a real app, you would open this URL in a WebView or browser
+      // and handle the callback. For now, we'll show a message.
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: 'Google OAuth URL: $authUrl\nPlease implement WebView to complete OAuth flow',
+          backgroundColor: Colors.blue,
+          toastLength: Toast.LENGTH_LONG,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: 'Failed to initiate Google sign in: ${e.toString()}',
+          backgroundColor: Colors.red,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingGoogle = false;
+        });
+      }
+    }
   }
 }
