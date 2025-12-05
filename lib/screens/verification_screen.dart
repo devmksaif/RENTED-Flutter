@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../utils/responsive_utils.dart';
 import '../services/image_picker_service.dart';
 import '../services/verification_service.dart';
+import '../config/app_theme.dart';
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
@@ -56,19 +57,19 @@ class _VerificationScreenState extends State<VerificationScreen> {
     final responsive = ResponsiveUtils(context);
 
     // Show loading indicator while checking status
+    final theme = Theme.of(context);
     if (_isLoadingStatus) {
       return Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           title: const Text(
             'Account Verification',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          backgroundColor: Colors.white,
           elevation: 0,
           centerTitle: true,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -106,18 +107,18 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   Widget _buildVerifiedScreen(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Account Verification',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -163,7 +164,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     horizontal: 32,
                     vertical: 16,
                   ),
-                  backgroundColor: const Color(0xFF4CAF50),
+                  backgroundColor: AppTheme.primaryGreen,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -182,20 +183,20 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   Widget _buildPendingScreen(BuildContext context) {
+    final theme = Theme.of(context);
     return PopScope(
       canPop: true,
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           title: const Text(
             'Account Verification',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          backgroundColor: Colors.white,
           elevation: 0,
           centerTitle: true,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -273,19 +274,19 @@ class _VerificationScreenState extends State<VerificationScreen> {
     ResponsiveUtils responsive,
   ) {
     final adminNotes = _verificationStatus?['admin_notes'] as String?;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Account Verification',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -363,7 +364,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   horizontal: 32,
                   vertical: 16,
                 ),
-                backgroundColor: const Color(0xFF4CAF50),
+                backgroundColor: AppTheme.primaryGreen,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -381,18 +382,18 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   Widget _buildUploadForm(BuildContext context, ResponsiveUtils responsive) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Account Verification',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -512,7 +513,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
               const SizedBox(height: 16),
               // Document type selector
               Card(
-                color: Colors.white,
+                color: theme.cardColor,
                 elevation: 2,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -520,7 +521,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 child: ListTile(
                   leading: const Icon(
                     Icons.document_scanner,
-                    color: Color(0xFF4CAF50),
+                    color: AppTheme.primaryGreen,
                   ),
                   title: const Text('Document Type'),
                   subtitle: Text(
@@ -593,7 +594,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   onPressed: _isLoading ? null : _submitVerification,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: const Color(0xFF4CAF50),
+                    backgroundColor: AppTheme.primaryGreen,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -666,15 +667,16 @@ class _VerificationScreenState extends State<VerificationScreen> {
     required String title,
     required String subtitle,
   }) {
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -688,7 +690,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
               color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: const Color(0xFF4CAF50), size: 24),
+            child: Icon(icon, color: AppTheme.primaryGreen, size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -722,13 +724,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
     String? imagePath,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -745,16 +748,16 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: imagePath != null
-                      ? const Color(0xFF4CAF50).withValues(alpha: 0.1)
-                      : Colors.grey[100],
+                      ? AppTheme.primaryGreen.withValues(alpha: 0.1)
+                      : theme.cardColor,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
                   size: 28,
                   color: imagePath != null
-                      ? const Color(0xFF4CAF50)
-                      : Colors.grey[400],
+                      ? AppTheme.primaryGreen
+                      : theme.hintColor,
                 ),
               ),
               const SizedBox(width: 16),

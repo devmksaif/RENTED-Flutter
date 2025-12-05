@@ -1,0 +1,8 @@
+lib/pages/notifications_page.dart
+lib/pages/product_details_page.dart
+lib/pages/chat_conversation_page.dart
+lib/pages/chat_list_page.dart
+lib/pages/favorites_page.dart
+lib/pages/settings_page.dart
+lib/pages/search_page.dart
+lib/pages/profile_page.dart

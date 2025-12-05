@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/app_theme.dart';
 import '../models/new_listing_model.dart';
 import '../data/mock_data.dart';
 import '../models/product_model.dart';
@@ -46,17 +47,18 @@ class NewListingStep3Page extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'Review Listing',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -69,9 +71,9 @@ class NewListingStep3Page extends StatelessWidget {
             Row(
               children: [
                 _ProgressStep(number: 1, label: 'Info', isActive: false),
-                Expanded(child: Container(height: 2, color: Colors.grey[300])),
+                Expanded(child: Container(height: 2, color: theme.dividerColor)),
                 _ProgressStep(number: 2, label: 'Photos', isActive: false),
-                Expanded(child: Container(height: 2, color: Colors.grey[300])),
+                Expanded(child: Container(height: 2, color: theme.dividerColor)),
                 _ProgressStep(number: 3, label: 'Review', isActive: true),
               ],
             ),
@@ -79,19 +81,25 @@ class NewListingStep3Page extends StatelessWidget {
 
             Text(
               'Review Your Listing',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.titleLarge?.color,
+              ),
             ),
             SizedBox(height: 24),
 
             // Preview Card
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey[200]!),
+                border: Border.all(color: theme.dividerColor),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.black.withValues(alpha: 0.3)
+                        : Colors.black.withValues(alpha: 0.06),
                     blurRadius: 4,
                   ),
                 ],
@@ -130,7 +138,7 @@ class NewListingStep3Page extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF4CAF50),
+                            color: AppTheme.primaryGreen,
                           ),
                         ),
                         SizedBox(height: 16),
@@ -143,7 +151,7 @@ class NewListingStep3Page extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey,
+                            color: theme.hintColor,
                           ),
                         ),
                         SizedBox(height: 6),
@@ -151,7 +159,7 @@ class NewListingStep3Page extends StatelessWidget {
                           listing.description,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey[700],
+                            color: theme.hintColor,
                           ),
                         ),
                       ],
@@ -167,18 +175,21 @@ class NewListingStep3Page extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Color(0xFFFFF3E0),
+                color: AppTheme.warningOrange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Color(0xFFFFB74D), width: 1),
+                border: Border.all(color: AppTheme.warningOrange, width: 1),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info, color: Color(0xFFFF9800), size: 20),
+                  Icon(Icons.info, color: AppTheme.warningOrange, size: 20),
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'By publishing, you agree to our listing terms and conditions',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF6D4C41)),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.textTheme.bodyMedium?.color,
+                      ),
                     ),
                   ),
                 ],
@@ -193,8 +204,8 @@ class NewListingStep3Page extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[200],
-                      foregroundColor: Colors.black,
+                      backgroundColor: theme.dividerColor,
+                      foregroundColor: theme.textTheme.bodyLarge?.color,
                       padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -215,7 +226,7 @@ class NewListingStep3Page extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF4CAF50),
+                      backgroundColor: AppTheme.primaryGreen,
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -255,20 +266,21 @@ class _ProgressStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: isActive ? Color(0xFF4CAF50) : Colors.grey[300],
+            color: isActive ? AppTheme.primaryGreen : theme.dividerColor,
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Text(
               '$number',
               style: TextStyle(
-                color: isActive ? Colors.white : Colors.grey,
+                color: isActive ? Colors.white : theme.hintColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -277,7 +289,11 @@ class _ProgressStep extends StatelessWidget {
         SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: theme.textTheme.bodySmall?.color,
+          ),
         ),
       ],
     );
@@ -292,6 +308,7 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -301,14 +318,14 @@ class _InfoRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Colors.grey,
+              color: theme.hintColor,
             ),
           ),
           SizedBox(width: 8),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+              style: TextStyle(fontSize: 12, color: theme.hintColor),
               overflow: TextOverflow.ellipsis,
             ),
           ),

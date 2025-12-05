@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/new_listing_model.dart';
+import '../config/app_theme.dart';
 import 'new_listing_step2_page.dart';
 
 class NewListingStep1Page extends StatefulWidget {
@@ -70,17 +71,18 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'New Listing',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -93,9 +95,9 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
             Row(
               children: [
                 _ProgressStep(number: 1, label: 'Info', isActive: true),
-                Expanded(child: Container(height: 2, color: Colors.grey[300])),
+                Expanded(child: Container(height: 2, color: theme.dividerColor)),
                 _ProgressStep(number: 2, label: 'Photos', isActive: false),
-                Expanded(child: Container(height: 2, color: Colors.grey[300])),
+                Expanded(child: Container(height: 2, color: theme.dividerColor)),
                 _ProgressStep(number: 3, label: 'Review', isActive: false),
               ],
             ),
@@ -104,7 +106,11 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
             // Title
             Text(
               'Title',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: theme.textTheme.titleLarge?.color,
+              ),
             ),
             SizedBox(height: 8),
             TextField(
@@ -280,7 +286,7 @@ class _NewListingStep1PageState extends State<NewListingStep1Page> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF4CAF50),
+                  backgroundColor: AppTheme.primaryGreen,
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -315,20 +321,21 @@ class _ProgressStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: isActive ? Color(0xFF4CAF50) : Colors.grey[300],
+            color: isActive ? AppTheme.primaryGreen : theme.dividerColor,
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Text(
               '$number',
               style: TextStyle(
-                color: isActive ? Colors.white : Colors.grey,
+                color: isActive ? Colors.white : theme.hintColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -337,7 +344,11 @@ class _ProgressStep extends StatelessWidget {
         SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: theme.textTheme.bodySmall?.color,
+          ),
         ),
       ],
     );

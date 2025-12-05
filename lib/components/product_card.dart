@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/product_model.dart';
+import '../config/app_theme.dart';
 
 class ProductCard extends StatefulWidget {
   final Product product;
@@ -37,6 +38,7 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final cardWidth = MediaQuery.of(context).size.width * 0.42;
     final cardHeight = cardWidth * 1.6;
 
@@ -44,10 +46,16 @@ class _ProductCardState extends State<ProductCard> {
       width: cardWidth,
       height: cardHeight,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+          BoxShadow(
+            color: theme.brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black12,
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
         ],
       ),
       padding: const EdgeInsets.all(10),
@@ -72,16 +80,21 @@ class _ProductCardState extends State<ProductCard> {
                   onTap: toggleFavorite,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.cardColor,
                       shape: BoxShape.circle,
                       boxShadow: [
-                        BoxShadow(color: Colors.black12, blurRadius: 4),
+                        BoxShadow(
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.black.withValues(alpha: 0.3)
+                              : Colors.black12,
+                          blurRadius: 4,
+                        ),
                       ],
                     ),
                     padding: EdgeInsets.all(6),
                     child: Icon(
                       isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.red : Colors.grey,
+                      color: isFavorite ? AppTheme.errorRed : theme.hintColor,
                       size: 18,
                     ),
                   ),
@@ -92,7 +105,11 @@ class _ProductCardState extends State<ProductCard> {
           const SizedBox(height: 8),
           Text(
             widget.product.title,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: theme.textTheme.titleLarge?.color,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -102,19 +119,19 @@ class _ProductCardState extends State<ProductCard> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF4CAF50),
+              color: AppTheme.primaryGreen,
             ),
           ),
           const SizedBox(height: 4),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: Color(0xFFEEEEEE),
+              color: theme.dividerColor,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               widget.product.category,
-              style: TextStyle(fontSize: 10, color: Colors.grey[700]),
+              style: TextStyle(fontSize: 10, color: theme.hintColor),
             ),
           ),
           const SizedBox(height: 6),
@@ -127,7 +144,7 @@ class _ProductCardState extends State<ProductCard> {
                     index < widget.product.rating.toInt()
                         ? Icons.star
                         : Icons.star_border,
-                    color: Color(0xFF4CAF50),
+                    color: AppTheme.primaryGreen,
                     size: 14,
                   ),
                 ),
@@ -135,19 +152,19 @@ class _ProductCardState extends State<ProductCard> {
               const SizedBox(width: 2),
               Text(
                 '(${widget.product.reviews})',
-                style: TextStyle(fontSize: 10, color: Colors.grey),
+                style: TextStyle(fontSize: 10, color: theme.hintColor),
               ),
             ],
           ),
           const SizedBox(height: 6),
           Row(
             children: [
-              Icon(Icons.location_on, color: Color(0xFF4CAF50), size: 14),
+              Icon(Icons.location_on, color: AppTheme.primaryGreen, size: 14),
               const SizedBox(width: 2),
               Expanded(
                 child: Text(
                   widget.product.location,
-                  style: TextStyle(fontSize: 10, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: 10, color: theme.hintColor),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -156,7 +173,7 @@ class _ProductCardState extends State<ProductCard> {
           const SizedBox(height: 6),
           Text(
             widget.product.description,
-            style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 10, color: theme.hintColor),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -166,7 +183,7 @@ class _ProductCardState extends State<ProductCard> {
               Expanded(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4CAF50),
+                    backgroundColor: AppTheme.primaryGreen,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -183,7 +200,7 @@ class _ProductCardState extends State<ProductCard> {
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4CAF50),
+                    backgroundColor: AppTheme.primaryGreen,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

@@ -69,8 +69,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Top left splash
@@ -143,11 +144,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             errorBuilder: (_, __, ___) => Container(
                               width: 400,
                               height: 250,
-                              color: Colors.grey[200],
-                              child: const Icon(
+                              color: theme.cardColor,
+                              child: Icon(
                                 Icons.image,
                                 size: 64,
-                                color: Colors.grey,
+                                color: theme.hintColor,
                               ),
                             ),
                           ),
@@ -162,12 +163,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             hintText: "Email",
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.email_outlined,
-                              color: Colors.grey,
+                              color: theme.hintColor,
                             ),
                             filled: true,
-                            fillColor: Colors.grey[100],
+                            fillColor: theme.inputDecorationTheme.fillColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -193,16 +194,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             hintText: "Password",
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.lock_outlined,
-                              color: Colors.grey,
+                              color: theme.hintColor,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: Colors.grey,
+                                color: theme.hintColor,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -211,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                             filled: true,
-                            fillColor: Colors.grey[100],
+                            fillColor: theme.inputDecorationTheme.fillColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -281,7 +282,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Text(
                             "Don't have an account? ",
-                            style: TextStyle(color: Colors.grey[700]),
+                            style: TextStyle(color: theme.hintColor),
                           ),
                           TextButton(
                             onPressed: () =>
@@ -300,15 +301,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Divider
                       Row(
                         children: [
-                          Expanded(child: Divider(color: Colors.grey[300])),
+                          Expanded(child: Divider(color: theme.dividerColor)),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
                               'OR',
-                              style: TextStyle(color: Colors.grey[600]),
+                              style: TextStyle(color: theme.hintColor),
                             ),
                           ),
-                          Expanded(child: Divider(color: Colors.grey[300])),
+                          Expanded(child: Divider(color: theme.dividerColor)),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -319,7 +320,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: OutlinedButton.icon(
                           onPressed: _isLoadingGoogle ? null : _signInWithGoogle,
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.grey[300]!),
+                            side: BorderSide(color: theme.dividerColor),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/product_model.dart';
 import '../components/image_carousel.dart';
+import '../config/app_theme.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final Product product;
@@ -32,8 +33,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
           CustomScrollView(
@@ -41,19 +43,27 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               SliverAppBar(
                 expandedHeight: 300,
                 pinned: true,
-                backgroundColor: Colors.white,
+                backgroundColor: theme.cardColor,
                 elevation: 0,
                 leading: Container(
                   margin: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.cardColor,
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(color: Colors.black12, blurRadius: 6),
+                      BoxShadow(
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.black.withValues(alpha: 0.3)
+                            : Colors.black12,
+                        blurRadius: 6,
+                      ),
                     ],
                   ),
                   child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.black),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: theme.textTheme.bodyLarge?.color,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -84,6 +94,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
+                                    color: theme.textTheme.titleLarge?.color,
                                   ),
                                 ),
                                 SizedBox(height: 8),
@@ -92,7 +103,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF4CAF50),
+                                    color: AppTheme.primaryGreen,
                                   ),
                                 ),
                               ],
@@ -111,17 +122,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Color(0xFFE8F5E9),
+                              color: AppTheme.accentGreen,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Color(0xFF4CAF50),
+                                color: AppTheme.primaryGreen,
                                 width: 1,
                               ),
                             ),
                             child: Text(
                               product.category,
                               style: TextStyle(
-                                color: Color(0xFF4CAF50),
+                                color: AppTheme.primaryGreen,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -133,7 +144,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Color(0xFFFFF9C4),
+                              color: theme.cardColor,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -141,6 +152,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
+                                color: theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ),
@@ -158,7 +170,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 index < product.rating.toInt()
                                     ? Icons.star
                                     : Icons.star_border,
-                                color: Color(0xFF4CAF50),
+                                color: AppTheme.primaryGreen,
                                 size: 18,
                               ),
                             ),
@@ -168,7 +180,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             '${product.rating} (${product.reviews} reviews)',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[700],
+                              color: theme.hintColor,
                             ),
                           ),
                         ],
@@ -178,11 +190,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       // Location
                       Row(
                         children: [
-                          Icon(Icons.location_on, color: Color(0xFF4CAF50)),
+                          Icon(Icons.location_on, color: AppTheme.primaryGreen),
                           SizedBox(width: 8),
                           Text(
                             product.location,
-                            style: TextStyle(fontSize: 14),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: theme.textTheme.bodyMedium?.color,
+                            ),
                           ),
                         ],
                       ),
@@ -194,6 +209,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: theme.textTheme.titleLarge?.color,
                         ),
                       ),
                       SizedBox(height: 8),
@@ -205,7 +221,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           product.description,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[700],
+                            color: theme.hintColor,
                             height: 1.6,
                           ),
                           maxLines: showFullDescription ? null : 3,
@@ -220,7 +236,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           child: Text(
                             showFullDescription ? 'Show less' : 'Show more',
                             style: TextStyle(
-                              color: Color(0xFF4CAF50),
+                              color: AppTheme.primaryGreen,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -233,17 +249,20 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: theme.textTheme.titleLarge?.color,
                         ),
                       ),
                       SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: theme.cardColor,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey[200]!),
+                          border: Border.all(color: theme.dividerColor),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.06),
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.black.withValues(alpha: 0.3)
+                                  : Colors.black.withValues(alpha: 0.06),
                               blurRadius: 4,
                             ),
                           ],
@@ -308,7 +327,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               product.owner.bio,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey[700],
+                                color: theme.hintColor,
                               ),
                             ),
                             SizedBox(height: 16),
@@ -317,7 +336,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFF4CAF50),
+                                      backgroundColor: AppTheme.primaryGreen,
                                       foregroundColor: Colors.white,
                                       padding: EdgeInsets.symmetric(
                                         vertical: 10,
@@ -346,7 +365,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFF4CAF50),
+                                      backgroundColor: AppTheme.primaryGreen,
                                       foregroundColor: Colors.white,
                                       padding: EdgeInsets.symmetric(
                                         vertical: 10,
@@ -390,10 +409,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             right: 0,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.cardColor,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black12,
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.black.withValues(alpha: 0.3)
+                        : Colors.black12,
                     blurRadius: 8,
                     offset: Offset(0, -2),
                   ),
@@ -405,7 +426,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF4CAF50),
+                        backgroundColor: AppTheme.primaryGreen,
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -430,12 +451,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   SizedBox(width: 12),
                   Container(
                     decoration: BoxDecoration(
-                      color: Color(0xFFE8F5E9),
+                      color: AppTheme.accentGreen,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Color(0xFF4CAF50), width: 2),
+                      border: Border.all(color: AppTheme.primaryGreen, width: 2),
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.share, color: Color(0xFF4CAF50)),
+                      icon: Icon(Icons.share, color: AppTheme.primaryGreen),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Shared ${product.title}!')),

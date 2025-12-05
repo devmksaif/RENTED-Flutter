@@ -61,7 +61,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         setState(() => _isLoading = false);
         Fluttertoast.showToast(
           msg: 'Failed to load profile',
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorRed,
         );
       }
     }
@@ -86,7 +86,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         });
         Fluttertoast.showToast(
           msg: 'Profile updated successfully',
-          backgroundColor: Colors.green,
+          backgroundColor: AppTheme.successGreen,
         );
         Navigator.pop(context, true);
       }
@@ -104,19 +104,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtils(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Edit Profile',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -302,8 +302,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             if (_currentUser?.avatarUrl != null && _currentUser!.avatarUrl!.isNotEmpty)
               ListTile(
-                leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('Remove Photo', style: TextStyle(color: Colors.red)),
+                leading: const Icon(Icons.delete, color: AppTheme.errorRed),
+                title: const Text(
+                  'Remove Photo', 
+                  style: TextStyle(color: AppTheme.errorRed),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _deleteAvatar();
@@ -341,7 +344,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
         Fluttertoast.showToast(
           msg: 'Profile picture updated successfully',
-          backgroundColor: Colors.green,
+          backgroundColor: AppTheme.successGreen,
         );
       }
     } catch (e) {
@@ -353,7 +356,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
         Fluttertoast.showToast(
           msg: 'Failed to upload photo: ${e.toString()}',
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorRed,
         );
       }
     }
@@ -376,7 +379,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
         Fluttertoast.showToast(
           msg: 'Profile picture removed',
-          backgroundColor: Colors.green,
+          backgroundColor: AppTheme.successGreen,
         );
       }
     } catch (e) {
@@ -387,7 +390,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
         Fluttertoast.showToast(
           msg: 'Failed to remove photo: ${e.toString()}',
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorRed,
         );
       }
     }
@@ -401,13 +404,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     String? Function(String?)? validator,
     int maxLines = 1,
   }) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: theme.brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -426,7 +432,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.inputDecorationTheme.fillColor,
           contentPadding: const EdgeInsets.all(16),
         ),
       ),

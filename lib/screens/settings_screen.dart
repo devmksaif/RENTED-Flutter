@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import '../config/app_theme.dart';
 import '../utils/responsive_utils.dart';
 import '../services/settings_service.dart';
+import '../providers/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -14,7 +16,6 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsService _settingsService = SettingsService();
   bool _pushNotifications = true;
-  bool _darkMode = false;
   String _language = 'English';
   String _currency = 'USD';
 
@@ -30,7 +31,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         setState(() {
           _pushNotifications = settings['pushNotifications'] ?? true;
-          _darkMode = settings['darkMode'] ?? false;
           _language = settings['language'] ?? 'English';
           _currency = settings['currency'] ?? 'USD';
         });
@@ -43,21 +43,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtils(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Settings',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -89,16 +86,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildSectionTitle('Appearance'),
               SizedBox(height: responsive.spacing(12)),
               _buildSettingsCard([
-                _buildSwitchTile('Dark Mode', 'Use dark theme', _darkMode, (
-                  value,
-                ) async {
-                  setState(() => _darkMode = value);
-                  await _settingsService.setDarkMode(value);
-                  Fluttertoast.showToast(
-                    msg: 'Dark mode saved (theme refresh coming soon)',
-                    backgroundColor: Colors.blue,
-                  );
-                }),
+                _buildSwitchTile(
+                  'Dark Mode',
+                  'Use dark theme',
+                  themeProvider.isDarkMode,
+                  (value) async {
+                    await themeProvider.setDarkMode(value);
+                    Fluttertoast.showToast(
+                      msg: value ? 'Dark mode enabled' : 'Light mode enabled',
+                      backgroundColor: AppTheme.primaryGreen,
+                    );
+                  },
+                ),
               ]),
               SizedBox(height: responsive.spacing(24)),
 
@@ -179,24 +178,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSectionTitle(String title) {
+    final theme = Theme.of(context);
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: Colors.black87,
+        color: theme.textTheme.titleLarge?.color,
       ),
     );
   }
 
   Widget _buildSettingsCard(List<Widget> children) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

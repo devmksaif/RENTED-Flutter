@@ -73,8 +73,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Top left splash
@@ -147,11 +148,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             errorBuilder: (_, __, ___) => Container(
                               width: 400,
                               height: 200,
-                              color: Colors.grey[200],
-                              child: const Icon(
+                              color: theme.cardColor,
+                              child: Icon(
                                 Icons.image,
                                 size: 64,
-                                color: Colors.grey,
+                                color: theme.hintColor,
                               ),
                             ),
                           ),
@@ -165,12 +166,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: _nameController,
                           decoration: InputDecoration(
                             hintText: "Full Name",
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.person_outlined,
-                              color: Colors.grey,
+                              color: theme.hintColor,
                             ),
                             filled: true,
-                            fillColor: Colors.grey[100],
+                            fillColor: theme.inputDecorationTheme.fillColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -196,12 +197,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             hintText: "Email",
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.email_outlined,
-                              color: Colors.grey,
+                              color: theme.hintColor,
                             ),
                             filled: true,
-                            fillColor: Colors.grey[100],
+                            fillColor: theme.inputDecorationTheme.fillColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -227,16 +228,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             hintText: "Password",
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.lock_outlined,
-                              color: Colors.grey,
+                              color: theme.hintColor,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: Colors.grey,
+                                color: theme.hintColor,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -245,7 +246,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               },
                             ),
                             filled: true,
-                            fillColor: Colors.grey[100],
+                            fillColor: theme.inputDecorationTheme.fillColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -271,16 +272,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           obscureText: _obscureConfirmPassword,
                           decoration: InputDecoration(
                             hintText: "Confirm Password",
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.lock_outlined,
-                              color: Colors.grey,
+                              color: theme.hintColor,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureConfirmPassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: Colors.grey,
+                                color: theme.hintColor,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -290,7 +291,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               },
                             ),
                             filled: true,
-                            fillColor: Colors.grey[100],
+                            fillColor: theme.inputDecorationTheme.fillColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -348,7 +349,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         children: [
                           Text(
                             "Already have an account? ",
-                            style: TextStyle(color: Colors.grey[700]),
+                            style: TextStyle(color: theme.hintColor),
                           ),
                           TextButton(
                             onPressed: () =>

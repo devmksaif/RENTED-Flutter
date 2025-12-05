@@ -93,7 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (mounted) {
         Fluttertoast.showToast(
           msg: 'Connection error: $error',
-          backgroundColor: Colors.orange,
+          backgroundColor: AppTheme.warningOrange,
         );
       }
     };
@@ -169,7 +169,7 @@ class _ChatScreenState extends State<ChatScreen> {
         setState(() {
           _isLoading = false;
         });
-        Fluttertoast.showToast(msg: e.message, backgroundColor: Colors.red);
+        Fluttertoast.showToast(msg: e.message, backgroundColor: AppTheme.errorRed);
       }
     }
   }
@@ -205,7 +205,7 @@ class _ChatScreenState extends State<ChatScreen> {
         setState(() {
           _isSending = false;
         });
-        Fluttertoast.showToast(msg: e.message, backgroundColor: Colors.red);
+        Fluttertoast.showToast(msg: e.message, backgroundColor: AppTheme.errorRed);
       }
     }
   }
@@ -222,6 +222,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final otherUser = _conversation?['other_user'] ?? {};
 
     return Scaffold(
@@ -265,7 +266,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ? Center(
                         child: Text(
                           'No messages yet',
-                          style: TextStyle(color: Colors.grey[600]),
+                          style: TextStyle(color: theme.hintColor),
                         ),
                       )
                     : Column(
@@ -299,7 +300,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               decoration: BoxDecoration(
                                 color: isMe
                                     ? AppTheme.primaryGreen
-                                    : Colors.grey[200],
+                                    : theme.cardColor,
                                 borderRadius: BorderRadius.circular(18),
                               ),
                               constraints: BoxConstraints(
@@ -311,7 +312,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                   Text(
                                     message['content'] ?? '',
                                     style: TextStyle(
-                                      color: isMe ? Colors.white : Colors.black87,
+                                      color: isMe 
+                                          ? Colors.white 
+                                          : theme.textTheme.bodyLarge?.color,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -321,7 +324,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       fontSize: 10,
                                       color: isMe
                                           ? Colors.white70
-                                          : Colors.grey[600],
+                                          : theme.hintColor,
                                     ),
                                   ),
                                 ],
@@ -341,7 +344,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 child: Text(
                                   'Typing...',
                                   style: TextStyle(
-                                    color: Colors.grey[600],
+                                    color: theme.hintColor,
                                     fontStyle: FontStyle.italic,
                                   ),
                                 ),
@@ -353,10 +356,12 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.black.withValues(alpha: 0.3)
+                      : Colors.black.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, -2),
                 ),
@@ -378,7 +383,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               borderSide: BorderSide.none,
                             ),
                             filled: true,
-                            fillColor: Colors.grey[100],
+                            fillColor: theme.inputDecorationTheme.fillColor,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 10,
@@ -443,15 +448,18 @@ class _ChatScreenState extends State<ChatScreen> {
         ? productImages[0]['url'] ?? productImages[0]
         : null;
 
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: theme.dividerColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: theme.brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -483,16 +491,16 @@ class _ChatScreenState extends State<ChatScreen> {
                           return Container(
                             width: 80,
                             height: 80,
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.image, color: Colors.grey),
+                            color: theme.cardColor,
+                            child: Icon(Icons.image, color: theme.hintColor),
                           );
                         },
                       )
                     : Container(
                         width: 80,
                         height: 80,
-                        color: Colors.grey[200],
-                        child: const Icon(Icons.image, color: Colors.grey),
+                        color: theme.cardColor,
+                        child: Icon(Icons.image, color: theme.hintColor),
                       ),
               ),
               const SizedBox(width: 12),
@@ -522,7 +530,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.grey),
+              Icon(Icons.chevron_right, color: theme.hintColor),
             ],
           ),
         ),
@@ -531,6 +539,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildOfferMessage(Map<String, dynamic> message, bool isMe) {
+    final theme = Theme.of(context);
     final offer = message['offer'] as Map<String, dynamic>;
     final offerStatus = offer['status'] ?? 'pending'; // pending, accepted, rejected
     final offerType = offer['offer_type'] ?? 'rental'; // rental or purchase
@@ -545,14 +554,16 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         child: Card(
           elevation: 2,
-          color: isMe ? AppTheme.primaryGreen.withValues(alpha: 0.1) : Colors.white,
+          color: isMe 
+              ? AppTheme.primaryGreen.withValues(alpha: 0.1) 
+              : theme.cardColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
               color: offerStatus == 'accepted'
-                  ? Colors.green
+                  ? AppTheme.successGreen
                   : offerStatus == 'rejected'
-                      ? Colors.red
+                      ? AppTheme.errorRed
                       : AppTheme.primaryGreen,
               width: 2,
             ),
@@ -583,7 +594,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.green,
+                          color: AppTheme.successGreen,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
@@ -599,7 +610,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.red,
+                          color: AppTheme.errorRed,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
@@ -615,7 +626,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.orange,
+                          color: AppTheme.warningOrange,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
@@ -635,7 +646,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   'Offer Amount',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: theme.hintColor,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -652,13 +663,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                      Icon(Icons.calendar_today, size: 16, color: theme.hintColor),
                       const SizedBox(width: 8),
                       Text(
                         '${offer['start_date']} - ${offer['end_date']}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: theme.hintColor,
                         ),
                       ),
                     ],
@@ -681,11 +692,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: OutlinedButton(
                           onPressed: () => _handleRejectOffer(offer['id']),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.red),
+                            side: BorderSide(color: AppTheme.errorRed),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Reject',
-                            style: TextStyle(color: Colors.red),
+                            style: TextStyle(color: AppTheme.errorRed),
                           ),
                         ),
                       ),
@@ -707,7 +718,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   _formatTime(message['created_at']),
                   style: TextStyle(
                     fontSize: 10,
-                    color: Colors.grey[600],
+                    color: theme.hintColor,
                   ),
                 ),
               ],
@@ -719,6 +730,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _showMakeOfferDialog() {
+    final theme = Theme.of(context);
     final product = _conversation?['product'];
     if (product == null) return;
 
@@ -731,7 +743,9 @@ class _ChatScreenState extends State<ChatScreen> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
+        builder: (context, setDialogState) {
+          final dialogTheme = Theme.of(context);
+          return AlertDialog(
           title: const Text('Make an Offer'),
           content: SingleChildScrollView(
             child: Column(
@@ -858,7 +872,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (amountController.text.isEmpty) {
                   Fluttertoast.showToast(
                     msg: 'Please enter an offer amount',
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppTheme.errorRed,
                   );
                   return;
                 }
@@ -867,7 +881,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (amount == null || amount <= 0) {
                   Fluttertoast.showToast(
                     msg: 'Please enter a valid amount',
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppTheme.errorRed,
                   );
                   return;
                 }
@@ -875,7 +889,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (offerType == 'rental' && (startDate == null || endDate == null)) {
                   Fluttertoast.showToast(
                     msg: 'Please select rental dates',
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppTheme.errorRed,
                   );
                   return;
                 }
@@ -887,7 +901,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   if (productId == null) {
                     Fluttertoast.showToast(
                       msg: 'Product information is missing',
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppTheme.errorRed,
                     );
                     return;
                   }
@@ -911,21 +925,22 @@ class _ChatScreenState extends State<ChatScreen> {
                   if (mounted) {
                     Fluttertoast.showToast(
                       msg: 'Offer sent successfully',
-                      backgroundColor: Colors.green,
+                      backgroundColor: AppTheme.successGreen,
                     );
                     await _loadMessages();
                   }
                 } on ApiError catch (e) {
                   Fluttertoast.showToast(
                     msg: e.message,
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppTheme.errorRed,
                   );
                 }
               },
               child: const Text('Send Offer'),
             ),
           ],
-        ),
+        );
+        },
       ),
     );
   }
@@ -959,14 +974,14 @@ class _ChatScreenState extends State<ChatScreen> {
         if (mounted) {
           Fluttertoast.showToast(
             msg: 'Offer accepted successfully',
-            backgroundColor: Colors.green,
+            backgroundColor: AppTheme.successGreen,
           );
           await _loadMessages();
         }
       } on ApiError catch (e) {
         Fluttertoast.showToast(
           msg: e.message,
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorRed,
         );
       }
     }
@@ -986,7 +1001,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: AppTheme.errorRed,
             ),
             child: const Text('Reject'),
           ),
@@ -1004,14 +1019,14 @@ class _ChatScreenState extends State<ChatScreen> {
         if (mounted) {
           Fluttertoast.showToast(
             msg: 'Offer rejected',
-            backgroundColor: Colors.orange,
+            backgroundColor: AppTheme.warningOrange,
           );
           await _loadMessages();
         }
       } on ApiError catch (e) {
         Fluttertoast.showToast(
           msg: e.message,
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorRed,
         );
       }
     }

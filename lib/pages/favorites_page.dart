@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/product_model.dart';
 import '../data/mock_data.dart';
 import '../components/product_card.dart';
+import '../config/app_theme.dart';
 import 'product_details_page.dart';
 
 class FavoritesPage extends StatefulWidget {
@@ -29,13 +30,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'Favorites',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
@@ -47,7 +49,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   Icon(
                     Icons.favorite_border,
                     size: 64,
-                    color: Colors.grey[300],
+                    color: theme.hintColor,
                   ),
                   SizedBox(height: 16),
                   Text(
@@ -55,13 +57,13 @@ class _FavoritesPageState extends State<FavoritesPage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey,
+                      color: theme.hintColor,
                     ),
                   ),
                   SizedBox(height: 8),
                   Text(
                     'Add items to your favorites to see them here',
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(color: theme.hintColor),
                     textAlign: TextAlign.center,
                   ),
                 ],

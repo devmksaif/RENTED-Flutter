@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
+import '../config/app_theme.dart';
 
 class ChatConversationPage extends StatefulWidget {
   final Chat chat;
@@ -45,16 +46,14 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          widget.chat.user.name,
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
+        title: Text(widget.chat.user.name),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -77,7 +76,9 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
                         maxWidth: MediaQuery.of(context).size.width * 0.7,
                       ),
                       decoration: BoxDecoration(
-                        color: msg.isOwn ? Color(0xFF4CAF50) : Colors.grey[200],
+                        color: msg.isOwn
+                            ? AppTheme.primaryGreen
+                            : theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       padding: EdgeInsets.symmetric(
@@ -87,7 +88,9 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
                       child: Text(
                         msg.text,
                         style: TextStyle(
-                          color: msg.isOwn ? Colors.white : Colors.black,
+                          color: msg.isOwn
+                              ? Colors.white
+                              : theme.textTheme.bodyLarge?.color,
                           fontSize: 14,
                         ),
                       ),
@@ -97,11 +100,11 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
               },
             ),
           ),
-          Container(
+            Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.grey[200]!)),
+              color: theme.cardColor,
+              border: Border(top: BorderSide(color: theme.dividerColor)),
             ),
             child: Row(
               children: [
@@ -112,7 +115,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
                       hintText: 'Type a message...',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
+                        borderSide: BorderSide(color: theme.dividerColor),
                       ),
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 16,
@@ -125,8 +128,8 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
                 FloatingActionButton(
                   mini: true,
                   onPressed: sendMessage,
-                  backgroundColor: Color(0xFF4CAF50),
-                  child: Icon(Icons.send),
+                  backgroundColor: AppTheme.primaryGreen,
+                  child: const Icon(Icons.send),
                 ),
               ],
             ),

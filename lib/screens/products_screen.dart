@@ -6,6 +6,7 @@ import '../models/api_error.dart';
 import '../services/product_service.dart';
 import '../services/favorite_service.dart';
 import '../utils/responsive_utils.dart';
+import '../config/app_theme.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -302,24 +303,24 @@ class _ProductsScreenState extends State<ProductsScreen> {
         _sortBy != 'newest' ||
         _searchController.text.isNotEmpty;
 
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'All Products',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
             icon: Icon(
               _showFilters ? Icons.filter_alt : Icons.filter_alt_outlined,
-              color: hasActiveFilters ? const Color(0xFF4CAF50) : Colors.grey,
+              color: hasActiveFilters ? AppTheme.primaryGreen : theme.hintColor,
             ),
             onPressed: () {
               setState(() {
@@ -333,7 +334,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         children: [
           // Search Bar
           Container(
-            color: Colors.white,
+            color: theme.cardColor,
             padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
@@ -350,18 +351,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+                  borderSide: BorderSide(color: theme.dividerColor),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+                  borderSide: BorderSide(color: theme.dividerColor),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFF4CAF50), width: 2),
+                  borderSide: const BorderSide(color: AppTheme.primaryGreen, width: 2),
                 ),
                 filled: true,
-                fillColor: Colors.grey[50],
+                fillColor: theme.inputDecorationTheme.fillColor,
               ),
             ),
           ),
@@ -381,14 +382,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             Icon(
                               Icons.search_off,
                               size: 64,
-                              color: Colors.grey[400],
+                              color: theme.hintColor,
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'No products found',
                               style: TextStyle(
                                 fontSize: 18,
-                                color: Colors.grey[600],
+                                color: theme.hintColor,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -397,7 +398,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               'Try adjusting your filters',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey[500],
+                                color: theme.hintColor,
                               ),
                             ),
                           ],
@@ -439,8 +440,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Widget _buildFiltersPanel() {
+    final theme = Theme.of(context);
     return Container(
-      color: Colors.white,
+      color: theme.cardColor,
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.5,
       ),
@@ -489,9 +491,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     _applyFilters();
                   });
                 },
-                selectedColor: const Color(0xFF4CAF50),
+                selectedColor: AppTheme.primaryGreen,
                 labelStyle: TextStyle(
-                  color: _selectedCategory == null ? Colors.white : Colors.black,
+                  color: _selectedCategory == null ? Colors.white : theme.textTheme.bodyLarge?.color,
                 ),
               ),
               ..._categories.map(
@@ -504,11 +506,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       _applyFilters();
                     });
                   },
-                  selectedColor: const Color(0xFF4CAF50),
+                  selectedColor: AppTheme.primaryGreen,
                   labelStyle: TextStyle(
                     color: _selectedCategory?.id == category.id
                         ? Colors.white
-                        : Colors.black,
+                        : theme.textTheme.bodyLarge?.color,
                   ),
                 ),
               ),
@@ -533,7 +535,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   min: 0,
                   max: 1000,
                   divisions: 100,
-                  activeColor: const Color(0xFF4CAF50),
+                  activeColor: AppTheme.primaryGreen,
                   onChanged: (values) {
                     setState(() {
                       _minPrice = values.start;
@@ -572,6 +574,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Widget _buildSortChip(String value, String label) {
+    final theme = Theme.of(context);
     final isSelected = _sortBy == value;
     return FilterChip(
       label: Text(label),
@@ -582,16 +585,17 @@ class _ProductsScreenState extends State<ProductsScreen> {
           _applyFilters();
         });
       },
-      selectedColor: const Color(0xFF4CAF50),
+      selectedColor: AppTheme.primaryGreen,
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.black,
+        color: isSelected ? Colors.white : theme.textTheme.bodyLarge?.color,
       ),
     );
   }
 
   Widget _buildActiveFiltersChips() {
+    final theme = Theme.of(context);
     return Container(
-      color: Colors.white,
+      color: theme.cardColor,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -642,13 +646,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Widget _buildProductCard(Product product) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -681,8 +686,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       product.thumbnail,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
-                        color: Colors.grey[200],
-                        child: const Icon(Icons.image_not_supported),
+                        color: theme.cardColor,
+                        child: Icon(Icons.image_not_supported, color: theme.hintColor),
                       ),
                     ),
                   ),
@@ -691,7 +696,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     top: 8,
                     right: 8,
                     child: Material(
-                      color: Colors.white,
+                      color: theme.cardColor,
                       borderRadius: BorderRadius.circular(20),
                       elevation: 2,
                       child: InkWell(
@@ -706,7 +711,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             size: 20,
                             color: _favoriteProductIds.contains(product.id)
                                 ? Colors.red
-                                : Colors.grey,
+                                : theme.hintColor,
                           ),
                         ),
                       ),
@@ -723,7 +728,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50).withOpacity(0.9),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -770,7 +775,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             Text(
                               '\$${product.pricePerDay}',
                               style: const TextStyle(
-                                color: Color(0xFF4CAF50),
+                                color: AppTheme.primaryGreen,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
@@ -778,7 +783,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             Text(
                               '/day',
                               style: TextStyle(
-                                color: Colors.grey[600],
+                                color: theme.hintColor,
                                 fontSize: 11,
                               ),
                             ),

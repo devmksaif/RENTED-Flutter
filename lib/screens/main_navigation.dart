@@ -6,6 +6,7 @@ import 'my_products_screen.dart';
 import 'profile_screen.dart';
 import 'conversations_screen.dart';
 import '../services/storage_service.dart';
+import '../config/app_theme.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -30,14 +31,15 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.1),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -55,9 +57,9 @@ class _MainNavigationState extends State<MainNavigation> {
             }
           },
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFF4CAF50),
-          unselectedItemColor: Colors.grey[600],
+          backgroundColor: theme.cardColor,
+          selectedItemColor: AppTheme.primaryGreen,
+          unselectedItemColor: theme.hintColor,
           selectedFontSize: 12,
           unselectedFontSize: 12,
           elevation: 0,
@@ -114,7 +116,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 }
                 Navigator.pushNamed(context, '/add-product');
               },
-              backgroundColor: const Color(0xFF4CAF50),
+              backgroundColor: AppTheme.primaryGreen,
               foregroundColor: Colors.white,
               icon: const Icon(Icons.add),
               label: const Text(

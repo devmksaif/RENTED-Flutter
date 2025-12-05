@@ -103,18 +103,18 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Rental Details',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -128,7 +128,7 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
 
   Widget _buildRentalDetails() {
     final rental = _rental!;
-
+    final theme = Theme.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -138,11 +138,11 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -170,7 +170,7 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
                         'Status',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: theme.hintColor,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -194,11 +194,11 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -222,14 +222,14 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
                       child: Container(
                         width: 80,
                         height: 80,
-                        color: Colors.grey[200],
+                        color: theme.cardColor,
                         child: rental.product.thumbnail.isNotEmpty
                             ? Image.network(
                                 rental.product.thumbnail,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const Icon(
+                                errorBuilder: (_, __, ___) => Icon(
                                   Icons.image_not_supported,
-                                  color: Colors.grey,
+                                  color: theme.hintColor,
                                 ),
                               )
                             : const Icon(Icons.inventory_2, color: Colors.grey),
@@ -251,7 +251,7 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
                           Text(
                             rental.product.category.name,
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: theme.hintColor,
                               fontSize: 14,
                             ),
                           ),
@@ -294,11 +294,11 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -337,7 +337,7 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
                         'Notes',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: theme.hintColor,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -359,11 +359,11 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -404,7 +404,7 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
                           Text(
                             rental.renter.email,
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: theme.hintColor,
                               fontSize: 14,
                             ),
                           ),
@@ -422,11 +422,11 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),

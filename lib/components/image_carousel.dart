@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/app_theme.dart';
 
 class ImageCarousel extends StatefulWidget {
   final List<String> images;
@@ -34,6 +35,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Stack(
       children: [
         PageView.builder(
@@ -58,14 +60,21 @@ class _ImageCarouselState extends State<ImageCarousel> {
             onTap: widget.onFavoriteTap,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.cardColor,
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.black.withValues(alpha: 0.3)
+                        : Colors.black12,
+                    blurRadius: 8,
+                  ),
+                ],
               ),
               padding: EdgeInsets.all(12),
               child: Icon(
                 widget.isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: widget.isFavorite ? Colors.red : Colors.grey,
+                color: widget.isFavorite ? AppTheme.errorRed : theme.hintColor,
                 size: 24,
               ),
             ),
@@ -85,8 +94,8 @@ class _ImageCarouselState extends State<ImageCarousel> {
                 margin: EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
                   color: _currentPage == index
-                      ? Color(0xFF4CAF50)
-                      : Colors.white70,
+                      ? AppTheme.primaryGreen
+                      : theme.cardColor.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),

@@ -60,14 +60,14 @@ class _MyProductsScreenState extends State<MyProductsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'My Products',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
@@ -77,7 +77,7 @@ class _MyProductsScreenState extends State<MyProductsScreen>
           ? _buildEmptyState()
           : RefreshIndicator(
               onRefresh: _loadProducts,
-              color: const Color(0xFF4CAF50),
+              color: AppTheme.primaryGreen,
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: _products.length,
@@ -91,6 +91,7 @@ class _MyProductsScreenState extends State<MyProductsScreen>
   }
 
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -98,28 +99,28 @@ class _MyProductsScreenState extends State<MyProductsScreen>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.inventory_2_outlined,
               size: 64,
-              color: const Color(0xFF4CAF50),
+              color: AppTheme.primaryGreen,
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'No products yet',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: theme.textTheme.titleLarge?.color,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Create your first product listing',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 14, color: theme.hintColor),
           ),
           const SizedBox(height: 32),
           
@@ -129,14 +130,15 @@ class _MyProductsScreenState extends State<MyProductsScreen>
   }
 
   Widget _buildProductCard(Product product) {
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -161,19 +163,19 @@ class _MyProductsScreenState extends State<MyProductsScreen>
                 child: Container(
                   width: 80,
                   height: 80,
-                  color: Colors.grey[100],
+                  color: theme.cardColor,
                   child: product.thumbnail.isNotEmpty
                       ? Image.network(
                           product.thumbnail,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Icon(
                             Icons.image_not_supported,
-                            color: Colors.grey[400],
+                            color: theme.hintColor,
                           ),
                         )
                       : Icon(
                           Icons.inventory_2_outlined,
-                          color: Colors.grey[400],
+                          color: theme.hintColor,
                         ),
                 ),
               ),
@@ -185,10 +187,10 @@ class _MyProductsScreenState extends State<MyProductsScreen>
                   children: [
                     Text(
                       product.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: theme.textTheme.bodyLarge?.color,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

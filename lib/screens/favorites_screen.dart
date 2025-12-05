@@ -4,6 +4,7 @@ import '../services/favorite_service.dart';
 import '../models/product.dart';
 import '../models/api_error.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
+import '../config/app_theme.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -107,14 +108,14 @@ class FavoritesScreenState extends State<FavoritesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Favorites',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
@@ -138,18 +139,18 @@ class FavoritesScreenState extends State<FavoritesScreen>
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'No favorites yet',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: theme.textTheme.titleLarge?.color,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Save your favorite products here',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 14, color: theme.hintColor),
                   ),
                   const SizedBox(height: 32),
                   ElevatedButton.icon(
@@ -157,7 +158,7 @@ class FavoritesScreenState extends State<FavoritesScreen>
                       Navigator.pushReplacementNamed(context, '/home');
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4CAF50),
+                      backgroundColor: AppTheme.primaryGreen,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
@@ -207,12 +208,13 @@ class FavoritesScreenState extends State<FavoritesScreen>
   }
 
   Widget _buildProductCard(Product product) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
             spreadRadius: 0,
@@ -220,7 +222,7 @@ class FavoritesScreenState extends State<FavoritesScreen>
         ],
       ),
       child: Material(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: () async {
@@ -261,7 +263,7 @@ class FavoritesScreenState extends State<FavoritesScreen>
                           return Container(
                             width: double.infinity,
                             height: double.infinity,
-                            color: Colors.grey[200],
+                            color: theme.cardColor,
                             child: Center(
                               child: CircularProgressIndicator(
                                 value: loadingProgress.expectedTotalBytes != null
@@ -277,20 +279,20 @@ class FavoritesScreenState extends State<FavoritesScreen>
                         errorBuilder: (_, __, ___) => Container(
                           width: double.infinity,
                           height: double.infinity,
-                          color: Colors.grey[200],
+                          color: theme.cardColor,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.image_not_supported,
                                 size: 40,
-                                color: Colors.grey[400],
+                                color: theme.hintColor,
                               ),
                               const SizedBox(height: 8),
                               Text(
                                 'No Image',
                                 style: TextStyle(
-                                  color: Colors.grey[400],
+                                  color: theme.hintColor,
                                   fontSize: 12,
                                 ),
                               ),
@@ -327,7 +329,7 @@ class FavoritesScreenState extends State<FavoritesScreen>
                       top: 8,
                       right: 8,
                       child: Material(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(20),
                         elevation: 2,
                         child: InkWell(
@@ -388,11 +390,11 @@ class FavoritesScreenState extends State<FavoritesScreen>
                         product.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                           height: 1.3,
-                          color: Colors.black87,
+                          color: theme.textTheme.bodyLarge?.color,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -416,7 +418,7 @@ class FavoritesScreenState extends State<FavoritesScreen>
                                 Text(
                                   '/day',
                                   style: TextStyle(
-                                    color: Colors.grey[600],
+                                    color: theme.hintColor,
                                     fontSize: 11,
                                   ),
                                 ),

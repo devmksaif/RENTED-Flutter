@@ -9,6 +9,7 @@ import '../services/storage_service.dart';
 import '../utils/responsive_utils.dart';
 import '../utils/logger.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
+import '../config/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -176,6 +177,7 @@ class _HomeScreenState extends State<HomeScreen>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
+        final theme = Theme.of(context);
         return SafeArea(
           child: StatefulBuilder(
             builder: (context, setModalState) {
@@ -183,9 +185,9 @@ class _HomeScreenState extends State<HomeScreen>
                 constraints: BoxConstraints(
                   maxHeight: responsive.screenHeight * 0.85,
                 ),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                 ),
                 padding: EdgeInsets.only(
                   bottom: responsive.keyboardHeight + responsive.spacing(20),
@@ -239,11 +241,11 @@ class _HomeScreenState extends State<HomeScreen>
                                     );
                                     setState(() => _selectedCategory = null);
                                   },
-                                  selectedColor: const Color(0xFF4CAF50),
+                                  selectedColor: AppTheme.primaryGreen,
                                   labelStyle: TextStyle(
                                     color: _selectedCategory == null
                                         ? Colors.white
-                                        : Colors.black,
+                                        : theme.textTheme.bodyLarge?.color,
                                   ),
                                 ),
                                 ..._categories.map(
@@ -263,12 +265,12 @@ class _HomeScreenState extends State<HomeScreen>
                                             : null,
                                       );
                                     },
-                                    selectedColor: const Color(0xFF4CAF50),
+                                    selectedColor: AppTheme.primaryGreen,
                                     labelStyle: TextStyle(
                                       color:
                                           _selectedCategory?.id == category.id
                                           ? Colors.white
-                                          : Colors.black,
+                                          : theme.textTheme.bodyLarge?.color,
                                     ),
                                   ),
                                 ),
@@ -292,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     min: 0,
                                     max: 1000,
                                     divisions: 100,
-                                    activeColor: const Color(0xFF4CAF50),
+                                    activeColor: AppTheme.primaryGreen,
                                     onChanged: (values) {
                                       setModalState(() {
                                         _minPrice = values.start;
@@ -345,13 +347,11 @@ class _HomeScreenState extends State<HomeScreen>
                                                   _selectedLocation = location,
                                             );
                                           },
-                                          selectedColor: const Color(
-                                            0xFF4CAF50,
-                                          ),
+                                          selectedColor: AppTheme.primaryGreen,
                                           labelStyle: TextStyle(
                                             color: _selectedLocation == location
                                                 ? Colors.white
-                                                : Colors.black,
+                                                : theme.textTheme.bodyLarge?.color,
                                           ),
                                         ),
                                       )
@@ -398,11 +398,11 @@ class _HomeScreenState extends State<HomeScreen>
                                               : 0,
                                         );
                                       },
-                                      selectedColor: const Color(0xFF4CAF50),
+                                      selectedColor: AppTheme.primaryGreen,
                                       labelStyle: TextStyle(
                                         color: _minRating == rating
                                             ? Colors.white
-                                            : Colors.black,
+                                            : theme.textTheme.bodyLarge?.color,
                                       ),
                                     ),
                                   );
@@ -435,8 +435,8 @@ class _HomeScreenState extends State<HomeScreen>
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 14,
                                       ),
-                                      side: const BorderSide(
-                                        color: Color(0xFF4CAF50),
+                                      side: BorderSide(
+                                        color: AppTheme.primaryGreen,
                                       ),
                                     ),
                                     child: const Text('Reset'),
@@ -457,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen>
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 14,
                                       ),
-                                      backgroundColor: const Color(0xFF4CAF50),
+                                      backgroundColor: AppTheme.primaryGreen,
                                       foregroundColor: Colors.white,
                                     ),
                                     child: const Text('Apply Filters'),
@@ -482,6 +482,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtils(context);
+    final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
         top: false, // Allow content to go under status bar for header image
@@ -506,17 +507,17 @@ class _HomeScreenState extends State<HomeScreen>
                             height: double.infinity,
                             errorBuilder: (context, error, stackTrace) =>
                                 Container(
-                                  color: Colors.grey[300],
+                                  color: theme.cardColor,
                                   child: Icon(
                                     Icons.home,
                                     size: 100,
-                                    color: Colors.grey[400],
+                                    color: theme.hintColor,
                                   ),
                                 ),
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
                               return Container(
-                                color: Colors.grey[300],
+                                color: theme.cardColor,
                                 child: Center(
                                   child: CircularProgressIndicator(
                                     value:
@@ -541,7 +542,7 @@ class _HomeScreenState extends State<HomeScreen>
                         SafeArea(
                           bottom: false,
                           child: Container(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             padding: EdgeInsets.symmetric(
                               horizontal: responsive.spacing(24),
                               vertical: responsive.spacing(16),
@@ -670,18 +671,18 @@ class _HomeScreenState extends State<HomeScreen>
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: theme.cardColor,
                                       borderRadius: BorderRadius.circular(32),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black12,
+                                          color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.12),
                                           blurRadius: 8,
                                         ),
                                       ],
                                     ),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.search, color: Colors.grey),
+                                        Icon(Icons.search, color: theme.hintColor),
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: TextField(
@@ -690,7 +691,7 @@ class _HomeScreenState extends State<HomeScreen>
                                               hintText:
                                                   'What are you looking for?',
                                               hintStyle: TextStyle(
-                                                color: Colors.grey,
+                                                color: theme.hintColor,
                                                 fontSize: 16,
                                               ),
                                               border: InputBorder.none,
@@ -766,9 +767,9 @@ class _HomeScreenState extends State<HomeScreen>
                       child: Center(
                         child: Padding(
                           padding: const EdgeInsets.all(32),
-                          child: CircularProgressIndicator(
-                            color: Color(0xFF4CAF50),
-                          ),
+                              child: CircularProgressIndicator(
+                                color: AppTheme.primaryGreen,
+                              ),
                         ),
                       ),
                     )
@@ -781,7 +782,7 @@ class _HomeScreenState extends State<HomeScreen>
                             'No products available',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey[600],
+                              color: theme.hintColor,
                             ),
                           ),
                         ),
@@ -822,7 +823,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   Navigator.pushNamed(context, '/products');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF4CAF50),
+                                  backgroundColor: AppTheme.primaryGreen,
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 32,
@@ -859,13 +860,14 @@ class _HomeScreenState extends State<HomeScreen>
         final cardWidth = constraints.maxWidth;
         final imageHeight = cardWidth * 0.75; // Responsive image height
 
+        final theme = Theme.of(context);
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
+                color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.08),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -892,20 +894,20 @@ class _HomeScreenState extends State<HomeScreen>
                   child: Container(
                     height: imageHeight,
                     width: double.infinity,
-                    color: Colors.grey[100],
+                    color: theme.cardColor,
                     child: product.thumbnail.isNotEmpty
                         ? Image.network(
                             product.thumbnail,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Icon(
                               Icons.image_not_supported,
-                              color: Colors.grey[400],
+                              color: theme.hintColor,
                               size: cardWidth * 0.25,
                             ),
                           )
                         : Icon(
                             Icons.inventory_2_outlined,
-                            color: Colors.grey[400],
+                            color: theme.hintColor,
                             size: cardWidth * 0.25,
                           ),
                   ),
@@ -923,7 +925,7 @@ class _HomeScreenState extends State<HomeScreen>
                           style: TextStyle(
                             fontSize: cardWidth * 0.08,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: theme.textTheme.bodyLarge?.color,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -933,7 +935,7 @@ class _HomeScreenState extends State<HomeScreen>
                           product.category.name,
                           style: TextStyle(
                             fontSize: cardWidth * 0.06,
-                            color: Colors.grey[600],
+                            color: theme.hintColor,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -950,14 +952,14 @@ class _HomeScreenState extends State<HomeScreen>
                                     style: TextStyle(
                                       fontSize: cardWidth * 0.09,
                                       fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF4CAF50),
+                                      color: AppTheme.primaryGreen,
                                     ),
                                   ),
                                   Text(
                                     'per day',
                                     style: TextStyle(
                                       fontSize: cardWidth * 0.055,
-                                      color: Colors.grey,
+                                      color: theme.hintColor,
                                     ),
                                   ),
                                 ],
@@ -974,7 +976,7 @@ class _HomeScreenState extends State<HomeScreen>
                                         : Icons.favorite_border,
                                     color: isFavorite
                                         ? Colors.red
-                                        : Colors.grey[400],
+                                        : theme.hintColor,
                                     size: cardWidth * 0.1,
                                   ),
                                   padding: EdgeInsets.zero,

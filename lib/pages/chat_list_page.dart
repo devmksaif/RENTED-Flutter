@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/mock_data.dart';
+import '../config/app_theme.dart';
 import 'chat_conversation_page.dart';
 
 class ChatListPage extends StatelessWidget {
@@ -7,13 +8,14 @@ class ChatListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'Chats',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
@@ -33,7 +35,7 @@ class ChatListPage extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+                border: Border(bottom: BorderSide(color: theme.dividerColor)),
               ),
               child: Row(
                 children: [
@@ -51,9 +53,9 @@ class ChatListPage extends StatelessWidget {
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: Color(0xFF4CAF50),
+                              color: AppTheme.primaryGreen,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
+                              border: Border.all(color: theme.cardColor, width: 2),
                             ),
                           ),
                         ),
@@ -71,6 +73,7 @@ class ChatListPage extends StatelessWidget {
                             fontWeight: chat.unread
                                 ? FontWeight.w700
                                 : FontWeight.w600,
+                            color: theme.textTheme.titleLarge?.color,
                           ),
                         ),
                         SizedBox(height: 4),
@@ -78,7 +81,7 @@ class ChatListPage extends StatelessWidget {
                           chat.lastMessage,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey[600],
+                            color: theme.hintColor,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -92,7 +95,7 @@ class ChatListPage extends StatelessWidget {
                     children: [
                       Text(
                         '${chat.time.hour}:${chat.time.minute.toString().padLeft(2, '0')}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: TextStyle(fontSize: 12, color: theme.hintColor),
                       ),
                       if (chat.unread)
                         Padding(
@@ -101,7 +104,7 @@ class ChatListPage extends StatelessWidget {
                             width: 10,
                             height: 10,
                             decoration: BoxDecoration(
-                              color: Color(0xFF4CAF50),
+                              color: AppTheme.primaryGreen,
                               shape: BoxShape.circle,
                             ),
                           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/new_listing_model.dart';
+import '../config/app_theme.dart';
 import 'new_listing_step3_page.dart';
 
 class NewListingStep2Page extends StatefulWidget {
@@ -59,17 +60,18 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'New Listing',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -82,9 +84,9 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
             Row(
               children: [
                 _ProgressStep(number: 1, label: 'Info', isActive: false),
-                Expanded(child: Container(height: 2, color: Colors.grey[300])),
+                Expanded(child: Container(height: 2, color: theme.dividerColor)),
                 _ProgressStep(number: 2, label: 'Photos', isActive: true),
-                Expanded(child: Container(height: 2, color: Colors.grey[300])),
+                Expanded(child: Container(height: 2, color: theme.dividerColor)),
                 _ProgressStep(number: 3, label: 'Review', isActive: false),
               ],
             ),
@@ -93,7 +95,11 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
             // Photos Section
             Text(
               'Photos',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.titleLarge?.color,
+              ),
             ),
             SizedBox(height: 16),
 
@@ -102,9 +108,9 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
                 width: double.infinity,
                 height: 150,
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[300]!),
+                  border: Border.all(color: theme.dividerColor),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -112,10 +118,13 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
                     Icon(
                       Icons.image_not_supported,
                       size: 48,
-                      color: Colors.grey,
+                      color: theme.hintColor,
                     ),
                     SizedBox(height: 8),
-                    Text('No photos yet', style: TextStyle(color: Colors.grey)),
+                    Text(
+                      'No photos yet',
+                      style: TextStyle(color: theme.hintColor),
+                    ),
                   ],
                 ),
               )
@@ -146,7 +155,7 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
                           onTap: () => removeImage(index),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.red,
+                              color: AppTheme.errorRed,
                               shape: BoxShape.circle,
                             ),
                             padding: EdgeInsets.all(4),
@@ -188,14 +197,18 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
             // Location Section
             Text(
               'Location',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.titleLarge?.color,
+              ),
             ),
             SizedBox(height: 16),
             TextField(
               controller: locationController,
               decoration: InputDecoration(
                 hintText: 'Enter location',
-                prefixIcon: Icon(Icons.location_on, color: Color(0xFF4CAF50)),
+                prefixIcon: Icon(Icons.location_on, color: AppTheme.primaryGreen),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -211,17 +224,20 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
               width: double.infinity,
               height: 150,
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[300]!),
+                border: Border.all(color: theme.dividerColor),
               ),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.map, size: 48, color: Colors.grey),
+                    Icon(Icons.map, size: 48, color: theme.hintColor),
                     SizedBox(height: 8),
-                    Text('Map preview', style: TextStyle(color: Colors.grey)),
+                    Text(
+                      'Map preview',
+                      style: TextStyle(color: theme.hintColor),
+                    ),
                   ],
                 ),
               ),
@@ -235,8 +251,8 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[200],
-                      foregroundColor: Colors.black,
+                      backgroundColor: theme.dividerColor,
+                      foregroundColor: theme.textTheme.bodyLarge?.color,
                       padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -257,7 +273,7 @@ class _NewListingStep2PageState extends State<NewListingStep2Page> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF4CAF50),
+                      backgroundColor: AppTheme.primaryGreen,
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -297,20 +313,21 @@ class _ProgressStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: isActive ? Color(0xFF4CAF50) : Colors.grey[300],
+            color: isActive ? AppTheme.primaryGreen : theme.dividerColor,
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Text(
               '$number',
               style: TextStyle(
-                color: isActive ? Colors.white : Colors.grey,
+                color: isActive ? Colors.white : theme.hintColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -319,7 +336,11 @@ class _ProgressStep extends StatelessWidget {
         SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: theme.textTheme.bodySmall?.color,
+          ),
         ),
       ],
     );

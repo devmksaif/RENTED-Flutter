@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/app_theme.dart';
 
 class IconButtonRounded extends StatelessWidget {
   final IconData icon;
@@ -20,6 +21,7 @@ class IconButtonRounded extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Tooltip(
       message: tooltip ?? '',
       child: GestureDetector(
@@ -28,11 +30,13 @@ class IconButtonRounded extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: backgroundColor ?? Color(0xFF4CAF50),
+            color: backgroundColor ?? AppTheme.primaryGreen,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black12,
+                color: theme.brightness == Brightness.dark
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.black12,
                 blurRadius: 8,
                 offset: Offset(0, 2),
               ),

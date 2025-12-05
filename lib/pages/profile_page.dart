@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/mock_data.dart';
+import '../config/app_theme.dart';
 import 'product_details_page.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -7,30 +8,32 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final user = mockCurrentUser;
     final userListings = mockProducts
         .where((p) => p.owner.id == user.id)
         .toList();
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 200,
             pinned: true,
-            backgroundColor: Color(0xFF4CAF50),
+            backgroundColor: AppTheme.primaryGreen,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                color: Color(0xFF4CAF50),
+                color: AppTheme.primaryGreen,
                 child: Stack(
                   children: [
                     Positioned.fill(
                       child: Container(
-                        color: Color(0xFF4CAF50).withValues(alpha: 0.9),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.9),
                       ),
                     ),
                     Padding(
@@ -85,23 +88,33 @@ class ProfilePage extends StatelessWidget {
                   // Bio and Location
                   Text(
                     'About',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.titleLarge?.color,
+                    ),
                   ),
                   SizedBox(height: 8),
                   Text(
                     user.bio,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                    style: TextStyle(fontSize: 14, color: theme.hintColor),
                   ),
                   SizedBox(height: 12),
                   Row(
                     children: [
                       Icon(
                         Icons.location_on,
-                        color: Color(0xFF4CAF50),
+                        color: AppTheme.primaryGreen,
                         size: 18,
                       ),
                       SizedBox(width: 8),
-                      Text(user.location, style: TextStyle(fontSize: 14)),
+                      Text(
+                        user.location,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.textTheme.bodyMedium?.color,
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: 24),
@@ -112,7 +125,7 @@ class ProfilePage extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF4CAF50),
+                            backgroundColor: AppTheme.primaryGreen,
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -135,7 +148,7 @@ class ProfilePage extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF4CAF50),
+                            backgroundColor: AppTheme.primaryGreen,
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -163,14 +176,18 @@ class ProfilePage extends StatelessWidget {
                   // My Listings
                   Text(
                     'My Listings',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.titleLarge?.color,
+                    ),
                   ),
                   SizedBox(height: 16),
                   if (userListings.isEmpty)
                     Center(
                       child: Text(
                         'No listings yet',
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: theme.hintColor),
                       ),
                     )
                   else
@@ -179,9 +196,9 @@ class ProfilePage extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey[200]!),
+                            border: Border.all(color: theme.dividerColor),
                           ),
                           child: ListTile(
                             leading: ClipRRect(
@@ -194,16 +211,22 @@ class ProfilePage extends StatelessWidget {
                             ),
                             title: Text(
                               product.title,
-                              style: TextStyle(fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: theme.textTheme.titleLarge?.color,
+                              ),
                             ),
-                            subtitle: Text('\$${product.price}/day'),
+                            subtitle: Text(
+                              '\$${product.price}/day',
+                              style: TextStyle(color: theme.hintColor),
+                            ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
                                   icon: Icon(
                                     Icons.edit,
-                                    color: Color(0xFF4CAF50),
+                                    color: AppTheme.primaryGreen,
                                   ),
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -216,7 +239,10 @@ class ProfilePage extends StatelessWidget {
                                   },
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: AppTheme.errorRed,
+                                  ),
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -260,6 +286,7 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Text(
@@ -267,11 +294,14 @@ class _StatCard extends StatelessWidget {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF4CAF50),
+            color: AppTheme.primaryGreen,
           ),
         ),
         SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: theme.hintColor),
+        ),
       ],
     );
   }

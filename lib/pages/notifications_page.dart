@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/mock_data.dart';
+import '../config/app_theme.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
@@ -19,13 +20,14 @@ class NotificationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'Notifications',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
@@ -37,7 +39,7 @@ class NotificationsPage extends StatelessWidget {
                   Icon(
                     Icons.notifications_off,
                     size: 64,
-                    color: Colors.grey[300],
+                    color: theme.hintColor,
                   ),
                   SizedBox(height: 16),
                   Text(
@@ -45,7 +47,7 @@ class NotificationsPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey,
+                      color: theme.hintColor,
                     ),
                   ),
                 ],
@@ -61,7 +63,7 @@ class NotificationsPage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: Colors.grey[200]!),
+                      bottom: BorderSide(color: theme.dividerColor),
                     ),
                   ),
                   child: Row(
@@ -70,12 +72,12 @@ class NotificationsPage extends StatelessWidget {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: Color(0xFFE8F5E9),
+                          color: AppTheme.accentGreen,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           getIconForType(notif['icon'] as String),
-                          color: Color(0xFF4CAF50),
+                          color: AppTheme.primaryGreen,
                           size: 24,
                         ),
                       ),
@@ -89,6 +91,7 @@ class NotificationsPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
+                                color: theme.textTheme.titleLarge?.color,
                               ),
                             ),
                             SizedBox(height: 4),
@@ -96,7 +99,7 @@ class NotificationsPage extends StatelessWidget {
                               notif['message'] as String,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey[600],
+                                color: theme.hintColor,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -106,7 +109,7 @@ class NotificationsPage extends StatelessWidget {
                               timeAgo,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[500],
+                                color: theme.hintColor,
                               ),
                             ),
                           ],

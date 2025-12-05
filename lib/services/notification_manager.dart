@@ -19,10 +19,16 @@ class NotificationManager {
   
   bool _isInitialized = false;
   int _unreadCount = 0;
+  GlobalKey<NavigatorState>? _navigatorKey;
   
   // Callbacks
   Function(int)? onUnreadCountChanged;
   Function(NotificationItem)? onNewNotification;
+  
+  /// Set navigator key for navigation handling
+  void setNavigatorKey(GlobalKey<NavigatorState> key) {
+    _navigatorKey = key;
+  }
 
   /// Initialize notification manager, WebSocket, and FCM
   Future<void> initialize() async {
@@ -37,14 +43,23 @@ class NotificationManager {
       }
 
       // Initialize FCM (Firebase Cloud Messaging)
+      // This will gracefully skip if Firebase is not configured
       try {
         await _fcmService.initialize();
-        // Set up FCM notification handler
-        _fcmService.onNotificationReceived = (data) {
-          _handleFcmNotification(data);
-        };
-      } catch (e) {
+        if (_fcmService.isInitialized) {
+          // Set up FCM notification handler
+          _fcmService.onNotificationReceived = (data) {
+            _handleFcmNotification(data);
+          };
+          AppLogger.i('✅ FCM service initialized and ready');
+        } else {
+          AppLogger.w('⚠️ FCM service not initialized (Firebase may not be configured)');
+          AppLogger.w('💡 To enable push notifications, run: flutterfire configure');
+        }
+      } catch (e, stackTrace) {
         AppLogger.w('⚠️ FCM initialization failed (may not be configured): $e');
+        AppLogger.d('Stack trace: $stackTrace');
+        // Continue without FCM - app will work with WebSocket notifications only
       }
 
       // Set up WebSocket callbacks for rental notifications
@@ -73,27 +88,56 @@ class NotificationManager {
 
       String title = 'Notification';
       String message = 'You have a new notification';
+      String route = '/notifications'; // Default route
+      dynamic routeArguments;
 
       switch (type) {
         case 'rental_created':
           title = 'New Rental Request';
           message = 'Someone wants to rent your product';
+          route = '/my-rentals';
           break;
         case 'rental_status_changed':
           title = 'Rental Status Updated';
           message = 'Your rental status has changed';
+          final rentalId = data['rental_id'] as int?;
+          if (rentalId != null) {
+            route = '/rental-detail';
+            routeArguments = rentalId;
+          } else {
+            route = '/my-rentals';
+          }
           break;
         case 'new_message':
           title = 'New Message';
           message = 'You have a new message';
+          final conversationId = data['conversation_id'] as int?;
+          if (conversationId != null) {
+            route = '/chat';
+            routeArguments = conversationId;
+          } else {
+            route = '/conversations';
+          }
           break;
         case 'offer_received':
           title = 'New Offer';
           message = 'You have received a new offer';
+          route = '/notifications';
+          break;
+        case 'product_approved':
+          title = 'Product Approved';
+          message = 'Your product has been approved';
+          route = '/my-products';
+          break;
+        case 'product_rejected':
+          title = 'Product Rejected';
+          message = 'Your product listing was rejected';
+          route = '/my-products';
           break;
         default:
           title = data['title'] as String? ?? title;
           message = data['body'] as String? ?? message;
+          route = data['route'] as String? ?? '/notifications';
       }
 
       // Show toast notification
@@ -102,6 +146,19 @@ class NotificationManager {
         backgroundColor: Colors.green,
         toastLength: Toast.LENGTH_LONG,
       );
+
+      // Navigate to appropriate screen if navigator is available
+      // route is always assigned in switch statement, so it's never null here
+      if (_navigatorKey?.currentState != null) {
+        final currentRoute = route; // route is always assigned in switch statement
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (routeArguments != null) {
+            _navigatorKey!.currentState!.pushNamed(currentRoute, arguments: routeArguments);
+          } else {
+            _navigatorKey!.currentState!.pushNamed(currentRoute);
+          }
+        });
+      }
 
       // Refresh unread count
       _refreshUnreadCount();
@@ -120,16 +177,20 @@ class NotificationManager {
 
       if (data == null) return;
 
-      String title;
-      String message;
+      String title = 'Notification';
+      String message = 'Notification';
+      String route = '/notifications'; // Default route
+      dynamic routeArguments;
 
       switch (type) {
         case 'rental.created':
           title = 'New Rental Request';
           message = 'Someone wants to rent your product';
+          route = '/my-rentals';
           break;
         case 'rental.status.changed':
           final newStatus = data['new_status'] as String?;
+          final rentalId = data['rental_id'] as int?;
           title = 'Rental Status Updated';
           switch (newStatus) {
             case 'approved':
@@ -147,6 +208,12 @@ class NotificationManager {
             default:
               message = 'Rental status has changed';
           }
+          if (rentalId != null) {
+            route = '/rental-detail';
+            routeArguments = rentalId;
+          } else {
+            route = '/my-rentals';
+          }
           break;
         default:
           return;
@@ -158,6 +225,19 @@ class NotificationManager {
         backgroundColor: Colors.green,
         toastLength: Toast.LENGTH_LONG,
       );
+
+      // Navigate to appropriate screen if navigator is available
+      // route is always assigned in switch statement, so it's never null here
+      if (_navigatorKey?.currentState != null) {
+        final currentRoute = route; // route is always assigned in switch statement
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (routeArguments != null) {
+            _navigatorKey!.currentState!.pushNamed(currentRoute, arguments: routeArguments);
+          } else {
+            _navigatorKey!.currentState!.pushNamed(currentRoute);
+          }
+        });
+      }
 
       // Refresh unread count
       _refreshUnreadCount();

@@ -66,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorRed),
             child: const Text('Logout'),
           ),
         ],
@@ -93,6 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -113,11 +114,11 @@ class _ProfileScreenState extends State<ProfileScreen>
           ? const Center(child: CircularProgressIndicator())
           : _user == null
           ? const Center(child: Text('Unable to load profile'))
-          : _buildProfileContent(),
+          : _buildProfileContent(theme),
     );
   }
 
-  Widget _buildProfileContent() {
+  Widget _buildProfileContent(ThemeData theme) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -136,7 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               children: [
                 CircleAvatar(
                   radius: 50,
-                  backgroundColor: Colors.white,
+                  backgroundColor: theme.cardColor,
                   backgroundImage: _user!.avatarUrl != null && _user!.avatarUrl!.isNotEmpty
                       ? NetworkImage(_user!.avatarUrl!)
                       : null,
@@ -163,7 +164,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                 const SizedBox(height: 8),
                 Text(
                   _user!.email,
-                  style: const TextStyle(fontSize: 16, color: Colors.white70),
+                  style: TextStyle(
+                    fontSize: 16, 
+                    color: Colors.white.withValues(alpha: 0.7),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 _buildVerificationBadge(),
@@ -240,8 +244,8 @@ class _ProfileScreenState extends State<ProfileScreen>
             icon: Icons.logout,
             title: 'Logout',
             onTap: _logout,
-            textColor: Colors.red,
-            iconColor: Colors.red,
+            textColor: AppTheme.errorRed,
+            iconColor: AppTheme.errorRed,
           ),
           const SizedBox(height: 24),
         ],
@@ -250,22 +254,23 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildVerificationBadge() {
+    final theme = Theme.of(context);
     if (_user!.isVerified) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.verified, color: Colors.green, size: 18),
-            SizedBox(width: 6),
+            const Icon(Icons.verified, color: AppTheme.successGreen, size: 18),
+            const SizedBox(width: 6),
             Text(
               'Verified',
               style: TextStyle(
-                color: Colors.green,
+                color: AppTheme.successGreen,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -276,18 +281,18 @@ class _ProfileScreenState extends State<ProfileScreen>
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.pending, color: Colors.orange, size: 18),
-            SizedBox(width: 6),
+            const Icon(Icons.pending, color: AppTheme.warningOrange, size: 18),
+            const SizedBox(width: 6),
             Text(
               'Pending Verification',
               style: TextStyle(
-                color: Colors.orange,
+                color: AppTheme.warningOrange,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -298,17 +303,20 @@ class _ProfileScreenState extends State<ProfileScreen>
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.warning, color: Colors.red, size: 18),
+            Icon(Icons.warning, color: AppTheme.errorRed, size: 18),
             SizedBox(width: 6),
             Text(
               'Not Verified',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AppTheme.errorRed, 
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

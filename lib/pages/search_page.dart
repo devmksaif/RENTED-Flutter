@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/mock_data.dart';
 import '../models/product_model.dart';
 import '../components/product_card.dart';
+import '../config/app_theme.dart';
 import 'product_details_page.dart';
 
 class SearchPage extends StatefulWidget {
@@ -75,13 +76,14 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'Search',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
@@ -95,10 +97,10 @@ class _SearchPageState extends State<SearchPage> {
               onChanged: (_) => filterProducts(),
               decoration: InputDecoration(
                 hintText: 'Search items...',
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
+                prefixIcon: Icon(Icons.search, color: theme.hintColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+                  borderSide: BorderSide(color: theme.dividerColor),
                 ),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 16,
@@ -169,7 +171,7 @@ class _SearchPageState extends State<SearchPage> {
                         Icon(
                           Icons.search_off,
                           size: 64,
-                          color: Colors.grey[300],
+                          color: theme.hintColor,
                         ),
                         SizedBox(height: 16),
                         Text(
@@ -177,7 +179,7 @@ class _SearchPageState extends State<SearchPage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey,
+                            color: theme.hintColor,
                           ),
                         ),
                       ],

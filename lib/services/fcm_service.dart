@@ -1,13 +1,12 @@
 import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../config/api_config.dart';
 import '../utils/logger.dart';
 import 'storage_service.dart';
-import '../models/api_error.dart';
 
 /// Firebase Cloud Messaging Service
 /// Handles push notifications from Firebase
@@ -16,7 +15,7 @@ class FcmService {
   factory FcmService() => _instance;
   FcmService._internal();
 
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  FirebaseMessaging? _firebaseMessaging;
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
   final StorageService _storageService = StorageService();
 
@@ -27,13 +26,31 @@ class FcmService {
   Function(Map<String, dynamic>)? onNotificationReceived;
   Function(String)? onTokenRefreshed;
 
+  /// Check if Firebase is available
+  bool _isFirebaseAvailable() {
+    try {
+      return Firebase.apps.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
+
   /// Initialize FCM service
   Future<void> initialize() async {
     if (_isInitialized) return;
 
+    // Check if Firebase is initialized
+    if (!_isFirebaseAvailable()) {
+      AppLogger.w('⚠️ FCM: Firebase not initialized, skipping FCM setup');
+      AppLogger.w('💡 To enable push notifications, run: flutterfire configure');
+      return;
+    }
+
     try {
+      _firebaseMessaging = FirebaseMessaging.instance;
+      
       // Request notification permissions
-      final settings = await _firebaseMessaging.requestPermission(
+      final settings = await _firebaseMessaging!.requestPermission(
         alert: true,
         badge: true,
         sound: true,
@@ -59,7 +76,7 @@ class FcmService {
       _setupMessageHandlers();
 
       // Listen for token refresh
-      _firebaseMessaging.onTokenRefresh.listen((newToken) {
+      _firebaseMessaging!.onTokenRefresh.listen((newToken) {
         _fcmToken = newToken;
         _updateTokenOnServer(newToken);
         onTokenRefreshed?.call(newToken);
@@ -108,8 +125,9 @@ class FcmService {
 
   /// Get FCM token and send to server
   Future<void> _getFcmToken() async {
+    if (_firebaseMessaging == null) return;
     try {
-      _fcmToken = await _firebaseMessaging.getToken();
+      _fcmToken = await _firebaseMessaging!.getToken();
       if (_fcmToken != null) {
         AppLogger.i('📱 FCM Token: $_fcmToken');
         await _updateTokenOnServer(_fcmToken!);
@@ -149,6 +167,8 @@ class FcmService {
 
   /// Set up message handlers
   void _setupMessageHandlers() {
+    if (_firebaseMessaging == null) return;
+    
     // Handle foreground messages (when app is open)
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       AppLogger.i('📬 FCM: Foreground message received');
@@ -162,7 +182,7 @@ class FcmService {
     });
 
     // Handle notification when app is opened from terminated state
-    _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
+    _firebaseMessaging!.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
         AppLogger.i('📬 FCM: App opened from notification');
         _handleNotificationTap(message);
@@ -226,8 +246,9 @@ class FcmService {
 
   /// Delete FCM token (on logout)
   Future<void> deleteToken() async {
+    if (_firebaseMessaging == null) return;
     try {
-      await _firebaseMessaging.deleteToken();
+      await _firebaseMessaging!.deleteToken();
       _fcmToken = null;
       AppLogger.i('🗑️ FCM token deleted');
     } catch (e) {
@@ -238,9 +259,25 @@ class FcmService {
 
 /// Top-level function for background message handler
 /// Must be top-level (not a class method)
+/// This function must be registered in main() before runApp()
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Initialize Firebase in background isolate if needed
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp();
+    }
+  } catch (e) {
+    // Firebase already initialized or not available
+  }
+  
   AppLogger.i('📬 FCM: Background message received: ${message.messageId}');
-  // Handle background message if needed
+  
+  // Handle background message
+  // You can process the notification data here
+  final data = message.data;
+  if (data.isNotEmpty) {
+    AppLogger.i('📬 FCM: Background notification data: $data');
+  }
 }
 

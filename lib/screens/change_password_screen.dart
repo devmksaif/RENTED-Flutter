@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:rented/config/app_theme.dart';
 import '../services/auth_service.dart';
 import '../models/api_error.dart';
 
@@ -81,13 +82,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Change Password'),
-        backgroundColor: Colors.white,
         elevation: 0,
       ),
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -110,7 +111,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         Text(
                           'Enter your current password and choose a new one',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey[600],
+                                color: Theme.of(context).hintColor,
                               ),
                         ),
                         const SizedBox(height: 24),
@@ -219,7 +220,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _changePassword,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF4CAF50),
+                              backgroundColor: AppTheme.primaryGreen,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
