@@ -99,8 +99,12 @@ class _ProfileScreenState extends State<ProfileScreen>
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.pushNamed(context, '/edit-profile');
+            onPressed: () async {
+              final result = await Navigator.pushNamed(context, '/edit-profile');
+              // Reload user data if profile was updated
+              if (result == true && mounted) {
+                _loadUser();
+              }
             },
           ),
         ],

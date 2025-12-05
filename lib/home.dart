@@ -456,6 +456,24 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  void _filterByCategory(String categoryName) {
+    setState(() {
+      if (_selectedCategoryFilter == categoryName) {
+        // If already selected, clear filter
+        _selectedCategoryFilter = null;
+        _displayedProducts = _products;
+      } else {
+        // Filter products by category name
+        _selectedCategoryFilter = categoryName;
+        _displayedProducts = _products.where((product) {
+          return product.category.name
+              .toLowerCase()
+              .contains(categoryName.toLowerCase());
+        }).toList();
+      }
+    });
+  }
 }
 
 // Product Search Delegate
@@ -639,24 +657,6 @@ class ProductSearchDelegate extends SearchDelegate<String> {
         );
       },
     );
-  }
-
-  void _filterByCategory(String categoryName) {
-    setState(() {
-      if (_selectedCategoryFilter == categoryName) {
-        // If already selected, clear filter
-        _selectedCategoryFilter = null;
-        _displayedProducts = _products;
-      } else {
-        // Filter products by category name
-        _selectedCategoryFilter = categoryName;
-        _displayedProducts = _products.where((product) {
-          return product.category.name
-              .toLowerCase()
-              .contains(categoryName.toLowerCase());
-        }).toList();
-      }
-    });
   }
 }
 

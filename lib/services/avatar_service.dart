@@ -41,10 +41,10 @@ class AvatarService {
       );
 
       // Delete old avatar if exists
-      if (currentUser?.avatar != null && currentUser!.avatar!.isNotEmpty) {
+      if (currentUser?.avatarUrl != null && currentUser!.avatarUrl!.isNotEmpty) {
         try {
           // Extract path from URL if it's a full URL
-          String? oldPath = currentUser.avatar;
+          String? oldPath = currentUser.avatarUrl;
           if (oldPath != null && oldPath.contains('/storage/')) {
             oldPath = oldPath.split('/storage/').last;
           }
@@ -60,13 +60,13 @@ class AvatarService {
 
       // Update user profile with new avatar URL
       final url = ApiConfig.userProfile;
-      AppLogger.apiRequest('PATCH', url, body: {'avatar': uploadResult['url']});
+      AppLogger.apiRequest('PUT', url, body: {'avatar_url': uploadResult['url']});
 
       final response = await http
-          .patch(
+          .put(
             Uri.parse(url),
             headers: ApiConfig.getAuthHeaders(token),
-            body: jsonEncode({'avatar': uploadResult['url']}),
+            body: jsonEncode({'avatar_url': uploadResult['url']}),
           )
           .timeout(ApiConfig.connectionTimeout);
 
@@ -74,7 +74,30 @@ class AvatarService {
       AppLogger.apiResponse(response.statusCode, url, body: responseData);
 
       if (response.statusCode == 200) {
-        final user = User.fromJson(responseData['data']);
+        final userData = responseData['data'];
+        final user = User.fromJson(userData);
+        
+        // If the API response doesn't include the avatar_url, use the one we just uploaded
+        if (user.avatarUrl == null || user.avatarUrl!.isEmpty) {
+          AppLogger.w('⚠️ API response missing avatar_url, using uploaded URL');
+          final userWithAvatar = User(
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            avatarUrl: uploadResult['url'], // Use the URL from upload response
+            emailVerifiedAt: user.emailVerifiedAt,
+            verificationStatus: user.verificationStatus,
+            verifiedAt: user.verifiedAt,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+          );
+          AppLogger.d('📸 Updated user avatar_url: ${userWithAvatar.avatarUrl}');
+          await _storageService.saveUser(userWithAvatar);
+          AppLogger.i('✅ Avatar uploaded successfully');
+          return userWithAvatar;
+        }
+        
+        AppLogger.d('📸 Updated user avatar_url: ${user.avatarUrl}');
         // Update locally stored user
         await _storageService.saveUser(user);
         AppLogger.i('✅ Avatar uploaded successfully');
@@ -120,9 +143,9 @@ class AvatarService {
       );
 
       // Delete old avatar if exists
-      if (currentUser?.avatar != null && currentUser!.avatar!.isNotEmpty) {
+      if (currentUser?.avatarUrl != null && currentUser!.avatarUrl!.isNotEmpty) {
         try {
-          String? oldPath = currentUser.avatar;
+          String? oldPath = currentUser.avatarUrl;
           if (oldPath != null && oldPath.contains('/storage/')) {
             oldPath = oldPath.split('/storage/').last;
           }
@@ -137,13 +160,13 @@ class AvatarService {
 
       // Update user profile with new avatar URL
       final url = ApiConfig.userProfile;
-      AppLogger.apiRequest('PATCH', url, body: {'avatar': uploadResult['url']});
+      AppLogger.apiRequest('PUT', url, body: {'avatar_url': uploadResult['url']});
 
       final response = await http
-          .patch(
+          .put(
             Uri.parse(url),
             headers: ApiConfig.getAuthHeaders(token),
-            body: jsonEncode({'avatar': uploadResult['url']}),
+            body: jsonEncode({'avatar_url': uploadResult['url']}),
           )
           .timeout(ApiConfig.connectionTimeout);
 
@@ -151,7 +174,30 @@ class AvatarService {
       AppLogger.apiResponse(response.statusCode, url, body: responseData);
 
       if (response.statusCode == 200) {
-        final user = User.fromJson(responseData['data']);
+        final userData = responseData['data'];
+        final user = User.fromJson(userData);
+        
+        // If the API response doesn't include the avatar_url, use the one we just uploaded
+        if (user.avatarUrl == null || user.avatarUrl!.isEmpty) {
+          AppLogger.w('⚠️ API response missing avatar_url, using uploaded URL');
+          final userWithAvatar = User(
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            avatarUrl: uploadResult['url'], // Use the URL from upload response
+            emailVerifiedAt: user.emailVerifiedAt,
+            verificationStatus: user.verificationStatus,
+            verifiedAt: user.verifiedAt,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+          );
+          AppLogger.d('📸 Updated user avatar_url: ${userWithAvatar.avatarUrl}');
+          await _storageService.saveUser(userWithAvatar);
+          AppLogger.i('✅ Avatar uploaded successfully');
+          return userWithAvatar;
+        }
+        
+        AppLogger.d('📸 Updated user avatar_url: ${user.avatarUrl}');
         await _storageService.saveUser(user);
         AppLogger.i('✅ Avatar uploaded successfully');
         return user;
@@ -167,75 +213,6 @@ class AvatarService {
       rethrow;
     } catch (e, stackTrace) {
       AppLogger.networkError('uploadAvatarBase64', e);
-      AppLogger.e('Failed to upload avatar', e, stackTrace);
-      throw ApiError(
-        message: 'Failed to upload avatar: ${e.toString()}',
-        statusCode: 0,
-      );
-    }
-  }
-
-  /// Delete user avatar
-  Future<User> deleteAvatar() async {
-    final url = ApiConfig.userAvatar;
-    try {
-      AppLogger.apiRequest('POST', url);
-      AppLogger.i('🖼️ Uploading avatar');
-
-      final token = await _storageService.getToken();
-      if (token == null) {
-        AppLogger.apiError(url, 401, 'Not authenticated');
-        throw ApiError(message: 'Not authenticated', statusCode: 401);
-      }
-
-      // Check if file exists
-      final avatarFile = File(avatarPath);
-      if (!await avatarFile.exists()) {
-        AppLogger.apiError(url, 400, 'Avatar file not found');
-        throw ApiError(message: 'Avatar file not found', statusCode: 400);
-      }
-
-      // Create multipart request
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(url),
-      );
-
-      // Add headers
-      request.headers.addAll(ApiConfig.getMultipartHeaders(token));
-
-      // Add avatar file
-      request.files.add(
-        await http.MultipartFile.fromPath('avatar', avatarPath),
-      );
-
-      // Send request
-      final streamedResponse = await request.send().timeout(
-        ApiConfig.connectionTimeout,
-      );
-      final response = await http.Response.fromStream(streamedResponse);
-
-      final responseData = jsonDecode(response.body);
-      AppLogger.apiResponse(response.statusCode, url, body: responseData);
-
-      if (response.statusCode == 200) {
-        final user = User.fromJson(responseData['data']);
-        // Update locally stored user
-        await _storageService.saveUser(user);
-        AppLogger.i('✅ Avatar uploaded successfully');
-        return user;
-      } else {
-        AppLogger.apiError(url, response.statusCode, responseData['message'] ?? 'Unknown error', errors: responseData['errors']);
-        throw ApiError.fromJson(responseData, response.statusCode);
-      }
-    } on SocketException catch (e) {
-      AppLogger.networkError('uploadAvatar', e);
-      throw ApiError(message: 'No internet connection', statusCode: 0);
-    } on ApiError catch (e) {
-      AppLogger.apiError(url, e.statusCode, e.message, errors: e.errors);
-      rethrow;
-    } catch (e, stackTrace) {
-      AppLogger.networkError('uploadAvatar', e);
       AppLogger.e('Failed to upload avatar', e, stackTrace);
       throw ApiError(
         message: 'Failed to upload avatar: ${e.toString()}',

@@ -11,6 +11,16 @@ import 'storage_service.dart';
 class ImageUploadService {
   final StorageService _storageService = StorageService();
 
+  /// Fixes URLs that contain localhost by replacing with the actual server URL
+  String _fixImageUrl(String url) {
+    if (url.contains('localhost:8000')) {
+      // Replace localhost:8000 with the actual server URL
+      final baseUrl = ApiConfig.baseUrl.replaceAll('/api/v1', '');
+      return url.replaceAll('http://localhost:8000', baseUrl);
+    }
+    return url;
+  }
+
   /// Upload a single image
   /// 
   /// [imagePath] - Path to image file (for file upload)
@@ -257,7 +267,7 @@ class ImageUploadService {
     var request = http.MultipartRequest('POST', Uri.parse(url));
     request.headers.addAll(ApiConfig.getMultipartHeaders(token));
     request.fields['type'] = type;
-    request.fields['base64'] = 'false';
+    // base64 field not needed for file uploads - API detects file upload automatically
     request.files.add(await http.MultipartFile.fromPath('image', imagePath));
 
     final streamedResponse = await request.send().timeout(ApiConfig.connectionTimeout);
@@ -345,7 +355,7 @@ class ImageUploadService {
     var request = http.MultipartRequest('POST', Uri.parse(url));
     request.headers.addAll(ApiConfig.getMultipartHeaders(token));
     request.fields['type'] = type;
-    request.fields['base64'] = 'false';
+    // base64 field not needed for file uploads - API detects file upload automatically
 
     for (var path in imagePaths) {
       request.files.add(await http.MultipartFile.fromPath('images[]', path));
@@ -431,7 +441,7 @@ class ImageUploadService {
 
     var request = http.MultipartRequest('POST', Uri.parse(url));
     request.headers.addAll(ApiConfig.getMultipartHeaders(token));
-    request.fields['base64'] = 'false';
+    // base64 field not needed for file uploads - API detects file upload automatically
     request.files.add(await http.MultipartFile.fromPath('avatar', avatarPath));
 
     final streamedResponse = await request.send().timeout(ApiConfig.connectionTimeout);
@@ -441,10 +451,11 @@ class ImageUploadService {
 
     if (response.statusCode == 201) {
       final data = responseData['data'];
+      final fixedUrl = _fixImageUrl(data['url']);
       AppLogger.i('✅ Avatar uploaded successfully: ${data['path']}');
       return {
         'path': data['path'],
-        'url': data['url'],
+        'url': fixedUrl,
       };
     } else {
       AppLogger.apiError(
@@ -481,10 +492,11 @@ class ImageUploadService {
 
     if (response.statusCode == 201) {
       final data = responseData['data'];
+      final fixedUrl = _fixImageUrl(data['url']);
       AppLogger.i('✅ Avatar uploaded successfully: ${data['path']}');
       return {
         'path': data['path'],
-        'url': data['url'],
+        'url': fixedUrl,
       };
     } else {
       AppLogger.apiError(

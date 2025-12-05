@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../config/app_theme.dart';
 import '../services/auth_service.dart';
+import '../services/avatar_service.dart';
+import '../services/image_picker_service.dart';
+import '../models/user.dart';
 import '../utils/responsive_utils.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -13,6 +17,8 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final AuthService _authService = AuthService();
+  final AvatarService _avatarService = AvatarService();
+  final ImagePickerService _imagePickerService = ImagePickerService();
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _nameController;
@@ -20,6 +26,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   bool _isLoading = true;
   bool _isSaving = false;
+  bool _isUploadingAvatar = false;
+  User? _currentUser;
+  File? _selectedAvatarFile;
 
   @override
   void initState() {
@@ -41,6 +50,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final user = await _authService.getCurrentUser();
       if (mounted) {
         setState(() {
+          _currentUser = user;
           _nameController.text = user.name;
           _emailController.text = user.email;
           _isLoading = false;
@@ -64,13 +74,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       // Update profile via API
-      await _authService.updateProfile(
+      final updatedUser = await _authService.updateProfile(
         name: _nameController.text,
         email: _emailController.text,
       );
 
       if (mounted) {
-        setState(() => _isSaving = false);
+        setState(() {
+          _currentUser = updatedUser;
+          _isSaving = false;
+        });
         Fluttertoast.showToast(
           msg: 'Profile updated successfully',
           backgroundColor: Colors.green,
@@ -123,16 +136,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             CircleAvatar(
                               radius: 60,
                               backgroundColor: AppTheme.primaryGreen,
-                              child: Text(
-                                _nameController.text.isNotEmpty
-                                    ? _nameController.text[0].toUpperCase()
-                                    : 'U',
-                                style: const TextStyle(
-                                  fontSize: 48,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              backgroundImage: _getAvatarImage(),
+                              child: _getAvatarImage() == null
+                                  ? Text(
+                                      _nameController.text.isNotEmpty
+                                          ? _nameController.text[0].toUpperCase()
+                                          : 'U',
+                                      style: const TextStyle(
+                                        fontSize: 48,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : null,
                             ),
                             Positioned(
                               bottom: 0,
@@ -147,17 +163,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                 ),
                                 child: IconButton(
-                                  icon: const Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                  onPressed: () {
-                                    Fluttertoast.showToast(
-                                      msg: 'Photo upload coming soon',
-                                      backgroundColor: Colors.blue,
-                                    );
-                                  },
+                                  icon: _isUploadingAvatar
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.camera_alt,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                  onPressed: _isUploadingAvatar ? null : _showImageSourceDialog,
                                 ),
                               ),
                             ),
@@ -240,6 +262,135 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
     );
+  }
+
+  ImageProvider? _getAvatarImage() {
+    if (_selectedAvatarFile != null) {
+      return FileImage(_selectedAvatarFile!);
+    }
+    if (_currentUser?.avatarUrl != null && _currentUser!.avatarUrl!.isNotEmpty) {
+      return NetworkImage(_currentUser!.avatarUrl!);
+    }
+    return null;
+  }
+
+  Future<void> _showImageSourceDialog() async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppTheme.primaryGreen),
+              title: const Text('Take Photo'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickAndUploadImage(fromCamera: true);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppTheme.primaryGreen),
+              title: const Text('Choose from Gallery'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickAndUploadImage(fromCamera: false);
+              },
+            ),
+            if (_currentUser?.avatarUrl != null && _currentUser!.avatarUrl!.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text('Remove Photo', style: TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteAvatar();
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickAndUploadImage({required bool fromCamera}) async {
+    try {
+      final File? imageFile = await _imagePickerService.pickImage(fromCamera: fromCamera);
+      
+      if (imageFile == null) {
+        return; // User cancelled
+      }
+
+      setState(() {
+        _selectedAvatarFile = imageFile;
+        _isUploadingAvatar = true;
+      });
+
+      // Upload avatar
+      final updatedUser = await _avatarService.uploadAvatar(imageFile.path);
+
+      if (mounted) {
+        setState(() {
+          _currentUser = updatedUser;
+          _selectedAvatarFile = null; // Clear selected file to show network image
+          _isUploadingAvatar = false;
+        });
+
+        Fluttertoast.showToast(
+          msg: 'Profile picture updated successfully',
+          backgroundColor: Colors.green,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isUploadingAvatar = false;
+          _selectedAvatarFile = null;
+        });
+
+        Fluttertoast.showToast(
+          msg: 'Failed to upload photo: ${e.toString()}',
+          backgroundColor: Colors.red,
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteAvatar() async {
+    try {
+      setState(() {
+        _isUploadingAvatar = true;
+      });
+
+      final updatedUser = await _avatarService.deleteAvatar();
+
+      if (mounted) {
+        setState(() {
+          _currentUser = updatedUser;
+          _selectedAvatarFile = null;
+          _isUploadingAvatar = false;
+        });
+
+        Fluttertoast.showToast(
+          msg: 'Profile picture removed',
+          backgroundColor: Colors.green,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isUploadingAvatar = false;
+        });
+
+        Fluttertoast.showToast(
+          msg: 'Failed to remove photo: ${e.toString()}',
+          backgroundColor: Colors.red,
+        );
+      }
+    }
   }
 
   Widget _buildTextField({
