@@ -142,12 +142,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                       : null,
                   child: _user!.avatarUrl == null || _user!.avatarUrl!.isEmpty
                       ? Text(
-                          _user!.name[0].toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryGreen,
-                          ),
+                    _user!.name[0].toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryGreen,
+                    ),
                         )
                       : null,
                 ),

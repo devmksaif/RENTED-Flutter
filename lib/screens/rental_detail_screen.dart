@@ -4,6 +4,7 @@ import '../models/rental.dart';
 import '../models/api_error.dart';
 import '../services/rental_service.dart';
 import '../services/dispute_service.dart';
+import '../widgets/avatar_image.dart';
 import '../config/app_theme.dart';
 
 class RentalDetailScreen extends StatefulWidget {
@@ -381,22 +382,11 @@ class _RentalDetailScreenState extends State<RentalDetailScreen> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    CircleAvatar(
+                    AvatarImage(
+                      imageUrl: rental.renter.avatarUrl,
+                      name: rental.renter.name,
                       radius: 30,
                       backgroundColor: AppTheme.primaryGreen,
-                      backgroundImage: rental.renter.avatarUrl != null && rental.renter.avatarUrl!.isNotEmpty
-                          ? NetworkImage(rental.renter.avatarUrl!)
-                          : null,
-                      child: rental.renter.avatarUrl == null || rental.renter.avatarUrl!.isEmpty
-                          ? Text(
-                              rental.renter.name[0].toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          : null,
                     ),
                     const SizedBox(width: 12),
                     Expanded(

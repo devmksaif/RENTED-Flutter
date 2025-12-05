@@ -10,6 +10,7 @@ import '../services/rental_availability_service.dart';
 import '../services/message_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/availability_calendar.dart';
+import '../widgets/avatar_image.dart';
 import '../utils/logger.dart';
 import '../config/app_theme.dart';
 
@@ -291,17 +292,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 if (product.owner != null)
                   Card(
                     child: ListTile(
-                      leading: CircleAvatar(
+                      leading: AvatarImage(
+                        imageUrl: product.owner!.avatarUrl,
+                        name: product.owner!.name,
+                        radius: 25,
                         backgroundColor: AppTheme.primaryGreen,
-                        backgroundImage: product.owner!.avatarUrl != null && product.owner!.avatarUrl!.isNotEmpty
-                            ? NetworkImage(product.owner!.avatarUrl!)
-                            : null,
-                        child: product.owner!.avatarUrl == null || product.owner!.avatarUrl!.isEmpty
-                            ? Text(
-                                product.owner!.name[0].toUpperCase(),
-                                style: const TextStyle(color: Colors.white),
-                              )
-                            : null,
                       ),
                       title: Text(product.owner!.name),
                       subtitle: Text(product.owner!.email),

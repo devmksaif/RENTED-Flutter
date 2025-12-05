@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../services/conversation_service.dart';
 import '../models/api_error.dart';
+import '../widgets/avatar_image.dart';
 import '../config/app_theme.dart';
 
 class ConversationsScreen extends StatefulWidget {
@@ -113,17 +114,11 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                           !(lastMessage['is_read'] ?? false);
 
                       return ListTile(
-                        leading: CircleAvatar(
+                        leading: AvatarImage(
+                          imageUrl: otherUser['avatar_url'],
+                          name: otherUser['name'] ?? 'Unknown User',
+                          radius: 25,
                           backgroundColor: AppTheme.primaryGreen,
-                          backgroundImage: otherUser['avatar_url'] != null
-                              ? NetworkImage(otherUser['avatar_url'])
-                              : null,
-                          child: otherUser['avatar_url'] == null
-                              ? Text(
-                                  (otherUser['name'] ?? 'U')[0].toUpperCase(),
-                                  style: const TextStyle(color: Colors.white),
-                                )
-                              : null,
                         ),
                         title: Text(
                           otherUser['name'] ?? 'Unknown User',

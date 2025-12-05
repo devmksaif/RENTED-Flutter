@@ -6,6 +6,7 @@ import '../services/message_service.dart';
 import '../services/websocket_service.dart';
 import '../services/offer_service.dart';
 import '../models/api_error.dart';
+import '../widgets/avatar_image.dart';
 import '../config/app_theme.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -236,17 +237,11 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(
+            AvatarImage(
+              imageUrl: otherUser['avatar_url'],
+              name: otherUser['name'] ?? 'Unknown User',
+              radius: 20,
               backgroundColor: AppTheme.primaryGreen,
-              backgroundImage: otherUser['avatar_url'] != null
-                  ? NetworkImage(otherUser['avatar_url'])
-                  : null,
-              child: otherUser['avatar_url'] == null
-                  ? Text(
-                      (otherUser['name'] ?? 'U')[0].toUpperCase(),
-                      style: const TextStyle(color: Colors.white),
-                    )
-                  : null,
             ),
             const SizedBox(width: 12),
             Expanded(
