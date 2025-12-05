@@ -410,7 +410,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       const Spacer(),
                       FutureBuilder<bool>(
-                        future: _favoritesService.isFavorite(product.id),
+                        future: _favoriteService.isFavorite(product.id),
                         builder: (context, snapshot) {
                           final isFavorite = snapshot.data ?? false;
                           return IconButton(
@@ -512,13 +512,7 @@ class ProductSearchDelegate extends SearchDelegate<String> {
         }
 
         final products = snapshot.data ?? [];
-        final displayedProducts = _selectedCategoryFilter == null
-            ? products
-            : products.where((product) {
-                return product.category.name
-                    .toLowerCase()
-                    .contains(_selectedCategoryFilter!.toLowerCase());
-              }).toList();
+        final displayedProducts = products;
 
         if (displayedProducts.isEmpty) {
           return Center(
@@ -646,7 +640,6 @@ class ProductSearchDelegate extends SearchDelegate<String> {
       },
     );
   }
-}
 
   void _filterByCategory(String categoryName) {
     setState(() {

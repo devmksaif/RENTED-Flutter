@@ -62,6 +62,11 @@ class ApiConfig {
   // Social Auth
   static const String googleAuth = '$baseUrl/auth/google';
   static const String googleAuthCallback = '$baseUrl/auth/google/callback';
+  
+  // Image Upload (New Unified API)
+  static const String uploadImage = '$baseUrl/upload/image';
+  static const String uploadImages = '$baseUrl/upload/images';
+  static const String uploadAvatar = '$baseUrl/upload/avatar';
 
   // Timeout durations
   static const Duration connectionTimeout = Duration(seconds: 30);

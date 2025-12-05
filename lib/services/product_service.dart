@@ -8,9 +8,11 @@ import '../models/category.dart';
 import '../models/api_error.dart';
 import '../utils/logger.dart';
 import 'storage_service.dart';
+import 'image_upload_service.dart';
 
 class ProductService {
   final StorageService _storageService = StorageService();
+  final ImageUploadService _imageUploadService = ImageUploadService();
 
   /// Get all products (paginated)
   Future<List<Product>> getProducts({int page = 1, int perPage = 15}) async {
@@ -200,8 +202,9 @@ class ProductService {
     }
   }
 
-  /// Create product (requires multipart for files)
-  /// API accepts images[] array (1-5 images). First image becomes thumbnail.
+  /// Create product using new image upload API
+  /// Images are uploaded first, then product is created with image paths
+  /// API accepts 1-10 images. First image becomes thumbnail.
   Future<Product> createProduct({
     required int categoryId,
     required String title,
@@ -226,8 +229,7 @@ class ProductService {
     double? deliveryRadiusKm,
     bool? pickupAvailable,
     String? productCondition,
-    required List<String>
-    imagePaths, // Changed: Now required array (min 1, max 5)
+    required List<String> imagePaths, // File paths to upload (1-10 images)
   }) async {
     try {
       final token = await _storageService.getToken();
@@ -244,111 +246,69 @@ class ProductService {
         );
       }
 
-      if (imagePaths.length > 5) {
-        AppLogger.validationError('images', 'Maximum 5 images allowed');
-        throw ApiError(message: 'Maximum 5 images allowed', statusCode: 400);
+      if (imagePaths.length > 10) {
+        AppLogger.validationError('images', 'Maximum 10 images allowed');
+        throw ApiError(message: 'Maximum 10 images allowed', statusCode: 400);
       }
 
       AppLogger.i('📤 Creating product: $title');
       AppLogger.d('Product details: category=$categoryId, price=\$$pricePerDay, images=${imagePaths.length}');
 
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(ApiConfig.products),
+      // Step 1: Upload images first using new upload API
+      AppLogger.i('📤 Step 1: Uploading ${imagePaths.length} product images...');
+      final uploadResult = await _imageUploadService.uploadImages(
+        imagePaths: imagePaths,
+        type: 'product_images',
+        useBase64: false,
       );
 
-      // Add headers
-      request.headers.addAll(ApiConfig.getMultipartHeaders(token));
+      final uploadedImagePaths = uploadResult['paths'] as List<String>;
+      AppLogger.i('✅ Images uploaded: ${uploadedImagePaths.length} images');
 
-      // Add required fields
-      request.fields['category_id'] = categoryId.toString();
-      request.fields['title'] = title;
-      request.fields['description'] = description;
-      request.fields['price_per_day'] = pricePerDay.toString();
-      request.fields['is_for_sale'] = isForSale ? '1' : '0';
-      
-      // Add optional fields
-      if (salePrice != null) {
-        request.fields['sale_price'] = salePrice.toString();
-      }
-      if (pricePerWeek != null) {
-        request.fields['price_per_week'] = pricePerWeek.toString();
-      }
-      if (pricePerMonth != null) {
-        request.fields['price_per_month'] = pricePerMonth.toString();
-      }
-      if (securityDeposit != null) {
-        request.fields['security_deposit'] = securityDeposit.toString();
-      }
-      if (minRentalDays != null) {
-        request.fields['min_rental_days'] = minRentalDays.toString();
-      }
-      if (maxRentalDays != null) {
-        request.fields['max_rental_days'] = maxRentalDays.toString();
-      }
-      if (locationAddress != null && locationAddress.isNotEmpty) {
-        request.fields['location_address'] = locationAddress;
-      }
-      if (locationCity != null && locationCity.isNotEmpty) {
-        request.fields['location_city'] = locationCity;
-      }
-      if (locationState != null && locationState.isNotEmpty) {
-        request.fields['location_state'] = locationState;
-      }
-      if (locationCountry != null && locationCountry.isNotEmpty) {
-        request.fields['location_country'] = locationCountry;
-      }
-      if (locationZip != null && locationZip.isNotEmpty) {
-        request.fields['location_zip'] = locationZip;
-      }
-      if (locationLatitude != null) {
-        request.fields['location_latitude'] = locationLatitude.toString();
-      }
-      if (locationLongitude != null) {
-        request.fields['location_longitude'] = locationLongitude.toString();
-      }
-      if (deliveryAvailable != null) {
-        request.fields['delivery_available'] = deliveryAvailable ? '1' : '0';
-      }
-      if (deliveryFee != null) {
-        request.fields['delivery_fee'] = deliveryFee.toString();
-      }
-      if (deliveryRadiusKm != null) {
-        request.fields['delivery_radius_km'] = deliveryRadiusKm.toString();
-      }
-      if (pickupAvailable != null) {
-        request.fields['pickup_available'] = pickupAvailable ? '1' : '0';
-      }
-      if (productCondition != null && productCondition.isNotEmpty) {
-        request.fields['product_condition'] = productCondition;
-      }
-
-      // Add images (API expects images[], first one becomes thumbnail)
-      for (int i = 0; i < imagePaths.length; i++) {
-        final imageFile = File(imagePaths[i]);
-        if (await imageFile.exists()) {
-          request.files.add(
-            await http.MultipartFile.fromPath('images[]', imagePaths[i]),
-          );
-        } else {
-          throw ApiError(
-            message: 'Image file not found: ${imagePaths[i]}',
-            statusCode: 400,
-          );
-        }
-      }
+      // Step 2: Create product with uploaded image paths
+      AppLogger.i('📤 Step 2: Creating product with image paths...');
+      final productData = {
+        'category_id': categoryId,
+        'title': title,
+        'description': description,
+        'price_per_day': pricePerDay,
+        'is_for_sale': isForSale ? 1 : 0,
+        'thumbnail': uploadedImagePaths[0], // First image is thumbnail
+        'images': uploadedImagePaths, // All images
+        if (salePrice != null) 'sale_price': salePrice,
+        if (pricePerWeek != null) 'price_per_week': pricePerWeek,
+        if (pricePerMonth != null) 'price_per_month': pricePerMonth,
+        if (securityDeposit != null) 'security_deposit': securityDeposit,
+        if (minRentalDays != null) 'min_rental_days': minRentalDays,
+        if (maxRentalDays != null) 'max_rental_days': maxRentalDays,
+        if (locationAddress != null && locationAddress.isNotEmpty) 'location_address': locationAddress,
+        if (locationCity != null && locationCity.isNotEmpty) 'location_city': locationCity,
+        if (locationState != null && locationState.isNotEmpty) 'location_state': locationState,
+        if (locationCountry != null && locationCountry.isNotEmpty) 'location_country': locationCountry,
+        if (locationZip != null && locationZip.isNotEmpty) 'location_zip': locationZip,
+        if (locationLatitude != null) 'location_latitude': locationLatitude,
+        if (locationLongitude != null) 'location_longitude': locationLongitude,
+        if (deliveryAvailable != null) 'delivery_available': deliveryAvailable ? 1 : 0,
+        if (deliveryFee != null) 'delivery_fee': deliveryFee,
+        if (deliveryRadiusKm != null) 'delivery_radius_km': deliveryRadiusKm,
+        if (pickupAvailable != null) 'pickup_available': pickupAvailable ? 1 : 0,
+        if (productCondition != null && productCondition.isNotEmpty) 'product_condition': productCondition,
+      };
 
       AppLogger.apiRequest('POST', ApiConfig.products, body: {
         'category_id': categoryId,
         'title': title,
         'price_per_day': pricePerDay,
-        'images_count': imagePaths.length,
-      }, headers: ApiConfig.getMultipartHeaders(token));
+        'images_count': uploadedImagePaths.length,
+      }, headers: ApiConfig.getAuthHeaders(token));
 
-      final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 30),
-      );
-      final response = await http.Response.fromStream(streamedResponse);
+      final response = await http
+          .post(
+            Uri.parse(ApiConfig.products),
+            headers: ApiConfig.getAuthHeaders(token),
+            body: jsonEncode(productData),
+          )
+          .timeout(ApiConfig.connectionTimeout);
 
       final responseData = jsonDecode(response.body);
       AppLogger.apiResponse(response.statusCode, ApiConfig.products, body: responseData);
@@ -358,6 +318,9 @@ class ProductService {
         AppLogger.i('✅ Product created successfully: ID ${product.id} - ${product.title}');
         return product;
       } else {
+        // If product creation fails, we should ideally delete the uploaded images
+        // But for now, just log the error
+        AppLogger.w('⚠️ Product creation failed, but images were already uploaded');
         AppLogger.apiError(ApiConfig.products, response.statusCode, responseData['message'] ?? 'Unknown error', errors: responseData['errors']);
         throw ApiError.fromJson(responseData, response.statusCode);
       }
