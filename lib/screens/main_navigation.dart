@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'home_screen.dart';
 import 'favorites_screen.dart';
 import 'my_products_screen.dart';
 import 'profile_screen.dart';
 import 'conversations_screen.dart';
+import '../services/storage_service.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -91,7 +93,25 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
       floatingActionButton: _currentIndex == 3
           ? FloatingActionButton.extended(
-              onPressed: () {
+              onPressed: () async {
+                // Check if user is verified
+                final storageService = StorageService();
+                final currentUser = await storageService.getUser();
+                if (currentUser == null) {
+                  Fluttertoast.showToast(
+                    msg: 'You must be logged in to create a product',
+                    backgroundColor: Colors.red,
+                  );
+                  return;
+                }
+                if (!currentUser.isVerified) {
+                  Fluttertoast.showToast(
+                    msg: 'You must be verified to create products. Please complete your verification first.',
+                    backgroundColor: Colors.orange,
+                    toastLength: Toast.LENGTH_LONG,
+                  );
+                  return;
+                }
                 Navigator.pushNamed(context, '/add-product');
               },
               backgroundColor: const Color(0xFF4CAF50),

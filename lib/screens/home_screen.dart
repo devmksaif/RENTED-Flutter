@@ -5,6 +5,7 @@ import '../models/category.dart';
 import '../models/api_error.dart';
 import '../services/product_service.dart';
 import '../services/favorite_service.dart';
+import '../services/storage_service.dart';
 import '../utils/responsive_utils.dart';
 import '../utils/logger.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
@@ -583,7 +584,25 @@ class _HomeScreenState extends State<HomeScreen>
                                     ),
                                     elevation: 0,
                                   ),
-                                  onPressed: () {
+                                  onPressed: () async {
+                                    // Check if user is verified
+                                    final storageService = StorageService();
+                                    final currentUser = await storageService.getUser();
+                                    if (currentUser == null) {
+                                      Fluttertoast.showToast(
+                                        msg: 'You must be logged in to create a product',
+                                        backgroundColor: Colors.red,
+                                      );
+                                      return;
+                                    }
+                                    if (!currentUser.isVerified) {
+                                      Fluttertoast.showToast(
+                                        msg: 'You must be verified to create products. Please complete your verification first.',
+                                        backgroundColor: Colors.orange,
+                                        toastLength: Toast.LENGTH_LONG,
+                                      );
+                                      return;
+                                    }
                                     Navigator.pushNamed(
                                       context,
                                       '/add-product',

@@ -4,6 +4,7 @@ import 'models/product.dart';
 import 'models/api_error.dart';
 import 'services/product_service.dart';
 import 'services/favorite_service.dart';
+import 'services/storage_service.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -128,7 +129,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                                 elevation: 0,
                               ),
-                              onPressed: () {
+                              onPressed: () async {
+                                // Check if user is verified
+                                final storageService = StorageService();
+                                final currentUser = await storageService.getUser();
+                                if (currentUser == null) {
+                                  Fluttertoast.showToast(
+                                    msg: 'You must be logged in to create a product',
+                                    backgroundColor: Colors.red,
+                                  );
+                                  return;
+                                }
+                                if (!currentUser.isVerified) {
+                                  Fluttertoast.showToast(
+                                    msg: 'You must be verified to create products. Please complete your verification first.',
+                                    backgroundColor: Colors.orange,
+                                    toastLength: Toast.LENGTH_LONG,
+                                  );
+                                  return;
+                                }
                                 Navigator.pushNamed(context, '/add-product');
                               },
                               child: Text('+  List Item'),
