@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'config/app_theme.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
@@ -91,19 +90,6 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'RENTED',
             theme: AppTheme.lightTheme,
-            builder: (context, child) => ResponsiveWrapper.builder(
-              ClampingScrollWrapper.builder(context, child!),
-              maxWidth: 2460,
-              minWidth: 450,
-              defaultScale: true,
-              breakpoints: [
-                const ResponsiveBreakpoint.resize(450, name: MOBILE),
-                const ResponsiveBreakpoint.autoScale(800, name: TABLET),
-                const ResponsiveBreakpoint.autoScale(1000, name: TABLET),
-                const ResponsiveBreakpoint.resize(1200, name: DESKTOP),
-                const ResponsiveBreakpoint.autoScale(2460, name: "4K"),
-              ],
-            ),
             home: const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             ),
@@ -121,24 +107,6 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          builder: (context, child) => ResponsiveWrapper.builder(
-            ClampingScrollWrapper.builder(context, child!),
-            maxWidth: 2460,
-            minWidth: 450,
-            defaultScale: true,
-            breakpoints: [
-              const ResponsiveBreakpoint.resize(450, name: MOBILE),
-              const ResponsiveBreakpoint.autoScale(800, name: TABLET),
-              const ResponsiveBreakpoint.autoScale(1000, name: TABLET),
-              const ResponsiveBreakpoint.resize(1200, name: DESKTOP),
-              const ResponsiveBreakpoint.autoScale(2460, name: "4K"),
-            ],
-            background: Container(
-              color: themeProvider.isDarkMode 
-                ? AppTheme.darkBackground 
-                : AppTheme.backgroundColor,
-            ),
-          ),
           initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
