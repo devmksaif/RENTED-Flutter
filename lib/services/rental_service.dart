@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/rental.dart';
+import '../models/product.dart';
 import '../models/api_error.dart';
 import '../utils/logger.dart';
 import 'storage_service.dart';
+import 'product_service.dart';
 
 class RentalService {
   final StorageService _storageService = StorageService();
@@ -23,6 +25,53 @@ class RentalService {
       if (token == null) {
         AppLogger.authError('createRental', 'No authentication token found');
         throw ApiError(message: 'Not authenticated', statusCode: 401);
+      }
+
+      // Get current user to check if they're the product owner
+      final currentUser = await _storageService.getUser();
+      if (currentUser == null) {
+        AppLogger.authError('createRental', 'No user data found');
+        throw ApiError(message: 'Not authenticated', statusCode: 401);
+      }
+
+      // Get product details to verify ownership and status
+      final productService = ProductService();
+      Product product;
+      try {
+        product = await productService.getProduct(productId);
+      } catch (e) {
+        AppLogger.e('Failed to fetch product for rental validation', e);
+        throw ApiError(
+          message: 'Product not found or unavailable',
+          statusCode: 404,
+        );
+      }
+
+      // Prevent owners from renting their own products
+      if (product.owner != null && product.owner!.id == currentUser.id) {
+        AppLogger.validationError('product_id', 'You cannot rent your own product');
+        throw ApiError(
+          message: 'You cannot rent your own product',
+          statusCode: 403,
+        );
+      }
+
+      // Only allow rental for approved products
+      if (product.verificationStatus != 'approved') {
+        AppLogger.validationError('product_id', 'Product is not approved for rental');
+        throw ApiError(
+          message: 'This product is not available for rental yet',
+          statusCode: 400,
+        );
+      }
+
+      // Only allow rental for available products
+      if (!product.isAvailable) {
+        AppLogger.validationError('product_id', 'Product is not available');
+        throw ApiError(
+          message: 'This product is not available for rental',
+          statusCode: 400,
+        );
       }
 
       // Validate date format (YYYY-MM-DD)

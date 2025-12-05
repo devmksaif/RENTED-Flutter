@@ -378,34 +378,111 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             if (product.owner != null && _currentUserId != product.owner!.id)
               const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _showRentalDialog(),
-                    icon: const Icon(Icons.access_time),
-                    label: const Text('Rent'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                  ),
+            // Show message if product is not available for rental/purchase
+            if (product.owner != null && _currentUserId == product.owner!.id)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange[200]!),
                 ),
-                if (product.isForSale) ...[
-                  const SizedBox(width: 12),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange[700], size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'This is your product. You cannot rent or purchase your own items.',
+                        style: TextStyle(
+                          color: Colors.orange[900],
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else if (product.verificationStatus != 'approved')
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange[700], size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        product.verificationStatus == 'pending'
+                            ? 'This product is pending approval and not available for rental yet.'
+                            : 'This product is not available for rental.',
+                        style: TextStyle(
+                          color: Colors.orange[900],
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else if (!product.isAvailable)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.red[700], size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'This product is currently not available for rental.',
+                        style: TextStyle(
+                          color: Colors.red[900],
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              Row(
+                children: [
+                  // Only show Rent button if user is not the owner and product is approved and available
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () => _purchaseProduct(),
-                      icon: const Icon(Icons.shopping_cart),
-                      label: const Text('Buy'),
+                      onPressed: () => _showRentalDialog(),
+                      icon: const Icon(Icons.access_time),
+                      label: const Text('Rent'),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: AppTheme.darkGreen,
                       ),
                     ),
                   ),
+                  if (product.isForSale) ...[
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _purchaseProduct(),
+                        icon: const Icon(Icons.shopping_cart),
+                        label: const Text('Buy'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: AppTheme.darkGreen,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            ),
+              ),
           ],
         ),
       ),

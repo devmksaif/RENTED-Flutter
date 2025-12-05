@@ -83,8 +83,15 @@ class _VerificationScreenState extends State<VerificationScreen> {
     }
 
     // If pending, show pending screen
+    // Check both status == 'pending' OR document_status == 'pending' OR has_submitted_documents == true
+    final status = _verificationStatus?['status'];
+    final documentStatus = _verificationStatus?['document_status'];
+    final hasSubmittedDocuments = _verificationStatus?['has_submitted_documents'] == true;
+    
     if (_verificationStatus != null &&
-        _verificationStatus!['status'] == 'pending') {
+        (status == 'pending' || 
+         documentStatus == 'pending' || 
+         hasSubmittedDocuments)) {
       return _buildPendingScreen(context);
     }
 
@@ -94,7 +101,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
       return _buildRejectedScreen(context, responsive);
     }
 
-    // Default: Show upload form
+    // Default: Show upload form (only if no documents have been submitted)
     return _buildUploadForm(context, responsive);
   }
 
@@ -835,6 +842,33 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   Future<void> _submitVerification() async {
+    // Check if documents are already submitted and pending
+    final status = _verificationStatus?['status'];
+    final documentStatus = _verificationStatus?['document_status'];
+    final hasSubmittedDocuments = _verificationStatus?['has_submitted_documents'] == true;
+    
+    if (status == 'pending' || 
+        documentStatus == 'pending' || 
+        hasSubmittedDocuments) {
+      Fluttertoast.showToast(
+        msg: 'You already have a pending verification request. Please wait for review.',
+        backgroundColor: Colors.orange,
+      );
+      // Reload status to show pending screen
+      await _loadVerificationStatus();
+      return;
+    }
+
+    // Check if already verified
+    if (status == 'verified') {
+      Fluttertoast.showToast(
+        msg: 'Your account is already verified',
+        backgroundColor: Colors.green,
+      );
+      await _loadVerificationStatus();
+      return;
+    }
+
     // Check if all documents are uploaded
     if (_idFrontFile == null || _idBackFile == null || _selfieFile == null) {
       Fluttertoast.showToast(

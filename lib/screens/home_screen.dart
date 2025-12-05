@@ -6,6 +6,7 @@ import '../models/api_error.dart';
 import '../services/product_service.dart';
 import '../services/favorite_service.dart';
 import '../utils/responsive_utils.dart';
+import '../utils/logger.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -79,6 +80,8 @@ class _HomeScreenState extends State<HomeScreen>
           _applyFilters();
           _isLoading = false;
         });
+        // Debug: Log filtering results
+        AppLogger.d('📊 Total products: ${products.length}, Filtered: ${_filteredProducts.length}');
       }
     } on ApiError catch (e) {
       if (mounted) {
@@ -126,6 +129,19 @@ class _HomeScreenState extends State<HomeScreen>
   void _applyFilters() {
     setState(() {
       _filteredProducts = _products.where((product) {
+        // Only show approved products
+        // If verification_status is null, assume backend is filtering and allow it
+        // If verification_status is set, only allow 'approved'
+        final status = product.verificationStatus;
+        if (status != null && status != 'approved') {
+          return false;
+        }
+
+        // Only show available products
+        if (!product.isAvailable) {
+          return false;
+        }
+
         // Search filter
         if (_searchController.text.isNotEmpty) {
           final searchLower = _searchController.text.toLowerCase();
@@ -752,20 +768,64 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                     )
-                  : SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: responsive.gridColumns(
-                          mobile: 2,
-                          tablet: 3,
-                          desktop: 4,
+                  : SliverList(
+                      delegate: SliverChildListDelegate([
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: responsive.gridColumns(
+                              mobile: 2,
+                              tablet: 3,
+                              desktop: 4,
+                            ),
+                            childAspectRatio: responsive.cardAspectRatio,
+                            crossAxisSpacing: responsive.spacing(10),
+                            mainAxisSpacing: responsive.spacing(10),
+                          ),
+                          itemCount: _filteredProducts.length >= 10
+                              ? 10
+                              : _filteredProducts.length,
+                          itemBuilder: (context, index) {
+                            return _buildProductCard(_filteredProducts[index]);
+                          },
                         ),
-                        childAspectRatio: responsive.cardAspectRatio,
-                        crossAxisSpacing: responsive.spacing(10),
-                        mainAxisSpacing: responsive.spacing(10),
-                      ),
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        return _buildProductCard(_filteredProducts[index]);
-                      }, childCount: _filteredProducts.length),
+                        // Show All Products Button
+                        if (_filteredProducts.length >= 10)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 24,
+                            ),
+                            child: Center(
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/products');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF4CAF50),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 2,
+                                ),
+                                icon: const Icon(Icons.grid_view),
+                                label: Text(
+                                  'Show All Products (${_filteredProducts.length})',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ]),
                     ),
             ),
           ],

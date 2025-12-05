@@ -15,9 +15,12 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
+  // Use GlobalKey to access FavoritesScreen state
+  final GlobalKey<FavoritesScreenState> _favoritesKey = GlobalKey<FavoritesScreenState>();
+
+  late final List<Widget> _screens = [
     const HomeScreen(),
-    const FavoritesScreen(),
+    FavoritesScreen(key: _favoritesKey),
     const ConversationsScreen(),
     const MyProductsScreen(),
     const ProfileScreen(),
@@ -45,7 +48,9 @@ class _MainNavigationState extends State<MainNavigation> {
               _currentIndex = index;
             });
             // Refresh favorites screen when tab is selected
-            // The RefreshOnFocusMixin will handle the refresh automatically
+            if (index == 1 && _favoritesKey.currentState != null) {
+              _favoritesKey.currentState!.loadFavorites();
+            }
           },
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,

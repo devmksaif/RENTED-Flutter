@@ -34,6 +34,15 @@ class ProductService {
         final List<dynamic> productsJson = responseData['data'];
         final products = productsJson.map((json) => Product.fromJson(json)).toList();
         AppLogger.i('✅ Retrieved ${products.length} products');
+        
+        // Debug: Log verification status of products
+        final statusCounts = <String, int>{};
+        for (var product in products) {
+          final status = product.verificationStatus ?? 'null';
+          statusCounts[status] = (statusCounts[status] ?? 0) + 1;
+        }
+        AppLogger.d('📊 Product verification status breakdown: $statusCounts');
+        
         return products;
       } else {
         AppLogger.apiError(url, response.statusCode, responseData['message'] ?? 'Unknown error', errors: responseData['errors']);

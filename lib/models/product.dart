@@ -77,22 +77,47 @@ class Product {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
-    // Handle missing category (use default for product creation response)
-    final categoryJson =
-        json['category'] ??
-        {
-          'id': 0,
-          'name': 'Unknown',
-          'slug': 'unknown',
-          'description': null,
-          'is_active': true,
-        };
+    // Handle category - can be a Map, String, or null
+    dynamic categoryValue = json['category'];
+    Map<String, dynamic> categoryJson;
+    
+    if (categoryValue == null) {
+      // Use default for missing category
+      categoryJson = {
+        'id': 0,
+        'name': 'Unknown',
+        'slug': 'unknown',
+        'description': null,
+        'is_active': true,
+      };
+    } else if (categoryValue is String) {
+      // Category is a string (e.g., "Vehicles") - convert to Map format
+      categoryJson = {
+        'id': 0,
+        'name': categoryValue,
+        'slug': categoryValue.toLowerCase().replaceAll(' ', '_'),
+        'description': null,
+        'is_active': true,
+      };
+    } else if (categoryValue is Map) {
+      // Category is already a Map
+      categoryJson = categoryValue as Map<String, dynamic>;
+    } else {
+      // Fallback for unexpected type
+      categoryJson = {
+        'id': 0,
+        'name': 'Unknown',
+        'slug': 'unknown',
+        'description': null,
+        'is_active': true,
+      };
+    }
 
     return Product(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      pricePerDay: json['price_per_day'].toString(),
+      id: json['id'] ?? 0,
+      title: json['title'] ?? 'Untitled Product',
+      description: json['description'] ?? '',
+      pricePerDay: json['price_per_day']?.toString() ?? '0.00',
       pricePerWeek: json['price_per_week']?.toString(),
       pricePerMonth: json['price_per_month']?.toString(),
       isForSale: json['is_for_sale'] ?? false,
@@ -130,8 +155,12 @@ class Product {
       securityDeposit: json['security_deposit']?.toString(),
       minRentalDays: json['min_rental_days'],
       maxRentalDays: json['max_rental_days'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
     );
   }
 

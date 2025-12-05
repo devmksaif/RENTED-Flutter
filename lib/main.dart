@@ -26,6 +26,8 @@ import 'screens/chat_screen.dart';
 import 'screens/disputes_screen.dart';
 import 'screens/dispute_detail_screen.dart';
 import 'screens/my_reviews_screen.dart';
+import 'screens/change_password_screen.dart';
+import 'screens/products_screen.dart';
 import 'providers/product_provider.dart';
 
 void main() {
@@ -68,6 +70,8 @@ class MyApp extends StatelessWidget {
         '/conversations': (context) => const ConversationsScreen(),
         '/disputes': (context) => const DisputesScreen(),
         '/my-reviews': (context) => const MyReviewsScreen(),
+        '/change-password': (context) => const ChangePasswordScreen(),
+        '/products': (context) => const ProductsScreen(),
       },
       onGenerateRoute: (settings) {
         // Handle product detail route with arguments
