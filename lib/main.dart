@@ -34,7 +34,17 @@ import 'services/notification_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize notification manager
+  // Initialize Firebase (if configured)
+  // Uncomment after running: flutterfire configure
+  // try {
+  //   await Firebase.initializeApp(
+  //     options: DefaultFirebaseOptions.currentPlatform,
+  //   );
+  // } catch (e) {
+  //   // Firebase not configured yet
+  // }
+  
+  // Initialize notification manager (includes FCM if configured)
   await NotificationManager().initialize();
   
   runApp(
