@@ -39,6 +39,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Map<String, dynamic>? _ratingStats;
   bool _loadingReviews = false;
   int? _currentUserId;
+  bool _isUserVerified = false;
 
   @override
   void initState() {
@@ -54,6 +55,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if (mounted) {
         setState(() {
           _currentUserId = user?.id;
+          _isUserVerified = user?.isVerified ?? false;
         });
       }
     } catch (e) {
@@ -454,11 +456,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   // Only show Rent button if user is not the owner and product is approved and available
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () => _showRentalDialog(),
-                      icon: const Icon(Icons.access_time),
-                      label: const Text('Rent'),
+                      onPressed: _isUserVerified ? () => _showRentalDialog() : () => _showVerificationRequiredDialog(),
+                      icon: Icon(_isUserVerified ? Icons.access_time : Icons.verified_user),
+                      label: Text(_isUserVerified ? 'Rent' : 'Verify to Rent'),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: _isUserVerified ? null : Colors.orange,
                       ),
                     ),
                   ),
@@ -484,7 +487,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  void _showVerificationRequiredDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.verified_user, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Verification Required'),
+          ],
+        ),
+        content: const Text(
+          'You must be verified to rent products. Please complete your verification first.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Optionally navigate to verification screen
+              // Navigator.pushNamed(context, '/verification');
+            },
+            child: const Text('Go to Verification'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showRentalDialog() {
+    // Double-check verification before showing dialog
+    if (!_isUserVerified) {
+      _showVerificationRequiredDialog();
+      return;
+    }
+
     DateTime? startDate;
     DateTime? endDate;
     bool checkingAvailability = false;

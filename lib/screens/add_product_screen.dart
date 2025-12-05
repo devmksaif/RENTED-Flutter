@@ -7,6 +7,7 @@ import '../models/category.dart';
 import '../models/api_error.dart';
 import '../providers/product_provider.dart';
 import '../config/app_theme.dart';
+import '../services/storage_service.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -18,6 +19,7 @@ class AddProductScreen extends StatefulWidget {
 class _AddProductScreenState extends State<AddProductScreen> {
   final ImagePicker _picker = ImagePicker();
   final PageController _pageController = PageController();
+  final StorageService _storageService = StorageService();
   int _currentStep = 0;
   final int _totalSteps = 6;
 
@@ -213,6 +215,26 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Future<void> _submitProduct() async {
+    // Check if user is verified
+    final currentUser = await _storageService.getUser();
+    if (currentUser == null) {
+      Fluttertoast.showToast(
+        msg: 'You must be logged in to create a product',
+        backgroundColor: Colors.red,
+      );
+      return;
+    }
+
+    if (!currentUser.isVerified) {
+      Fluttertoast.showToast(
+        msg: 'You must be verified to create products. Please complete your verification first.',
+        backgroundColor: Colors.orange,
+        toastLength: Toast.LENGTH_LONG,
+      );
+      // Optionally navigate to verification screen
+      return;
+    }
+
     if (_imageFiles.isEmpty) {
       Fluttertoast.showToast(
         msg: 'Please add at least one image',

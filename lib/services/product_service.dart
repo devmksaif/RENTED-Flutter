@@ -85,13 +85,16 @@ class ProductService {
     final url = '${ApiConfig.products}/$id';
     
     try {
-      AppLogger.apiRequest('GET', url);
+      // Get auth token to allow viewing own unapproved products
+      final token = await _storageService.getToken();
+      
+      AppLogger.apiRequest('GET', url, headers: token != null ? ApiConfig.getAuthHeaders(token) : null);
       AppLogger.i('📦 Fetching product $id');
 
       final response = await http
           .get(
             Uri.parse(url),
-            headers: ApiConfig.headers,
+            headers: token != null ? ApiConfig.getAuthHeaders(token) : ApiConfig.headers,
           )
           .timeout(ApiConfig.connectionTimeout);
 

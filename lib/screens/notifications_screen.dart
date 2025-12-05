@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/notification_service.dart';
+import '../services/notification_manager.dart';
 import '../config/app_theme.dart';
 import '../utils/responsive_utils.dart';
 
@@ -19,6 +20,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void initState() {
     super.initState();
     _loadNotifications();
+    // Refresh notification manager when screen opens
+    NotificationManager().refreshNotifications();
   }
 
   Future<void> _loadNotifications() async {
@@ -226,14 +229,30 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Color _getNotificationColor(String type) {
     switch (type) {
-      case 'rental':
+      case 'rental_requested':
+      case 'rental_confirmed':
+      case 'rental_completed':
         return Colors.blue;
-      case 'purchase':
+      case 'purchase_ordered':
+      case 'purchase_completed':
         return AppTheme.primaryGreen;
-      case 'payment':
+      case 'offer_received':
+      case 'offer_accepted':
         return Colors.orange;
-      case 'verification':
+      case 'offer_rejected':
+        return Colors.red;
+      case 'new_message':
         return Colors.purple;
+      case 'product_approved':
+        return AppTheme.primaryGreen;
+      case 'product_rejected':
+        return Colors.red;
+      case 'review_received':
+        return Colors.amber;
+      case 'dispute_opened':
+        return Colors.red;
+      case 'dispute_resolved':
+        return AppTheme.primaryGreen;
       default:
         return Colors.grey;
     }

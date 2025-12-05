@@ -17,7 +17,7 @@ class NotificationService {
 
       final response = await http
           .get(
-            Uri.parse('${ApiConfig.baseUrl}/notifications'),
+            Uri.parse(ApiConfig.notifications),
             headers: {...ApiConfig.headers, 'Authorization': 'Bearer $token'},
           )
           .timeout(ApiConfig.connectionTimeout);
@@ -45,9 +45,9 @@ class NotificationService {
       }
 
       final response = await http
-          .put(
+          .post(
             Uri.parse(
-              '${ApiConfig.baseUrl}/notifications/$notificationId/read',
+              '${ApiConfig.notifications}/$notificationId/read',
             ),
             headers: {...ApiConfig.headers, 'Authorization': 'Bearer $token'},
           )
@@ -63,6 +63,31 @@ class NotificationService {
         message: 'Failed to mark notification as read',
         statusCode: 0,
       );
+    }
+  }
+
+  /// Get unread notification count
+  Future<int> getUnreadCount() async {
+    try {
+      final token = await _storageService.getToken();
+      if (token == null) {
+        return 0;
+      }
+
+      final response = await http
+          .get(
+            Uri.parse(ApiConfig.notificationsUnreadCount),
+            headers: {...ApiConfig.headers, 'Authorization': 'Bearer $token'},
+          )
+          .timeout(ApiConfig.connectionTimeout);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return responseData['count'] as int? ?? 0;
+      }
+      return 0;
+    } catch (e) {
+      return 0;
     }
   }
 }

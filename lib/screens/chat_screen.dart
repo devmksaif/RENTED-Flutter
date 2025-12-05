@@ -188,26 +188,17 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     try {
-      // Try WebSocket first if connected, otherwise fallback to REST
-      if (_wsService.isConnected) {
-        _wsService.sendMessage(
-          conversationId: widget.conversationId,
-          content: content,
-        );
+      // Send message via HTTP API (WebSocket is for receiving only)
+      await _messageService.sendMessage(
+        conversationId: widget.conversationId,
+        content: content,
+      );
+      
+      if (mounted) {
         setState(() {
           _isSending = false;
         });
-      } else {
-        await _messageService.sendMessage(
-          conversationId: widget.conversationId,
-          content: content,
-        );
-        if (mounted) {
-          setState(() {
-            _isSending = false;
-          });
-          await _loadMessages();
-        }
+        await _loadMessages();
       }
     } on ApiError catch (e) {
       if (mounted) {
@@ -892,8 +883,18 @@ class _ChatScreenState extends State<ChatScreen> {
                 Navigator.pop(context);
 
                 try {
+                  final productId = product['id'] as int?;
+                  if (productId == null) {
+                    Fluttertoast.showToast(
+                      msg: 'Product information is missing',
+                      backgroundColor: Colors.red,
+                    );
+                    return;
+                  }
+
                   await _offerService.createOffer(
                     conversationId: widget.conversationId,
+                    productId: productId,
                     amount: amount,
                     message: messageController.text.trim().isEmpty
                         ? null

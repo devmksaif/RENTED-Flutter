@@ -29,8 +29,14 @@ import 'screens/my_reviews_screen.dart';
 import 'screens/change_password_screen.dart';
 import 'screens/products_screen.dart';
 import 'providers/product_provider.dart';
+import 'services/notification_manager.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize notification manager
+  await NotificationManager().initialize();
+  
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => ProductProvider())],

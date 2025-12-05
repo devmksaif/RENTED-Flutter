@@ -12,6 +12,7 @@ class OfferService {
   /// API: POST /conversations/{conversationId}/offers
   Future<Map<String, dynamic>> createOffer({
     required int conversationId,
+    required int productId,
     required double amount,
     String? message,
     String? offerType, // 'rental' or 'purchase'
@@ -20,6 +21,7 @@ class OfferService {
   }) async {
     final url = '${ApiConfig.conversations}/$conversationId/offers';
     final body = <String, dynamic>{
+      'product_id': productId,
       'amount': amount,
       if (message != null && message.isNotEmpty) 'message': message,
       if (offerType != null) 'offer_type': offerType,

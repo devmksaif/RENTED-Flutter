@@ -27,6 +27,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   bool _isLoadingMore = false;
   int _currentPage = 1;
   bool _hasMore = true;
+  Set<int> _favoriteProductIds = {}; // Track favorite product IDs
 
   // Filter variables
   Category? _selectedCategory;
@@ -92,6 +93,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
       final products = await _productService.getProducts(page: 1, perPage: 50);
 
       if (mounted) {
+        // Load favorite status for all products
+        await _loadFavoriteStatuses(products);
+        
         setState(() {
           _allProducts = products;
           _applyFilters();
@@ -121,6 +125,27 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
+  /// Load favorite statuses for a list of products
+  Future<void> _loadFavoriteStatuses(List<Product> products) async {
+    final favoriteIds = <int>{..._favoriteProductIds}; // Keep existing favorites
+    for (final product in products) {
+      try {
+        final isFavorite = await _favoriteService.isFavorite(product.id);
+        if (isFavorite) {
+          favoriteIds.add(product.id);
+        } else {
+          favoriteIds.remove(product.id); // Remove if not favorite
+        }
+      } catch (e) {
+        // If check fails, continue with next product
+        continue;
+      }
+    }
+    setState(() {
+      _favoriteProductIds = favoriteIds;
+    });
+  }
+
   Future<void> _loadMoreProducts() async {
     if (_isLoadingMore || !_hasMore) return;
 
@@ -133,16 +158,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
       final products = await _productService.getProducts(page: nextPage, perPage: 50);
 
       if (mounted) {
-        setState(() {
-          if (products.isEmpty) {
+        if (products.isEmpty) {
+          setState(() {
             _hasMore = false;
-          } else {
+            _isLoadingMore = false;
+          });
+        } else {
+          // Load favorite statuses for newly loaded products
+          await _loadFavoriteStatuses(products);
+          
+          setState(() {
             _allProducts.addAll(products);
             _currentPage = nextPage;
             _applyFilters();
-          }
-          _isLoadingMore = false;
-        });
+            _isLoadingMore = false;
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -237,10 +268,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   Future<void> _toggleFavorite(Product product) async {
     try {
-      await _favoriteService.toggleFavorite(product.id);
+      final newFavoriteStatus = await _favoriteService.toggleFavorite(product.id);
+      
+      // Update favorite status in the set
+      setState(() {
+        if (newFavoriteStatus) {
+          _favoriteProductIds.add(product.id);
+        } else {
+          _favoriteProductIds.remove(product.id);
+        }
+      });
+      
       Fluttertoast.showToast(
-        msg: 'Favorite updated',
-        backgroundColor: Colors.green,
+        msg: newFavoriteStatus
+            ? 'Added to favorites'
+            : 'Removed from favorites',
+        backgroundColor: newFavoriteStatus ? Colors.green : Colors.orange,
       );
     } catch (e) {
       Fluttertoast.showToast(
@@ -654,20 +697,23 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       child: InkWell(
                         onTap: () => _toggleFavorite(product),
                         borderRadius: BorderRadius.circular(20),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
                           child: Icon(
-                            Icons.favorite_border,
+                            _favoriteProductIds.contains(product.id)
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             size: 20,
-                            color: Colors.grey,
+                            color: _favoriteProductIds.contains(product.id)
+                                ? Colors.red
+                                : Colors.grey,
                           ),
                         ),
                       ),
                     ),
                   ),
                   // Category badge
-                  if (product.category.name != null &&
-                      product.category.name != 'Unknown')
+                  if (product.category.name != 'Unknown')
                     Positioned(
                       top: 8,
                       left: 8,

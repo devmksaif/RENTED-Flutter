@@ -38,6 +38,11 @@ class ApiConfig {
   static const String messages = '$baseUrl/messages';
   static const String conversationsUnreadCount = '$baseUrl/conversations/unread/count';
   
+  // Notifications
+  static const String notifications = '$baseUrl/notifications';
+  static const String notificationsUnread = '$baseUrl/notifications/unread';
+  static const String notificationsUnreadCount = '$baseUrl/notifications/unread/count';
+  
   // Offers (within conversations)
   // Note: Use string interpolation: '${ApiConfig.conversations}/$conversationId/offers'
   // For specific endpoints:

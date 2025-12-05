@@ -34,6 +34,15 @@ class RentalService {
         throw ApiError(message: 'Not authenticated', statusCode: 401);
       }
 
+      // Check if user is verified before allowing rental
+      if (!currentUser.isVerified) {
+        AppLogger.validationError('user', 'User must be verified to create rentals');
+        throw ApiError(
+          message: 'You must be verified to rent products. Please complete your verification first.',
+          statusCode: 403,
+        );
+      }
+
       // Get product details to verify ownership and status
       final productService = ProductService();
       Product product;
