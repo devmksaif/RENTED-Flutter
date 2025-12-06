@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../models/product.dart';
 import '../models/category.dart';
+import '../models/user.dart';
 import '../models/api_error.dart';
+import '../models/pagination_response.dart';
 import '../services/product_service.dart';
 import '../services/favorite_service.dart';
 import '../services/storage_service.dart';
@@ -10,6 +12,7 @@ import '../utils/responsive_utils.dart';
 import '../utils/logger.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
 import '../config/app_theme.dart';
+import '../widgets/avatar_image.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,11 +25,18 @@ class _HomeScreenState extends State<HomeScreen>
     with WidgetsBindingObserver, RefreshOnFocusMixin {
   final ProductService _productService = ProductService();
   final FavoriteService _favoriteService = FavoriteService();
+  final StorageService _storageService = StorageService();
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   List<Product> _products = [];
   List<Product> _filteredProducts = [];
   List<Category> _categories = [];
   bool _isLoading = true;
+  bool _isLoadingMore = false;
+  int _currentPage = 1;
+  bool _hasMore = true;
+  int _totalProducts = 0;
+  User? _currentUser;
 
   // Filter variables
   Category? _selectedCategory;
@@ -40,13 +50,36 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _loadProducts();
     _loadCategories();
+    _loadCurrentUser();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadMoreProducts();
+    }
+  }
+
+  Future<void> _loadCurrentUser() async {
+    try {
+      final user = await _storageService.getUser();
+      if (mounted) {
+        setState(() {
+          _currentUser = user;
+        });
+      }
+    } catch (e) {
+      // Handle error silently
+    }
+  }
+
 
   @override
   Future<void> onRefresh() async {
@@ -68,22 +101,39 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  Future<void> _loadProducts() async {
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> _loadProducts({bool refresh = false}) async {
+    if (refresh) {
+      setState(() {
+        _currentPage = 1;
+        _hasMore = true;
+        _isLoading = true;
+      });
+    } else {
+      setState(() {
+        _isLoading = true;
+      });
+    }
 
     try {
-      final products = await _productService.getProducts(page: 1, perPage: 50);
+      final result = await _productService.getProducts(page: 1, perPage: 20);
+      final products = result['products'] as List<Product>;
+      final pagination = result['pagination'] as PaginationResponse?;
 
       if (mounted) {
         setState(() {
           _products = products;
+          _currentPage = 1;
+          if (pagination != null) {
+            _hasMore = pagination.hasMore;
+            _totalProducts = pagination.total;
+          } else {
+            _hasMore = products.length >= 20; // Assume more if we got a full page
+          }
           _applyFilters();
           _isLoading = false;
         });
         // Debug: Log filtering results
-        AppLogger.d('📊 Total products: ${products.length}, Filtered: ${_filteredProducts.length}');
+        AppLogger.d('📊 Total products: ${_totalProducts}, Loaded: ${_products.length}, Filtered: ${_filteredProducts.length}');
       }
     } on ApiError catch (e) {
       if (mounted) {
@@ -95,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen>
         } else {
           Fluttertoast.showToast(
             msg: e.message,
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.errorRed,
             toastLength: Toast.LENGTH_LONG,
           );
         }
@@ -107,9 +157,52 @@ class _HomeScreenState extends State<HomeScreen>
         });
         Fluttertoast.showToast(
           msg: 'Error loading products: ${e.toString()}',
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorRed,
           toastLength: Toast.LENGTH_LONG,
         );
+      }
+    }
+  }
+
+  Future<void> _loadMoreProducts() async {
+    if (_isLoadingMore || !_hasMore) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    try {
+      final nextPage = _currentPage + 1;
+      final result = await _productService.getProducts(page: nextPage, perPage: 20);
+      final products = result['products'] as List<Product>;
+      final pagination = result['pagination'] as PaginationResponse?;
+
+      if (mounted) {
+        if (products.isEmpty) {
+          setState(() {
+            _hasMore = false;
+            _isLoadingMore = false;
+          });
+        } else {
+          setState(() {
+            _products.addAll(products);
+            _currentPage = nextPage;
+            if (pagination != null) {
+              _hasMore = pagination.hasMore;
+              _totalProducts = pagination.total;
+            } else {
+              _hasMore = products.length >= 20;
+            }
+            _applyFilters();
+            _isLoadingMore = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingMore = false;
+        });
       }
     }
   }
@@ -494,6 +587,7 @@ class _HomeScreenState extends State<HomeScreen>
               pinned: false,
               backgroundColor: Colors.transparent,
               elevation: 0,
+              automaticallyImplyLeading: false,
               flexibleSpace: FlexibleSpaceBar(
                 background: Stack(
                   children: [
@@ -615,7 +709,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 IconButton(
                                   icon: Icon(
                                     Icons.notifications,
-                                    color: Colors.grey,
+                                    color: Colors.white,
                                     size: 28,
                                   ),
                                   onPressed: () {
@@ -625,12 +719,28 @@ class _HomeScreenState extends State<HomeScreen>
                                     );
                                   },
                                 ),
-                                IconButton(
-                                  icon: Icon(Icons.account_circle),
-                                  color: Color(0xFF4CAF50),
-                                  onPressed: () {
+                                const SizedBox(width: 8),
+                                GestureDetector(
+                                  onTap: () {
                                     Navigator.pushNamed(context, '/profile');
                                   },
+                                  child: _currentUser != null
+                                      ? AvatarImage(
+                                          imageUrl: _currentUser!.avatarUrl,
+                                          name: _currentUser!.name,
+                                          radius: 20,
+                                          backgroundColor: AppTheme.primaryGreen,
+                                          textColor: Colors.white,
+                                        )
+                                      : CircleAvatar(
+                                          radius: 20,
+                                          backgroundColor: AppTheme.primaryGreen,
+                                          child: const Icon(
+                                            Icons.person,
+                                            color: Colors.white,
+                                            size: 20,
+                                          ),
+                                        ),
                                 ),
                               ],
                             ),
@@ -836,7 +946,9 @@ class _HomeScreenState extends State<HomeScreen>
                                 ),
                                 icon: const Icon(Icons.grid_view),
                                 label: Text(
-                                  'Show All Products (${_filteredProducts.length})',
+                                  _totalProducts > 0
+                                      ? 'Show All Products ($_totalProducts)'
+                                      : 'Show All Products (${_filteredProducts.length})',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,

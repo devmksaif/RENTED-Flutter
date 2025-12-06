@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:rented/config/app_theme.dart';
+import '../config/app_theme.dart';
 import '../services/auth_service.dart';
 import '../models/api_error.dart';
 
@@ -40,20 +40,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     });
 
     try {
-      // Note: The API might not have a change password endpoint yet
-      // This is a placeholder implementation
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // TODO: Implement actual password change API call when available
-      // await _authService.changePassword(
-      //   currentPassword: _currentPasswordController.text,
-      //   newPassword: _newPasswordController.text,
-      // );
+      await _authService.updateProfile(
+        currentPassword: _currentPasswordController.text,
+        password: _newPasswordController.text,
+        passwordConfirmation: _confirmPasswordController.text,
+      );
 
       if (mounted) {
         Fluttertoast.showToast(
-          msg: 'Password change functionality coming soon',
-          backgroundColor: Colors.orange,
+          msg: 'Password changed successfully',
+          backgroundColor: Colors.green,
         );
         Navigator.pop(context);
       }
@@ -62,6 +58,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         Fluttertoast.showToast(
           msg: e.message,
           backgroundColor: Colors.red,
+          toastLength: Toast.LENGTH_LONG,
         );
       }
     } catch (e) {
@@ -69,6 +66,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         Fluttertoast.showToast(
           msg: 'Failed to change password: ${e.toString()}',
           backgroundColor: Colors.red,
+          toastLength: Toast.LENGTH_LONG,
         );
       }
     } finally {
@@ -97,7 +95,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Card(
+                Container(
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -105,28 +114,32 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       children: [
                         Text(
                           'Update your password',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Enter your current password and choose a new one',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).hintColor,
-                              ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.hintColor,
+                          ),
                         ),
                         const SizedBox(height: 24),
                         // Current Password
                         TextFormField(
                           controller: _currentPasswordController,
                           obscureText: _obscureCurrentPassword,
+                          style: TextStyle(color: theme.textTheme.bodyLarge?.color),
                           decoration: InputDecoration(
                             labelText: 'Current Password',
-                            prefixIcon: const Icon(Icons.lock_outline),
+                            prefixIcon: Icon(Icons.lock_outline, color: AppTheme.primaryGreen),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureCurrentPassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
+                                color: theme.hintColor,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -137,6 +150,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            filled: true,
+                            fillColor: theme.inputDecorationTheme.fillColor,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -150,14 +165,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         TextFormField(
                           controller: _newPasswordController,
                           obscureText: _obscureNewPassword,
+                          style: TextStyle(color: theme.textTheme.bodyLarge?.color),
                           decoration: InputDecoration(
                             labelText: 'New Password',
-                            prefixIcon: const Icon(Icons.lock),
+                            prefixIcon: Icon(Icons.lock, color: AppTheme.primaryGreen),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureNewPassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
+                                color: theme.hintColor,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -168,6 +185,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            filled: true,
+                            fillColor: theme.inputDecorationTheme.fillColor,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -184,14 +203,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         TextFormField(
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
+                          style: TextStyle(color: theme.textTheme.bodyLarge?.color),
                           decoration: InputDecoration(
                             labelText: 'Confirm New Password',
-                            prefixIcon: const Icon(Icons.lock),
+                            prefixIcon: Icon(Icons.lock, color: AppTheme.primaryGreen),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureConfirmPassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
+                                color: theme.hintColor,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -202,6 +223,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            filled: true,
+                            fillColor: theme.inputDecorationTheme.fillColor,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {

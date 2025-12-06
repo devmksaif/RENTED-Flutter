@@ -96,7 +96,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         setState(() {
           _loadingCategories = false;
         });
-        Fluttertoast.showToast(msg: e.message, backgroundColor: Colors.red);
+        Fluttertoast.showToast(msg: e.message, backgroundColor: AppTheme.errorRed);
       }
     }
   }
@@ -121,14 +121,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
         if (images.length > (5 - _imageFiles.length)) {
           Fluttertoast.showToast(
             msg: 'Only 5 images allowed. Some images were not added.',
-            backgroundColor: Colors.orange,
+            backgroundColor: AppTheme.warningOrange,
           );
         }
       }
     } catch (e) {
       Fluttertoast.showToast(
         msg: 'Failed to pick images: ${e.toString()}',
-        backgroundColor: Colors.red,
+        backgroundColor: AppTheme.errorRed,
       );
     }
   }
@@ -220,7 +220,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     if (currentUser == null) {
       Fluttertoast.showToast(
         msg: 'You must be logged in to create a product',
-        backgroundColor: Colors.red,
+        backgroundColor: AppTheme.errorRed,
       );
       return;
     }
@@ -238,7 +238,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     if (_imageFiles.isEmpty) {
       Fluttertoast.showToast(
         msg: 'Please add at least one image',
-        backgroundColor: Colors.red,
+        backgroundColor: AppTheme.errorRed,
       );
       return;
     }
@@ -250,7 +250,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     try {
       Fluttertoast.showToast(
         msg: 'Uploading product...',
-        backgroundColor: Colors.blue,
+        backgroundColor: AppTheme.infoBlue,
         toastLength: Toast.LENGTH_SHORT,
       );
 
@@ -321,7 +321,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       if (mounted) {
         Fluttertoast.showToast(
           msg: 'Product created successfully',
-          backgroundColor: Colors.green,
+          backgroundColor: AppTheme.successGreen,
         );
         Navigator.pop(context, true);
       }
@@ -343,7 +343,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         });
         Fluttertoast.showToast(
           msg: 'Error: ${e.toString()}',
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorRed,
           toastLength: Toast.LENGTH_LONG,
         );
       }
@@ -375,6 +375,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildStepIndicator() {
+    final theme = Theme.of(context);
     final stepNames = [
       'Basic Info',
       'Pricing',
@@ -400,15 +401,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     shape: BoxShape.circle,
                     color: isActive || isCompleted
                         ? AppTheme.primaryGreen
-                        : Colors.grey[300],
+                        : theme.dividerColor,
                   ),
                   child: Center(
                     child: isCompleted
-                        ? const Icon(Icons.check, color: Colors.white, size: 20)
+                        ? Icon(Icons.check, color: theme.cardColor, size: 20)
                         : Text(
                             '${index + 1}',
                             style: TextStyle(
-                              color: isActive ? Colors.white : Colors.grey[600],
+                              color: isActive ? theme.cardColor : theme.hintColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -421,7 +422,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     fontSize: 10,
                     color: isActive || isCompleted
                         ? AppTheme.primaryGreen
-                        : Colors.grey[600],
+                        : theme.hintColor,
                     fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
                   ),
                   textAlign: TextAlign.center,
@@ -789,7 +790,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               onTap: () => _removeImage(index),
                               child: Container(
                                 decoration: const BoxDecoration(
-                                  color: Colors.red,
+                                  color: AppTheme.errorRed,
                                   shape: BoxShape.circle,
                                 ),
                                 padding: const EdgeInsets.all(4),
@@ -824,7 +825,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   'At least one image is required',
-                  style: TextStyle(color: Colors.red[600], fontSize: 12),
+                  style: TextStyle(color: AppTheme.errorRed, fontSize: 12),
                 ),
               ),
           ],
@@ -842,7 +843,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
           _buildSectionTitle('Review Your Product'),
           const SizedBox(height: 16),
           _buildReviewCard('Title', _titleController.text),
-          _buildReviewCard('Category', _categories.firstWhere((c) => c.id == _selectedCategoryId, orElse: () => _categories.first).name),
+          _buildReviewCard('Category', _categories.isNotEmpty && _selectedCategoryId != null
+              ? (_categories.firstWhere((c) => c.id == _selectedCategoryId, orElse: () => _categories.isNotEmpty ? _categories.first : Category(id: 0, name: 'Unknown', slug: '', isActive: true))).name
+              : 'Not selected'),
           _buildReviewCard('Description', _descriptionController.text),
           _buildReviewCard('Price Per Day', '\$${_pricePerDayController.text}'),
           if (_pricePerWeekController.text.isNotEmpty)
@@ -868,12 +871,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildSectionTitle(String title) {
+    final theme = Theme.of(context);
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
-        color: Colors.black87,
+        color: theme.textTheme.titleLarge?.color,
       ),
     );
   }
@@ -887,13 +891,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
     TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -901,6 +906,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       ),
       child: TextFormField(
         controller: controller,
+        style: TextStyle(color: theme.textTheme.bodyLarge?.color),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
@@ -910,7 +916,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.inputDecorationTheme.fillColor,
         ),
         maxLines: maxLines,
         keyboardType: keyboardType,
@@ -927,13 +933,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
     required void Function(T?) onChanged,
     String? Function(T?)? validator,
   }) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -941,6 +948,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       ),
       child: DropdownButtonFormField<T>(
         value: value,
+        style: TextStyle(color: theme.textTheme.bodyLarge?.color),
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon, color: AppTheme.primaryGreen),
@@ -949,8 +957,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.inputDecorationTheme.fillColor,
         ),
+        dropdownColor: theme.cardColor,
         items: items,
         onChanged: onChanged,
         validator: validator,
@@ -964,21 +973,31 @@ class _AddProductScreenState extends State<AddProductScreen> {
     required bool value,
     required void Function(bool) onChanged,
   }) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: SwitchListTile(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(color: theme.hintColor),
+        ),
         value: value,
         onChanged: onChanged,
         activeThumbColor: AppTheme.primaryGreen,
@@ -990,15 +1009,16 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildReviewCard(String label, String value) {
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -1010,9 +1030,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Colors.grey,
+                color: theme.hintColor,
               ),
             ),
           ),
@@ -1020,7 +1040,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
             flex: 2,
             child: Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: theme.textTheme.bodyLarge?.color,
+              ),
               textAlign: TextAlign.right,
             ),
           ),

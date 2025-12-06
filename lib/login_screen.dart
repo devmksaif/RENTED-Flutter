@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         Fluttertoast.showToast(
           msg: "Login successful! Welcome back.",
-          backgroundColor: Colors.green,
+          backgroundColor: AppTheme.successGreen,
         );
         Navigator.pushReplacementNamed(context, '/home');
       }
@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _isLoading = false;
         });
-        Fluttertoast.showToast(msg: e.message, backgroundColor: Colors.red);
+        Fluttertoast.showToast(msg: e.message, backgroundColor: AppTheme.errorRed);
       }
     }
   }
@@ -364,25 +364,40 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      // Get Google OAuth URL
-      final authUrl = await _socialAuthService.getGoogleAuthUrl();
-      
-      // In a real app, you would open this URL in a WebView or browser
-      // and handle the callback. For now, we'll show a message.
+      // Sign in with Google using Firebase Auth
+      final authResponse = await _socialAuthService.signInWithGoogle();
+
+      // Update session manager with user data
+      await _sessionManager.updateSession(authResponse.user);
+
       if (mounted) {
         Fluttertoast.showToast(
-          msg: 'Google OAuth URL: $authUrl\nPlease implement WebView to complete OAuth flow',
-          backgroundColor: Colors.blue,
+          msg: 'Login successful! Welcome ${authResponse.user.name}',
+          backgroundColor: AppTheme.successGreen,
+        );
+        // Small delay to ensure token is saved
+        await Future.delayed(const Duration(milliseconds: 100));
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } on ApiError catch (e) {
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: e.message,
+          backgroundColor: AppTheme.errorRed,
           toastLength: Toast.LENGTH_LONG,
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (mounted) {
         Fluttertoast.showToast(
-          msg: 'Failed to initiate Google sign in: ${e.toString()}',
-          backgroundColor: Colors.red,
+          msg: 'Failed to sign in with Google: ${e.toString()}',
+          backgroundColor: AppTheme.errorRed,
+          toastLength: Toast.LENGTH_LONG,
         );
       }
+      // Log the full error for debugging
+      print('Google Sign-In Error: $e');
+      print('Stack trace: $stackTrace');
     } finally {
       if (mounted) {
         setState(() {

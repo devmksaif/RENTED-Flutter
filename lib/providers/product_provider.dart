@@ -23,10 +23,11 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final products = await _productService.getProducts(
+      final result = await _productService.getProducts(
         page: page,
         perPage: perPage,
       );
+      final products = result['products'] as List<Product>;
       _products = products;
       _error = null;
     } catch (e) {

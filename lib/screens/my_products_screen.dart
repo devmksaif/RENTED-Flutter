@@ -14,7 +14,7 @@ class MyProductsScreen extends StatefulWidget {
 }
 
 class _MyProductsScreenState extends State<MyProductsScreen>
-    with WidgetsBindingObserver, RefreshOnFocusMixin {
+    with WidgetsBindingObserver, RefreshOnFocusMixin, RefreshOnNavigationMixin {
   final ProductService _productService = ProductService();
   List<Product> _products = [];
   bool _isLoading = true;
@@ -27,7 +27,13 @@ class _MyProductsScreenState extends State<MyProductsScreen>
 
   @override
   Future<void> onRefresh() async {
-    // Refresh products when screen comes into focus
+    // Refresh products when app comes back to foreground
+    await _loadProducts();
+  }
+
+  @override
+  Future<void> onNavigationRefresh() async {
+    // Refresh products when screen is focused/navigated to
     await _loadProducts();
   }
 
@@ -295,17 +301,72 @@ class _MyProductsScreenState extends State<MyProductsScreen>
   }
 
   Future<void> _toggleAvailability(Product product) async {
+    final newAvailability = !product.isAvailable;
+    
+    // Optimistically update UI immediately
+    setState(() {
+      final index = _products.indexWhere((p) => p.id == product.id);
+      if (index != -1) {
+        // Create updated product with new availability
+        _products[index] = Product(
+          id: product.id,
+          title: product.title,
+          description: product.description,
+          pricePerDay: product.pricePerDay,
+          pricePerWeek: product.pricePerWeek,
+          pricePerMonth: product.pricePerMonth,
+          isForSale: product.isForSale,
+          salePrice: product.salePrice,
+          isAvailable: newAvailability,
+          verificationStatus: product.verificationStatus,
+          rejectionReason: product.rejectionReason,
+          verifiedAt: product.verifiedAt,
+          thumbnail: product.thumbnail,
+          images: product.images,
+          category: product.category,
+          owner: product.owner,
+          locationAddress: product.locationAddress,
+          locationCity: product.locationCity,
+          locationState: product.locationState,
+          locationCountry: product.locationCountry,
+          locationZip: product.locationZip,
+          locationLatitude: product.locationLatitude,
+          locationLongitude: product.locationLongitude,
+          deliveryAvailable: product.deliveryAvailable,
+          deliveryFee: product.deliveryFee,
+          deliveryRadiusKm: product.deliveryRadiusKm,
+          pickupAvailable: product.pickupAvailable,
+          productCondition: product.productCondition,
+          securityDeposit: product.securityDeposit,
+          minRentalDays: product.minRentalDays,
+          maxRentalDays: product.maxRentalDays,
+          createdAt: product.createdAt,
+          updatedAt: product.updatedAt,
+        );
+      }
+    });
+
     try {
       await _productService.updateProduct(
         productId: product.id,
-        isAvailable: !product.isAvailable,
+        isAvailable: newAvailability,
       );
       Fluttertoast.showToast(
-        msg: 'Product updated successfully',
+        msg: newAvailability
+            ? 'Product is now available'
+            : 'Product is now unavailable',
         backgroundColor: Colors.green,
       );
+      // Refresh to get latest data from server
       _loadProducts();
     } on ApiError catch (e) {
+      // Revert on error
+      setState(() {
+        final index = _products.indexWhere((p) => p.id == product.id);
+        if (index != -1) {
+          _products[index] = product; // Revert to original
+        }
+      });
       Fluttertoast.showToast(msg: e.message, backgroundColor: Colors.red);
     }
   }
@@ -313,32 +374,53 @@ class _MyProductsScreenState extends State<MyProductsScreen>
   Future<void> _deleteProduct(Product product) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Product'),
-        content: Text('Are you sure you want to delete "${product.title}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+      builder: (context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          backgroundColor: theme.cardColor,
+          title: Text(
+            'Delete Product',
+            style: TextStyle(color: theme.textTheme.titleLarge?.color),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete'),
+          content: Text(
+            'Are you sure you want to delete "${product.title}"? This action cannot be undone.',
+            style: TextStyle(color: theme.textTheme.bodyLarge?.color),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('Cancel', style: TextStyle(color: theme.hintColor)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorRed),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirm == true) {
+      // Optimistically remove from UI
+      setState(() {
+        _products.removeWhere((p) => p.id == product.id);
+      });
+
       try {
         await _productService.deleteProduct(product.id);
         Fluttertoast.showToast(
           msg: 'Product deleted successfully',
           backgroundColor: Colors.green,
         );
+        // Refresh to ensure consistency
         _loadProducts();
       } on ApiError catch (e) {
+        // Revert on error
+        setState(() {
+          _products.add(product);
+          _products.sort((a, b) => b.id.compareTo(a.id)); // Keep sorted
+        });
         Fluttertoast.showToast(msg: e.message, backgroundColor: Colors.red);
       }
     }

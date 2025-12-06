@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../config/app_theme.dart';
 import '../utils/responsive_utils.dart';
 import '../services/settings_service.dart';
+import '../services/auth_service.dart';
+import '../models/api_error.dart';
 import '../providers/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -15,9 +17,9 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsService _settingsService = SettingsService();
+  final AuthService _authService = AuthService();
   bool _pushNotifications = true;
-  String _language = 'English';
-  String _currency = 'USD';
+  bool _isDeletingAccount = false;
 
   @override
   void initState() {
@@ -31,8 +33,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         setState(() {
           _pushNotifications = settings['pushNotifications'] ?? true;
-          _language = settings['language'] ?? 'English';
-          _currency = settings['currency'] ?? 'USD';
         });
       }
     } catch (e) {
@@ -95,40 +95,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Fluttertoast.showToast(
                       msg: value ? 'Dark mode enabled' : 'Light mode enabled',
                       backgroundColor: AppTheme.primaryGreen,
-                    );
-                  },
-                ),
-              ]),
-              SizedBox(height: responsive.spacing(24)),
-
-              // Preferences Section
-              _buildSectionTitle('Preferences'),
-              SizedBox(height: responsive.spacing(12)),
-              _buildSettingsCard([
-                _buildDropdownTile(
-                  'Language',
-                  _language,
-                  ['English', 'Spanish', 'French', 'German'],
-                  (value) async {
-                    setState(() => _language = value!);
-                    await _settingsService.setLanguage(value!);
-                    Fluttertoast.showToast(
-                      msg: 'Language saved: $value',
-                      backgroundColor: Colors.green,
-                    );
-                  },
-                ),
-                const Divider(height: 1),
-                _buildDropdownTile(
-                  'Currency',
-                  _currency,
-                  ['USD', 'EUR', 'GBP', 'JPY'],
-                  (value) async {
-                    setState(() => _currency = value!);
-                    await _settingsService.setCurrency(value!);
-                    Fluttertoast.showToast(
-                      msg: 'Currency saved: $value',
-                      backgroundColor: Colors.green,
                     );
                   },
                 ),
@@ -226,27 +192,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildDropdownTile(
-    String title,
-    String value,
-    List<String> items,
-    ValueChanged<String?> onChanged,
-  ) {
-    return ListTile(
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-      ),
-      trailing: DropdownButton<String>(
-        value: value,
-        onChanged: onChanged,
-        underline: const SizedBox(),
-        items: items.map((item) {
-          return DropdownMenuItem(value: item, child: Text(item));
-        }).toList(),
-      ),
-    );
-  }
 
   Widget _buildActionTile(
     String title,
@@ -271,33 +216,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showDeleteAccountDialog() {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
+        backgroundColor: theme.cardColor,
+        title: Text(
+          'Delete Account',
+          style: TextStyle(color: theme.textTheme.titleLarge?.color),
+        ),
+        content: Text(
           'Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently deleted.',
+          style: TextStyle(color: theme.textTheme.bodyLarge?.color),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            onPressed: _isDeletingAccount
+                ? null
+                : () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: theme.hintColor),
+            ),
           ),
           ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              // TODO: Implement account deletion API call
-              Fluttertoast.showToast(
-                msg: 'Account deletion feature will be available soon',
-                backgroundColor: Colors.orange,
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete'),
+            onPressed: _isDeletingAccount
+                ? null
+                : () async {
+                    Navigator.pop(context);
+                    await _deleteAccount();
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.errorRed,
+              foregroundColor: Colors.white,
+            ),
+            child: _isDeletingAccount
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Text('Delete'),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _deleteAccount() async {
+    setState(() {
+      _isDeletingAccount = true;
+    });
+
+    try {
+      await _authService.deleteAccount();
+
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: 'Account deleted successfully',
+          backgroundColor: AppTheme.successGreen,
+        );
+
+        // Navigate to login screen after successful deletion
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/login',
+          (route) => false,
+        );
+      }
+    } on ApiError catch (e) {
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: e.message,
+          backgroundColor: AppTheme.errorRed,
+          toastLength: Toast.LENGTH_LONG,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: 'Failed to delete account: ${e.toString()}',
+          backgroundColor: AppTheme.errorRed,
+          toastLength: Toast.LENGTH_LONG,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeletingAccount = false;
+        });
+      }
+    }
   }
 
   void _showPrivacySettings() {

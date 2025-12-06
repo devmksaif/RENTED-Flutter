@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../models/product.dart';
 import '../models/category.dart';
 import '../models/api_error.dart';
+import '../models/pagination_response.dart';
 import '../services/product_service.dart';
 import '../services/favorite_service.dart';
 import '../utils/responsive_utils.dart';
@@ -28,6 +29,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   bool _isLoadingMore = false;
   int _currentPage = 1;
   bool _hasMore = true;
+  int _totalProducts = 0;
   Set<int> _favoriteProductIds = {}; // Track favorite product IDs
 
   // Filter variables
@@ -91,7 +93,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     try {
-      final products = await _productService.getProducts(page: 1, perPage: 50);
+      final result = await _productService.getProducts(page: 1, perPage: 20);
+      final products = result['products'] as List<Product>;
+      final pagination = result['pagination'] as PaginationResponse?;
 
       if (mounted) {
         // Load favorite status for all products
@@ -99,6 +103,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
         
         setState(() {
           _allProducts = products;
+          _currentPage = 1;
+          if (pagination != null) {
+            _hasMore = pagination.hasMore;
+            _totalProducts = pagination.total;
+          } else {
+            _hasMore = products.length >= 20;
+          }
           _applyFilters();
           _isLoading = false;
         });
@@ -110,7 +121,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         });
         Fluttertoast.showToast(
           msg: e.message,
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorRed,
         );
       }
     } catch (e) {
@@ -120,7 +131,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         });
         Fluttertoast.showToast(
           msg: 'Error loading products',
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorRed,
         );
       }
     }
@@ -156,7 +167,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
     try {
       final nextPage = _currentPage + 1;
-      final products = await _productService.getProducts(page: nextPage, perPage: 50);
+      final result = await _productService.getProducts(page: nextPage, perPage: 20);
+      final products = result['products'] as List<Product>;
+      final pagination = result['pagination'] as PaginationResponse?;
 
       if (mounted) {
         if (products.isEmpty) {
@@ -171,6 +184,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
           setState(() {
             _allProducts.addAll(products);
             _currentPage = nextPage;
+            if (pagination != null) {
+              _hasMore = pagination.hasMore;
+              _totalProducts = pagination.total;
+            } else {
+              _hasMore = products.length >= 20;
+            }
             _applyFilters();
             _isLoadingMore = false;
           });
@@ -289,7 +308,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     } catch (e) {
       Fluttertoast.showToast(
         msg: 'Failed to update favorite',
-        backgroundColor: Colors.red,
+        backgroundColor: AppTheme.errorRed,
       );
     }
   }
@@ -307,9 +326,23 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
-          'All Products',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'All Products',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            if (_totalProducts > 0)
+              Text(
+                '$_totalProducts products',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                  color: theme.hintColor,
+                ),
+              ),
+          ],
         ),
         elevation: 0,
         leading: IconButton(

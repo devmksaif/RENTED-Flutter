@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../config/api_config.dart';
 import '../utils/logger.dart';
 import 'storage_service.dart';
+import '../firebase_options.dart';
 
 /// Firebase Cloud Messaging Service
 /// Handles push notifications from Firebase
@@ -146,16 +148,24 @@ class FcmService {
         return;
       }
 
+      // Get device info
+      final deviceInfo = await _getDeviceInfo();
+
       final response = await http.post(
         Uri.parse('${ApiConfig.baseUrl}/fcm/token'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $userToken',
         },
-        body: jsonEncode({'token': token}),
+        body: jsonEncode({
+          'token': token,
+          'device_type': deviceInfo['device_type'],
+          'device_id': deviceInfo['device_id'],
+          'app_version': deviceInfo['app_version'],
+        }),
       ).timeout(const Duration(seconds: 10));
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         AppLogger.i('✅ FCM token updated on server');
       } else {
         AppLogger.w('⚠️ Failed to update FCM token on server: ${response.statusCode}');
@@ -163,6 +173,60 @@ class FcmService {
     } catch (e) {
       AppLogger.e('❌ Error updating FCM token on server', e);
     }
+  }
+
+  /// Get device information
+  Future<Map<String, String?>> _getDeviceInfo() async {
+    try {
+      // Import platform info
+      final platform = await _getPlatform();
+      final deviceId = await _getDeviceId();
+      final appVersion = await _getAppVersion();
+
+      return {
+        'device_type': platform,
+        'device_id': deviceId,
+        'app_version': appVersion,
+      };
+    } catch (e) {
+      AppLogger.w('⚠️ Failed to get device info: $e');
+      return {
+        'device_type': 'unknown',
+        'device_id': null,
+        'app_version': null,
+      };
+    }
+  }
+
+  /// Get platform name
+  Future<String> _getPlatform() async {
+    try {
+      // You can use device_info_plus package for better device info
+      // For now, use a simple check
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        return 'android';
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+        return 'ios';
+      } else {
+        return 'web';
+      }
+    } catch (e) {
+      return 'unknown';
+    }
+  }
+
+  /// Get device ID (simplified - you may want to use device_info_plus)
+  Future<String?> _getDeviceId() async {
+    // For now, return null. You can implement using device_info_plus package
+    // or use a combination of device identifiers
+    return null;
+  }
+
+  /// Get app version
+  Future<String?> _getAppVersion() async {
+    // You can use package_info_plus to get app version
+    // For now, return null
+    return null;
   }
 
   /// Set up message handlers
@@ -248,8 +312,30 @@ class FcmService {
   Future<void> deleteToken() async {
     if (_firebaseMessaging == null) return;
     try {
+      final token = _fcmToken;
+      
+      // Delete from Firebase
       await _firebaseMessaging!.deleteToken();
       _fcmToken = null;
+      
+      // Delete from server if user is logged in
+      final userToken = await _storageService.getToken();
+      if (userToken != null && token != null) {
+        try {
+          await http.delete(
+            Uri.parse('${ApiConfig.baseUrl}/fcm/token'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $userToken',
+            },
+            body: jsonEncode({'token': token}),
+          ).timeout(const Duration(seconds: 10));
+          AppLogger.i('🗑️ FCM token deleted from server');
+        } catch (e) {
+          AppLogger.w('⚠️ Failed to delete FCM token from server: $e');
+        }
+      }
+      
       AppLogger.i('🗑️ FCM token deleted');
     } catch (e) {
       AppLogger.e('❌ Failed to delete FCM token', e);
@@ -265,10 +351,13 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Initialize Firebase in background isolate if needed
   try {
     if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
     }
   } catch (e) {
     // Firebase already initialized or not available
+    AppLogger.w('⚠️ FCM: Background handler Firebase init: $e');
   }
   
   AppLogger.i('📬 FCM: Background message received: ${message.messageId}');
@@ -279,5 +368,8 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (data.isNotEmpty) {
     AppLogger.i('📬 FCM: Background notification data: $data');
   }
+  
+  // You can add custom logic here to handle background notifications
+  // For example, update local database, show local notification, etc.
 }
 

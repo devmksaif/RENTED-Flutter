@@ -41,8 +41,9 @@ mixin RefreshOnFocusMixin<T extends StatefulWidget> on State<T>, WidgetsBindingO
   }
 }
 
-/// Alternative mixin using RouteAware for navigation-based refresh
-/// This refreshes when navigating back to the screen
+/// Mixin using RouteAware for navigation-based refresh
+/// This refreshes when navigating to/back to the screen
+/// Requires RouteObserver to be set up in MaterialApp
 mixin RefreshOnNavigationMixin<T extends StatefulWidget> on State<T> {
   /// Override this method in your screen to implement the refresh logic
   Future<void> onNavigationRefresh();
@@ -50,23 +51,65 @@ mixin RefreshOnNavigationMixin<T extends StatefulWidget> on State<T> {
   /// Flag to track if initial load is done
   bool _initialLoadDone = false;
 
+  /// RouteObserver instance - should be set in main.dart
+  static RouteObserver<PageRoute>? routeObserver;
+
+  /// RouteAware instance to handle route lifecycle
+  late final _RouteAwareHandler _routeAwareHandler;
+
   @override
   void initState() {
     super.initState();
-    // Don't refresh on initial load
     _initialLoadDone = false;
+    _routeAwareHandler = _RouteAwareHandler(
+      onPush: () {
+        if (_initialLoadDone && mounted) {
+          onNavigationRefresh();
+        }
+        _initialLoadDone = true;
+      },
+      onPopNext: () {
+        if (_initialLoadDone && mounted) {
+          onNavigationRefresh();
+        }
+      },
+    );
   }
 
-  /// Call this in your route's onGenerateRoute or when popping
-  void handleNavigationReturn() {
-    if (_initialLoadDone && mounted) {
-      onNavigationRefresh();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Subscribe to route changes
+    final route = ModalRoute.of(context);
+    if (route is PageRoute && routeObserver != null) {
+      routeObserver!.subscribe(_routeAwareHandler, route);
     }
-    _initialLoadDone = true;
   }
 
-  /// Manually trigger refresh
-  Future<void> manualRefresh() async {
-    await onNavigationRefresh();
+  @override
+  void dispose() {
+    // Unsubscribe from route changes
+    if (routeObserver != null) {
+      routeObserver!.unsubscribe(_routeAwareHandler);
+    }
+    super.dispose();
+  }
+}
+
+/// Internal RouteAware handler
+class _RouteAwareHandler extends RouteAware {
+  final VoidCallback onPush;
+  final VoidCallback onPopNext;
+
+  _RouteAwareHandler({required this.onPush, required this.onPopNext});
+
+  @override
+  void didPush() {
+    onPush();
+  }
+
+  @override
+  void didPopNext() {
+    onPopNext();
   }
 }

@@ -323,4 +323,50 @@ class AuthService {
   Future<void> forceLogout() async {
     await _storageService.clearAll();
   }
+
+  /// Delete user account
+  Future<void> deleteAccount() async {
+    final url = ApiConfig.deleteAccount;
+    
+    try {
+      final token = await _storageService.getToken();
+      if (token == null) {
+        AppLogger.authError('deleteAccount', 'No authentication token found');
+        throw ApiError(message: 'Not authenticated', statusCode: 401);
+      }
+
+      AppLogger.apiRequest('DELETE', url, headers: ApiConfig.getAuthHeaders(token));
+      AppLogger.i('🗑️ Deleting user account');
+
+      final response = await http
+          .delete(
+            Uri.parse(url),
+            headers: ApiConfig.getAuthHeaders(token),
+          )
+          .timeout(ApiConfig.connectionTimeout);
+
+      AppLogger.apiResponse(response.statusCode, url);
+
+      if (response.statusCode == 200) {
+        // Clear local storage after successful deletion
+        await _storageService.clearAll();
+        AppLogger.i('✅ Account deleted successfully');
+        return;
+      } else {
+        final responseData = jsonDecode(response.body);
+        AppLogger.apiError(url, response.statusCode, responseData['message'] ?? 'Unknown error', errors: responseData['errors']);
+        throw ApiError.fromJson(responseData, response.statusCode);
+      }
+    } on ApiError catch (e) {
+      AppLogger.apiError(url, e.statusCode, e.message, errors: e.errors);
+      rethrow;
+    } catch (e, stackTrace) {
+      AppLogger.networkError('deleteAccount', e);
+      AppLogger.e('Failed to delete account', e, stackTrace);
+      throw ApiError(
+        message: 'Network error. Please check your connection.',
+        statusCode: 0,
+      );
+    }
+  }
 }

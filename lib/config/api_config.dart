@@ -13,6 +13,7 @@ class ApiConfig {
   static const String user = '$baseUrl/user';
   static const String userProfile = '$baseUrl/user/profile';
   static const String userAvatar = '$baseUrl/user/avatar';
+  static const String deleteAccount = '$baseUrl/user/account';
   static const String categories = '$baseUrl/categories';
   static const String products = '$baseUrl/products';
   static const String userProducts = '$baseUrl/user/products';
@@ -67,6 +68,7 @@ class ApiConfig {
   // Social Auth
   static const String googleAuth = '$baseUrl/auth/google';
   static const String googleAuthCallback = '$baseUrl/auth/google/callback';
+  static const String googleFirebaseAuth = '$baseUrl/auth/google/firebase';
   
   // Image Upload (New Unified API)
   static const String uploadImage = '$baseUrl/upload/image';

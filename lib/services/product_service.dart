@@ -6,6 +6,7 @@ import '../config/api_config.dart';
 import '../models/product.dart';
 import '../models/category.dart';
 import '../models/api_error.dart';
+import '../models/pagination_response.dart';
 import '../utils/logger.dart';
 import 'storage_service.dart';
 import 'image_upload_service.dart';
@@ -15,7 +16,8 @@ class ProductService {
   final ImageUploadService _imageUploadService = ImageUploadService();
 
   /// Get all products (paginated)
-  Future<List<Product>> getProducts({int page = 1, int perPage = 15}) async {
+  /// Returns a map with 'products' and 'pagination' keys
+  Future<Map<String, dynamic>> getProducts({int page = 1, int perPage = 15}) async {
     final url = '${ApiConfig.products}?page=$page&per_page=$perPage';
     
     try {
@@ -35,7 +37,15 @@ class ProductService {
       if (response.statusCode == 200) {
         final List<dynamic> productsJson = responseData['data'];
         final products = productsJson.map((json) => Product.fromJson(json)).toList();
-        AppLogger.i('✅ Retrieved ${products.length} products');
+        
+        // Parse pagination metadata
+        PaginationResponse? pagination;
+        if (responseData['meta'] != null) {
+          pagination = PaginationResponse.fromJson(responseData['meta']);
+          AppLogger.i('✅ Retrieved ${products.length} products (page ${pagination.currentPage}/${pagination.lastPage}, total: ${pagination.total})');
+        } else {
+          AppLogger.i('✅ Retrieved ${products.length} products (no pagination metadata)');
+        }
         
         // Debug: Log verification status of products
         final statusCounts = <String, int>{};
@@ -45,7 +55,10 @@ class ProductService {
         }
         AppLogger.d('📊 Product verification status breakdown: $statusCounts');
         
-        return products;
+        return {
+          'products': products,
+          'pagination': pagination,
+        };
       } else {
         AppLogger.apiError(url, response.statusCode, responseData['message'] ?? 'Unknown error', errors: responseData['errors']);
         throw ApiError.fromJson(responseData, response.statusCode);

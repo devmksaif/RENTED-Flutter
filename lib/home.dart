@@ -33,7 +33,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     try {
-      final products = await _productService.getProducts(page: 1, perPage: 20);
+      final result = await _productService.getProducts(page: 1, perPage: 20);
+      final products = result['products'] as List<Product>;
       if (mounted) {
         setState(() {
           _products = products;
@@ -625,7 +626,8 @@ class ProductSearchDelegate extends SearchDelegate<String> {
 
     try {
       // Get all products and filter by search query
-      final products = await _productService.getProducts(page: 1, perPage: 50);
+      final result = await _productService.getProducts(page: 1, perPage: 50);
+      final products = result['products'] as List<Product>;
       return products
           .where(
             (product) =>
