@@ -47,6 +47,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
   // Form State
   int? _selectedCategoryId;
   bool _isForSale = false;
+  bool? _deliveryAvailable;
+  bool? _pickupAvailable;
+  String? _productCondition;
+  final _locationLatitudeController = TextEditingController();
+  final _locationLongitudeController = TextEditingController();
   List<File> _newImageFiles = [];
   List<String> _existingImageUrls = [];
 
@@ -72,6 +77,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _locationStateController.dispose();
     _locationCountryController.dispose();
     _locationZipController.dispose();
+    _locationLatitudeController.dispose();
+    _locationLongitudeController.dispose();
     _deliveryFeeController.dispose();
     _deliveryRadiusController.dispose();
     super.dispose();
@@ -119,6 +126,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _locationStateController.text = product.locationState ?? '';
     _locationCountryController.text = product.locationCountry ?? '';
     _locationZipController.text = product.locationZip ?? '';
+    _locationLatitudeController.text = product.locationLatitude?.toString() ?? '';
+    _locationLongitudeController.text = product.locationLongitude?.toString() ?? '';
+    _deliveryAvailable = product.deliveryAvailable;
+    _pickupAvailable = product.pickupAvailable;
+    _productCondition = product.productCondition;
     _deliveryFeeController.text = product.deliveryFee ?? '';
     _deliveryRadiusController.text = product.deliveryRadiusKm?.toString() ?? '';
     _existingImageUrls = List.from(product.images);
@@ -184,15 +196,57 @@ class _EditProductScreenState extends State<EditProductScreen> {
         title: _titleController.text,
         description: _descriptionController.text,
         pricePerDay: double.parse(_pricePerDayController.text),
+        pricePerWeek: _pricePerWeekController.text.isNotEmpty
+            ? double.tryParse(_pricePerWeekController.text)
+            : null,
+        pricePerMonth: _pricePerMonthController.text.isNotEmpty
+            ? double.tryParse(_pricePerMonthController.text)
+            : null,
         isForSale: _isForSale,
         salePrice: _salePriceController.text.isNotEmpty
             ? double.tryParse(_salePriceController.text)
             : null,
+        locationAddress: _locationAddressController.text.isNotEmpty
+            ? _locationAddressController.text
+            : null,
+        locationCity: _locationCityController.text.isNotEmpty
+            ? _locationCityController.text
+            : null,
+        locationState: _locationStateController.text.isNotEmpty
+            ? _locationStateController.text
+            : null,
+        locationCountry: _locationCountryController.text.isNotEmpty
+            ? _locationCountryController.text
+            : null,
+        locationZip: _locationZipController.text.isNotEmpty
+            ? _locationZipController.text
+            : null,
+        locationLatitude: _locationLatitudeController.text.isNotEmpty
+            ? double.tryParse(_locationLatitudeController.text)
+            : null,
+        locationLongitude: _locationLongitudeController.text.isNotEmpty
+            ? double.tryParse(_locationLongitudeController.text)
+            : null,
+        deliveryAvailable: _deliveryAvailable,
+        deliveryFee: _deliveryFeeController.text.isNotEmpty
+            ? double.tryParse(_deliveryFeeController.text)
+            : null,
+        deliveryRadiusKm: _deliveryRadiusController.text.isNotEmpty
+            ? double.tryParse(_deliveryRadiusController.text)
+            : null,
+        pickupAvailable: _pickupAvailable,
+        productCondition: _productCondition,
+        securityDeposit: _securityDepositController.text.isNotEmpty
+            ? double.tryParse(_securityDepositController.text)
+            : null,
+        minRentalDays: _minRentalDaysController.text.isNotEmpty
+            ? int.tryParse(_minRentalDaysController.text)
+            : null,
+        maxRentalDays: _maxRentalDaysController.text.isNotEmpty
+            ? int.tryParse(_maxRentalDaysController.text)
+            : null,
         newImagePaths: imagePaths,
       );
-      
-      // Note: Additional fields like delivery, pickup, condition, etc.
-      // can be added to the updateProduct method if needed
 
       if (mounted) {
         Fluttertoast.showToast(
@@ -306,6 +360,227 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           ),
                         ],
+                        const SizedBox(height: 24),
+                        // Pricing Section
+                        Text(
+                          'Additional Pricing',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          controller: _pricePerWeekController,
+                          label: 'Price Per Week (Optional)',
+                          hint: 'Enter weekly rental price',
+                          icon: Icons.calendar_view_week,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          controller: _pricePerMonthController,
+                          label: 'Price Per Month (Optional)',
+                          hint: 'Enter monthly rental price',
+                          icon: Icons.calendar_month,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          controller: _securityDepositController,
+                          label: 'Security Deposit (Optional)',
+                          hint: 'Enter security deposit amount',
+                          icon: Icons.security,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildTextField(
+                                controller: _minRentalDaysController,
+                                label: 'Min Rental Days',
+                                hint: 'e.g., 3',
+                                icon: Icons.event_busy,
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildTextField(
+                                controller: _maxRentalDaysController,
+                                label: 'Max Rental Days',
+                                hint: 'e.g., 30',
+                                icon: Icons.event_available,
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Location Section
+                        Text(
+                          'Location Information',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          controller: _locationAddressController,
+                          label: 'Street Address (Optional)',
+                          hint: 'Enter street address',
+                          icon: Icons.location_on,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          controller: _locationCityController,
+                          label: 'City (Optional)',
+                          hint: 'Enter city',
+                          icon: Icons.location_city,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildTextField(
+                                controller: _locationStateController,
+                                label: 'State/Province',
+                                hint: 'Enter state',
+                                icon: Icons.map,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildTextField(
+                                controller: _locationZipController,
+                                label: 'Postal Code',
+                                hint: 'Enter zip',
+                                icon: Icons.markunread_mailbox,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          controller: _locationCountryController,
+                          label: 'Country (Optional)',
+                          hint: 'Enter country',
+                          icon: Icons.public,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildTextField(
+                                controller: _locationLatitudeController,
+                                label: 'Latitude (Optional)',
+                                hint: 'e.g., 40.7128',
+                                icon: Icons.explore,
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildTextField(
+                                controller: _locationLongitudeController,
+                                label: 'Longitude (Optional)',
+                                hint: 'e.g., -74.0060',
+                                icon: Icons.explore,
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Delivery & Pickup Section
+                        Text(
+                          'Delivery & Pickup Options',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SwitchListTile(
+                          title: const Text('Delivery Available'),
+                          subtitle: const Text('Offer delivery service for this product'),
+                          value: _deliveryAvailable ?? false,
+                          onChanged: (value) {
+                            setState(() {
+                              _deliveryAvailable = value;
+                            });
+                          },
+                        ),
+                        if (_deliveryAvailable == true) ...[
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _deliveryFeeController,
+                            label: 'Delivery Fee (Optional)',
+                            hint: 'Enter delivery fee amount',
+                            icon: Icons.local_shipping,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _deliveryRadiusController,
+                            label: 'Delivery Radius (km) (Optional)',
+                            hint: 'Enter delivery radius in kilometers',
+                            icon: Icons.radio_button_checked,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        SwitchListTile(
+                          title: const Text('Pickup Available'),
+                          subtitle: const Text('Allow customers to pick up the product'),
+                          value: _pickupAvailable ?? false,
+                          onChanged: (value) {
+                            setState(() {
+                              _pickupAvailable = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        // Product Condition
+                        Text(
+                          'Product Condition',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          value: _productCondition,
+                          decoration: InputDecoration(
+                            labelText: 'Product Condition (Optional)',
+                            prefixIcon: Icon(Icons.check_circle_outline, color: AppTheme.primaryGreen),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: theme.inputDecorationTheme.fillColor,
+                          ),
+                          dropdownColor: theme.cardColor,
+                          items: const [
+                            DropdownMenuItem(value: 'new', child: Text('New')),
+                            DropdownMenuItem(value: 'like_new', child: Text('Like New')),
+                            DropdownMenuItem(value: 'good', child: Text('Good')),
+                            DropdownMenuItem(value: 'fair', child: Text('Fair')),
+                            DropdownMenuItem(value: 'worn', child: Text('Worn')),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _productCondition = value;
+                            });
+                          },
+                        ),
                         const SizedBox(height: 24),
                         // Images Section
                         Text(

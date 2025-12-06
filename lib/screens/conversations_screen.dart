@@ -5,7 +5,6 @@ import '../models/api_error.dart';
 import '../widgets/avatar_image.dart';
 import '../config/app_theme.dart';
 import '../utils/responsive_utils.dart';
-import '../utils/responsive_utils.dart';
 
 class ConversationsScreen extends StatefulWidget {
   const ConversationsScreen({super.key});
@@ -73,17 +72,21 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
           style: TextStyle(fontSize: responsive.fontSize(20)),
         ),
         actions: [
-          if (_unreadCount > 0)
-            Padding(
-              padding: EdgeInsets.all(responsive.spacing(16)),
-              child: Badge(
-                label: Text(
-                  '$_unreadCount',
-                  style: TextStyle(fontSize: responsive.fontSize(12)),
-                ),
-                child: Icon(Icons.notifications, size: responsive.iconSize(24)),
-              ),
-            ),
+          IconButton(
+            icon: _unreadCount > 0
+                ? Badge(
+                    label: Text(
+                      '$_unreadCount',
+                      style: TextStyle(fontSize: responsive.fontSize(12)),
+                    ),
+                    child: Icon(Icons.notifications, size: responsive.iconSize(24)),
+                  )
+                : Icon(Icons.notifications, size: responsive.iconSize(24)),
+            onPressed: () {
+              Navigator.pushNamed(context, '/notifications');
+            },
+            tooltip: 'Notifications',
+          ),
         ],
       ),
       body: _isLoading

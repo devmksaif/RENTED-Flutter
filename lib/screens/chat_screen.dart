@@ -245,6 +245,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   Text(
                     otherUser['name'] ?? 'Unknown User',
                     style: TextStyle(fontSize: responsive.fontSize(16)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   if (_conversation?['product'] != null)
                     Text(
@@ -252,13 +254,17 @@ class _ChatScreenState extends State<ChatScreen> {
                       style: TextStyle(
                         fontSize: responsive.fontSize(12),
                         fontWeight: FontWeight.normal,
+                        color: theme.hintColor,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                 ],
               ),
             ),
           ],
         ),
+        toolbarHeight: responsive.responsive(mobile: 56, tablet: 64, desktop: 72),
       ),
       body: Column(
         children: [
@@ -295,49 +301,111 @@ class _ChatScreenState extends State<ChatScreen> {
                             return _buildOfferMessage(message, isMe);
                           }
 
-                          return Align(
-                            alignment: isMe
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: responsive.spacing(8)),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: responsive.spacing(16),
-                                vertical: responsive.spacing(10),
-                              ),
-                              decoration: BoxDecoration(
-                                color: isMe
-                                    ? AppTheme.primaryGreen
-                                    : theme.cardColor,
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              constraints: BoxConstraints(
-                                maxWidth: responsive.screenWidth * responsive.responsive(mobile: 0.7, tablet: 0.6, desktop: 0.5),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    message['content'] ?? '',
-                                    style: TextStyle(
-                                      color: isMe 
-                                          ? Colors.white 
-                                          : theme.textTheme.bodyLarge?.color,
-                                      fontSize: responsive.fontSize(14),
-                                    ),
-                                  ),
-                                  SizedBox(height: responsive.spacing(4)),
-                                  Text(
-                                    _formatTime(message['created_at']),
-                                    style: TextStyle(
-                                      fontSize: responsive.fontSize(10),
-                                      color: isMe
-                                          ? Colors.white70
-                                          : theme.hintColor,
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: responsive.spacing(8),
+                              vertical: responsive.spacing(4),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: isMe
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                if (!isMe) ...[
+                                  // Avatar for receiver (left side)
+                                  Padding(
+                                    padding: EdgeInsets.only(right: responsive.spacing(8)),
+                                    child: AvatarImage(
+                                      imageUrl: message['sender']?['avatar_url'],
+                                      name: message['sender']?['name'] ?? 'User',
+                                      radius: responsive.responsive(mobile: 16, tablet: 18, desktop: 20),
+                                      backgroundColor: AppTheme.primaryGreen,
                                     ),
                                   ),
                                 ],
-                              ),
+                                Flexible(
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth: responsive.screenWidth * responsive.responsive(mobile: 0.7, tablet: 0.6, desktop: 0.5),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: responsive.spacing(16),
+                                      vertical: responsive.spacing(12),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isMe
+                                          ? AppTheme.primaryGreen
+                                          : theme.cardColor,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(18),
+                                        topRight: Radius.circular(18),
+                                        bottomLeft: isMe ? Radius.circular(18) : Radius.circular(4),
+                                        bottomRight: isMe ? Radius.circular(4) : Radius.circular(18),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.05),
+                                          blurRadius: 2,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: isMe
+                                          ? CrossAxisAlignment.end
+                                          : CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          message['content'] ?? '',
+                                          style: TextStyle(
+                                            color: isMe 
+                                                ? Colors.white 
+                                                : theme.textTheme.bodyLarge?.color,
+                                            fontSize: responsive.fontSize(14),
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                        SizedBox(height: responsive.spacing(4)),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              _formatTime(message['created_at']),
+                                              style: TextStyle(
+                                                fontSize: responsive.fontSize(10),
+                                                color: isMe
+                                                    ? Colors.white70
+                                                    : theme.hintColor,
+                                              ),
+                                            ),
+                                            if (isMe && (message['is_read'] ?? false)) ...[
+                                              SizedBox(width: responsive.spacing(4)),
+                                              Icon(
+                                                Icons.done_all,
+                                                size: responsive.iconSize(12),
+                                                color: Colors.white70,
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                if (isMe) ...[
+                                  // Avatar for sender (right side)
+                                  Padding(
+                                    padding: EdgeInsets.only(left: responsive.spacing(8)),
+                                    child: AvatarImage(
+                                      imageUrl: message['sender']?['avatar_url'],
+                                      name: message['sender']?['name'] ?? 'You',
+                                      radius: responsive.responsive(mobile: 16, tablet: 18, desktop: 20),
+                                      backgroundColor: AppTheme.primaryGreen,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           );
                               },
@@ -463,10 +531,29 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildProductCard() {
     final product = _conversation!['product'];
-    final productImages = product['images'] as List<dynamic>?;
-    final firstImage = productImages != null && productImages.isNotEmpty
-        ? productImages[0]['url'] ?? productImages[0]
-        : null;
+    // Handle different image formats from API
+    dynamic productImages = product['images'] ?? product['image_urls'];
+    String? firstImage;
+    
+    if (productImages != null) {
+      if (productImages is List) {
+        if (productImages.isNotEmpty) {
+          final first = productImages[0];
+          if (first is Map) {
+            firstImage = first['url'] ?? first['thumbnail_url'] ?? first.toString();
+          } else {
+            firstImage = first.toString();
+          }
+        }
+      } else if (productImages is String) {
+        firstImage = productImages;
+      }
+    }
+    
+    // Fallback to thumbnail if no images
+    if (firstImage == null || firstImage.isEmpty) {
+      firstImage = product['thumbnail'] ?? product['thumbnail_url'];
+    }
 
     final theme = Theme.of(context);
     final responsive = ResponsiveUtils(context);

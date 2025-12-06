@@ -582,7 +582,11 @@ class _HomeScreenState extends State<HomeScreen>
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
-              expandedHeight: responsive.screenHeight * 0.5,
+              expandedHeight: responsive.responsive(
+                mobile: responsive.screenHeight * 0.5,
+                tablet: responsive.screenHeight * 0.45,
+                desktop: responsive.screenHeight * 0.4,
+              ),
               floating: false,
               pinned: false,
               backgroundColor: Colors.transparent,
@@ -636,150 +640,164 @@ class _HomeScreenState extends State<HomeScreen>
                         SafeArea(
                           bottom: false,
                           child: Container(
-                            color: theme.cardColor,
+                            decoration: BoxDecoration(
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.black.withValues(alpha: 0.5)
+                                  : Colors.white.withValues(alpha: 0.95),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.2 : 0.05),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
                             padding: EdgeInsets.symmetric(
-                              horizontal: responsive.spacing(24),
-                              vertical: responsive.spacing(16),
+                              horizontal: responsive.spacing(16),
+                              vertical: responsive.spacing(12),
                             ),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      'RENTED',
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF4CAF50),
-                                        letterSpacing: 1,
+                                // Left side - List Item button
+                                Flexible(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () async {
+                                      // Check if user is verified
+                                      final storageService = StorageService();
+                                      final currentUser = await storageService.getUser();
+                                      if (currentUser == null) {
+                                        Fluttertoast.showToast(
+                                          msg: 'You must be logged in to create a product',
+                                          backgroundColor: Colors.red,
+                                        );
+                                        return;
+                                      }
+                                      if (!currentUser.isVerified) {
+                                        Fluttertoast.showToast(
+                                          msg: 'You must be verified to create products. Please complete your verification first.',
+                                          backgroundColor: Colors.orange,
+                                          toastLength: Toast.LENGTH_LONG,
+                                        );
+                                        return;
+                                      }
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/add-product',
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppTheme.primaryGreen,
+                                      foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: responsive.spacing(16),
+                                        vertical: responsive.spacing(10),
                                       ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      elevation: 0,
                                     ),
-                                    Container(
-                                      width: 8,
-                                      height: 8,
-                                      margin: const EdgeInsets.only(left: 5),
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFF4CAF50),
-                                        shape: BoxShape.circle,
+                                    icon: Icon(
+                                      Icons.add,
+                                      size: responsive.iconSize(20),
+                                    ),
+                                    label: Text(
+                                      'List Item',
+                                      style: TextStyle(fontSize: responsive.fontSize(14)),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: responsive.spacing(12)),
+                                // Right side - Notifications and Avatar
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.notifications_outlined,
+                                        color: theme.brightness == Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black87,
+                                        size: responsive.iconSize(24),
                                       ),
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/notifications',
+                                        );
+                                      },
+                                      tooltip: 'Notifications',
+                                    ),
+                                    SizedBox(width: responsive.spacing(4)),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(context, '/profile');
+                                      },
+                                      child: _currentUser != null
+                                          ? AvatarImage(
+                                              imageUrl: _currentUser!.avatarUrl,
+                                              name: _currentUser!.name,
+                                              radius: responsive.responsive(mobile: 20, tablet: 24, desktop: 28),
+                                              backgroundColor: AppTheme.primaryGreen,
+                                              textColor: Colors.white,
+                                            )
+                                          : CircleAvatar(
+                                              radius: responsive.responsive(mobile: 20, tablet: 24, desktop: 28),
+                                              backgroundColor: AppTheme.primaryGreen,
+                                              child: Icon(
+                                                Icons.person,
+                                                color: Colors.white,
+                                                size: responsive.iconSize(20),
+                                              ),
+                                            ),
                                     ),
                                   ],
-                                ),
-                                Spacer(),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFF4CAF50),
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 24,
-                                      vertical: 12,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                  onPressed: () async {
-                                    // Check if user is verified
-                                    final storageService = StorageService();
-                                    final currentUser = await storageService.getUser();
-                                    if (currentUser == null) {
-                                      Fluttertoast.showToast(
-                                        msg: 'You must be logged in to create a product',
-                                        backgroundColor: Colors.red,
-                                      );
-                                      return;
-                                    }
-                                    if (!currentUser.isVerified) {
-                                      Fluttertoast.showToast(
-                                        msg: 'You must be verified to create products. Please complete your verification first.',
-                                        backgroundColor: Colors.orange,
-                                        toastLength: Toast.LENGTH_LONG,
-                                      );
-                                      return;
-                                    }
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/add-product',
-                                    );
-                                  },
-                                  child: Text('+  List Item'),
-                                ),
-                                const SizedBox(width: 16),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.notifications,
-                                    color: Colors.white,
-                                    size: 28,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/notifications',
-                                    );
-                                  },
-                                ),
-                                const SizedBox(width: 8),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.pushNamed(context, '/profile');
-                                  },
-                                  child: _currentUser != null
-                                      ? AvatarImage(
-                                          imageUrl: _currentUser!.avatarUrl,
-                                          name: _currentUser!.name,
-                                          radius: 20,
-                                          backgroundColor: AppTheme.primaryGreen,
-                                          textColor: Colors.white,
-                                        )
-                                      : CircleAvatar(
-                                          radius: 20,
-                                          backgroundColor: AppTheme.primaryGreen,
-                                          child: const Icon(
-                                            Icons.person,
-                                            color: Colors.white,
-                                            size: 20,
-                                          ),
-                                        ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        const Spacer(),
+                        Spacer(),
                         Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Rent Anything You Need',
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Rent Anything You Need',
+                                  style: TextStyle(
+                                    fontSize: responsive.fontSize(32),
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Access thousands of items in your neighborhood',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
+                                SizedBox(height: responsive.spacing(12)),
+                                Text(
+                                  'Access thousands of items in your neighborhood',
+                                  style: TextStyle(
+                                    fontSize: responsive.fontSize(18),
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 32),
-                              Hero(
-                                tag: 'searchBar',
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: Container(
-                                    width: 400,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 4,
-                                    ),
+                                SizedBox(height: responsive.spacing(32)),
+                                Hero(
+                                  tag: 'searchBar',
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: Container(
+                                      width: responsive.responsive(
+                                        mobile: responsive.screenWidth * 0.9,
+                                        tablet: 500,
+                                        desktop: 600,
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: responsive.spacing(16),
+                                        vertical: responsive.spacing(4),
+                                      ),
                                     decoration: BoxDecoration(
                                       color: theme.cardColor,
                                       borderRadius: BorderRadius.circular(32),
@@ -792,23 +810,28 @@ class _HomeScreenState extends State<HomeScreen>
                                     ),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.search, color: theme.hintColor),
-                                        const SizedBox(width: 8),
+                                        Icon(
+                                          Icons.search,
+                                          color: theme.hintColor,
+                                          size: responsive.iconSize(24),
+                                        ),
+                                        SizedBox(width: responsive.spacing(8)),
                                         Expanded(
                                           child: TextField(
                                             controller: _searchController,
+                                            style: TextStyle(fontSize: responsive.fontSize(16)),
                                             decoration: InputDecoration(
                                               hintText:
                                                   'What are you looking for?',
                                               hintStyle: TextStyle(
                                                 color: theme.hintColor,
-                                                fontSize: 16,
+                                                fontSize: responsive.fontSize(16),
                                               ),
                                               border: InputBorder.none,
                                               isDense: true,
                                               contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                    vertical: 8,
+                                                  EdgeInsets.symmetric(
+                                                    vertical: responsive.spacing(8),
                                                   ),
                                             ),
                                             onChanged: (value) =>
@@ -816,9 +839,10 @@ class _HomeScreenState extends State<HomeScreen>
                                           ),
                                         ),
                                         IconButton(
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.tune,
                                             color: Color(0xFF4CAF50),
+                                            size: responsive.iconSize(24),
                                           ),
                                           onPressed: _showFilterDialog,
                                           tooltip: 'Filters',
@@ -828,41 +852,13 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 24),
-                              // Popular tags
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Popular:',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  _PopularTag(
-                                    text: 'Cameras',
-                                    onTap: () => _filterByCategory('Cameras'),
-                                  ),
-                                  _PopularTag(
-                                    text: 'Bikes',
-                                    onTap: () => _filterByCategory('Bikes'),
-                                  ),
-                                  _PopularTag(
-                                    text: 'Tools',
-                                    onTap: () => _filterByCategory('Tools'),
-                                  ),
-                                  _PopularTag(
-                                    text: 'Furniture',
-                                    onTap: () => _filterByCategory('Furniture'),
-                                  ),
-                                ],
-                              ),
-                            ],
+                              SizedBox(height: responsive.spacing(24)),
+                             
+                              ],
+                            ),
                           ),
                         ),
-                        const Spacer(),
+                        Spacer(),
                       ],
                     ),
                   ],
@@ -1140,11 +1136,15 @@ class _PopularTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        margin: EdgeInsets.symmetric(horizontal: responsive.spacing(4)),
+        padding: EdgeInsets.symmetric(
+          horizontal: responsive.spacing(12),
+          vertical: responsive.spacing(6),
+        ),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(16),
@@ -1152,7 +1152,11 @@ class _PopularTag extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontSize: responsive.fontSize(14),
+          ),
         ),
       ),
     );

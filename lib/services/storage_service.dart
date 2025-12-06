@@ -52,6 +52,9 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_userKey);
+    await prefs.remove(_loginTimeKey);
+    // Clear all other cached data
+    await prefs.clear();
   }
 
   /// Clear token only

@@ -379,9 +379,26 @@ class ProductService {
     String? title,
     String? description,
     double? pricePerDay,
+    double? pricePerWeek,
+    double? pricePerMonth,
     bool? isForSale,
     double? salePrice,
     bool? isAvailable,
+    String? locationAddress,
+    String? locationCity,
+    String? locationState,
+    String? locationCountry,
+    String? locationZip,
+    double? locationLatitude,
+    double? locationLongitude,
+    bool? deliveryAvailable,
+    double? deliveryFee,
+    double? deliveryRadiusKm,
+    bool? pickupAvailable,
+    String? productCondition,
+    double? securityDeposit,
+    int? minRentalDays,
+    int? maxRentalDays,
     List<String>? newImagePaths, // If provided, replaces all existing images
   }) async {
     try {
@@ -399,9 +416,26 @@ class ProductService {
         if (title != null) body['title'] = title;
         if (description != null) body['description'] = description;
         if (pricePerDay != null) body['price_per_day'] = pricePerDay;
+        if (pricePerWeek != null) body['price_per_week'] = pricePerWeek;
+        if (pricePerMonth != null) body['price_per_month'] = pricePerMonth;
         if (isForSale != null) body['is_for_sale'] = isForSale;
         if (salePrice != null) body['sale_price'] = salePrice;
         if (isAvailable != null) body['is_available'] = isAvailable;
+        if (locationAddress != null) body['location_address'] = locationAddress;
+        if (locationCity != null) body['location_city'] = locationCity;
+        if (locationState != null) body['location_state'] = locationState;
+        if (locationCountry != null) body['location_country'] = locationCountry;
+        if (locationZip != null) body['location_zip'] = locationZip;
+        if (locationLatitude != null) body['location_latitude'] = locationLatitude;
+        if (locationLongitude != null) body['location_longitude'] = locationLongitude;
+        if (deliveryAvailable != null) body['delivery_available'] = deliveryAvailable;
+        if (deliveryFee != null) body['delivery_fee'] = deliveryFee;
+        if (deliveryRadiusKm != null) body['delivery_radius_km'] = deliveryRadiusKm;
+        if (pickupAvailable != null) body['pickup_available'] = pickupAvailable;
+        if (productCondition != null) body['product_condition'] = productCondition;
+        if (securityDeposit != null) body['security_deposit'] = securityDeposit;
+        if (minRentalDays != null) body['min_rental_days'] = minRentalDays;
+        if (maxRentalDays != null) body['max_rental_days'] = maxRentalDays;
 
         final url = '${ApiConfig.products}/$productId';
         AppLogger.apiRequest('PUT', url, body: body, headers: ApiConfig.getAuthHeaders(token));
@@ -452,6 +486,12 @@ class ProductService {
       if (pricePerDay != null) {
         request.fields['price_per_day'] = pricePerDay.toString();
       }
+      if (pricePerWeek != null) {
+        request.fields['price_per_week'] = pricePerWeek.toString();
+      }
+      if (pricePerMonth != null) {
+        request.fields['price_per_month'] = pricePerMonth.toString();
+      }
       if (isForSale != null) {
         request.fields['is_for_sale'] = isForSale ? '1' : '0';
       }
@@ -460,6 +500,39 @@ class ProductService {
       }
       if (isAvailable != null) {
         request.fields['is_available'] = isAvailable ? '1' : '0';
+      }
+      if (locationAddress != null) request.fields['location_address'] = locationAddress;
+      if (locationCity != null) request.fields['location_city'] = locationCity;
+      if (locationState != null) request.fields['location_state'] = locationState;
+      if (locationCountry != null) request.fields['location_country'] = locationCountry;
+      if (locationZip != null) request.fields['location_zip'] = locationZip;
+      if (locationLatitude != null) {
+        request.fields['location_latitude'] = locationLatitude.toString();
+      }
+      if (locationLongitude != null) {
+        request.fields['location_longitude'] = locationLongitude.toString();
+      }
+      if (deliveryAvailable != null) {
+        request.fields['delivery_available'] = deliveryAvailable ? '1' : '0';
+      }
+      if (deliveryFee != null) {
+        request.fields['delivery_fee'] = deliveryFee.toString();
+      }
+      if (deliveryRadiusKm != null) {
+        request.fields['delivery_radius_km'] = deliveryRadiusKm.toString();
+      }
+      if (pickupAvailable != null) {
+        request.fields['pickup_available'] = pickupAvailable ? '1' : '0';
+      }
+      if (productCondition != null) request.fields['product_condition'] = productCondition;
+      if (securityDeposit != null) {
+        request.fields['security_deposit'] = securityDeposit.toString();
+      }
+      if (minRentalDays != null) {
+        request.fields['min_rental_days'] = minRentalDays.toString();
+      }
+      if (maxRentalDays != null) {
+        request.fields['max_rental_days'] = maxRentalDays.toString();
       }
 
       // Add new images (replaces all old images)
