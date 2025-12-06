@@ -359,6 +359,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signInWithGoogle() async {
+    if (!mounted) return;
+    
     setState(() {
       _isLoadingGoogle = true;
     });
@@ -367,37 +369,91 @@ class _LoginScreenState extends State<LoginScreen> {
       // Sign in with Google using Firebase Auth
       final authResponse = await _socialAuthService.signInWithGoogle();
 
+      if (!mounted) return;
+
       // Update session manager with user data
       await _sessionManager.updateSession(authResponse.user);
 
       if (mounted) {
-        Fluttertoast.showToast(
-          msg: 'Login successful! Welcome ${authResponse.user.name}',
-          backgroundColor: AppTheme.successGreen,
-        );
+        try {
+          Fluttertoast.showToast(
+            msg: 'Login successful! Welcome ${authResponse.user.name}',
+            backgroundColor: AppTheme.successGreen,
+          );
+        } catch (e) {
+          // Ignore toast errors
+          print('Toast error: $e');
+        }
+        
         // Small delay to ensure token is saved
         await Future.delayed(const Duration(milliseconds: 100));
-        Navigator.pushReplacementNamed(context, '/home');
+        
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       }
     } on ApiError catch (e) {
       if (mounted) {
-        Fluttertoast.showToast(
-          msg: e.message,
-          backgroundColor: AppTheme.errorRed,
-          toastLength: Toast.LENGTH_LONG,
-        );
+        try {
+          Fluttertoast.showToast(
+            msg: e.message,
+            backgroundColor: AppTheme.errorRed,
+            toastLength: Toast.LENGTH_LONG,
+          );
+        } catch (toastError) {
+          // If toast fails, show a dialog instead
+          if (mounted) {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Sign-In Error'),
+                content: Text(e.message),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        }
       }
     } catch (e, stackTrace) {
-      if (mounted) {
-        Fluttertoast.showToast(
-          msg: 'Failed to sign in with Google: ${e.toString()}',
-          backgroundColor: AppTheme.errorRed,
-          toastLength: Toast.LENGTH_LONG,
-        );
-      }
       // Log the full error for debugging
       print('Google Sign-In Error: $e');
       print('Stack trace: $stackTrace');
+      
+      if (mounted) {
+        final errorMessage = e.toString().length > 100 
+            ? 'Failed to sign in with Google. Please try again.'
+            : 'Failed to sign in with Google: ${e.toString()}';
+        
+        try {
+          Fluttertoast.showToast(
+            msg: errorMessage,
+            backgroundColor: AppTheme.errorRed,
+            toastLength: Toast.LENGTH_LONG,
+          );
+        } catch (toastError) {
+          // If toast fails, show a dialog instead
+          if (mounted) {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Sign-In Error'),
+                content: Text(errorMessage),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        }
+      }
     } finally {
       if (mounted) {
         setState(() {
