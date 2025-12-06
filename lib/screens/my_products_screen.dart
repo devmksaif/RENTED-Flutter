@@ -5,6 +5,7 @@ import '../models/api_error.dart';
 import '../services/product_service.dart';
 import '../config/app_theme.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
+import '../utils/responsive_utils.dart';
 
 class MyProductsScreen extends StatefulWidget {
   const MyProductsScreen({super.key});
@@ -67,12 +68,16 @@ class _MyProductsScreenState extends State<MyProductsScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'My Products',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: responsive.fontSize(20),
+          ),
         ),
         elevation: 0,
         centerTitle: true,
@@ -85,7 +90,7 @@ class _MyProductsScreenState extends State<MyProductsScreen>
               onRefresh: _loadProducts,
               color: AppTheme.primaryGreen,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: responsive.responsivePadding(mobile: 16, tablet: 24, desktop: 32),
                 itemCount: _products.length,
                 itemBuilder: (context, index) {
                   final product = _products[index];
@@ -123,13 +128,15 @@ class _MyProductsScreenState extends State<MyProductsScreen>
               color: theme.textTheme.titleLarge?.color,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: context.responsive.spacing(8)),
           Text(
             'Create your first product listing',
-            style: TextStyle(fontSize: 14, color: theme.hintColor),
+            style: TextStyle(
+              fontSize: context.responsive.fontSize(14),
+              color: theme.hintColor,
+            ),
           ),
-          const SizedBox(height: 32),
-          
+          SizedBox(height: context.responsive.spacing(32)),
         ],
       ),
     );
@@ -137,8 +144,9 @@ class _MyProductsScreenState extends State<MyProductsScreen>
 
   Widget _buildProductCard(Product product) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: responsive.spacing(16)),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -160,15 +168,15 @@ class _MyProductsScreenState extends State<MyProductsScreen>
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(responsive.spacing(12)),
           child: Row(
             children: [
               // Product Image
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  width: 80,
-                  height: 80,
+                  width: responsive.responsive(mobile: 80, tablet: 100, desktop: 120),
+                  height: responsive.responsive(mobile: 80, tablet: 100, desktop: 120),
                   color: theme.cardColor,
                   child: product.thumbnail.isNotEmpty
                       ? Image.network(
@@ -185,7 +193,7 @@ class _MyProductsScreenState extends State<MyProductsScreen>
                         ),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: responsive.spacing(12)),
               // Product Info
               Expanded(
                 child: Column(
@@ -194,33 +202,36 @@ class _MyProductsScreenState extends State<MyProductsScreen>
                     Text(
                       product.title,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: responsive.fontSize(16),
                         fontWeight: FontWeight.w600,
                         color: theme.textTheme.bodyLarge?.color,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: responsive.spacing(4)),
                     Text(
                       product.category.name,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: responsive.fontSize(12),
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: responsive.spacing(8)),
                     Row(
                       children: [
                         Text(
                           '\$${product.pricePerDay}/day',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppTheme.primaryGreen,
                             fontWeight: FontWeight.bold,
+                            fontSize: responsive.fontSize(14),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: responsive.spacing(12)),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: responsive.spacing(8),
+                            vertical: responsive.spacing(2),
                           ),
                           decoration: BoxDecoration(
                             color: product.isAvailable
@@ -231,7 +242,7 @@ class _MyProductsScreenState extends State<MyProductsScreen>
                           child: Text(
                             product.isAvailable ? 'Available' : 'Unavailable',
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: responsive.fontSize(10),
                               color: product.isAvailable
                                   ? AppTheme.darkGreen
                                   : Colors.red[900],

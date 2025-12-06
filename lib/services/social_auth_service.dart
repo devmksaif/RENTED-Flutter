@@ -95,14 +95,6 @@ class SocialAuthService {
         );
       }
       
-      if (googleAuth.accessToken == null) {
-        AppLogger.e('❌ Google access token is null', Exception('Access token missing'), StackTrace.current);
-        throw ApiError(
-          message: 'Failed to get Google access token',
-          statusCode: 401,
-        );
-      }
-      
       AppLogger.i('✅ Google authentication tokens obtained');
 
       // Create a new credential

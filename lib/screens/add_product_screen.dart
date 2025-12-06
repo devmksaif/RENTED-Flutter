@@ -8,6 +8,7 @@ import '../models/api_error.dart';
 import '../providers/product_provider.dart';
 import '../config/app_theme.dart';
 import '../services/storage_service.dart';
+import '../utils/responsive_utils.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -351,8 +352,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildProgressIndicator() {
+    final responsive = ResponsiveUtils(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(
+        horizontal: responsive.spacing(16),
+        vertical: responsive.spacing(12),
+      ),
       child: Row(
         children: List.generate(_totalSteps, (index) {
           final isActive = index == _currentStep;
@@ -376,6 +381,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   Widget _buildStepIndicator() {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     final stepNames = [
       'Basic Info',
       'Pricing',
@@ -385,7 +391,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
       'Review'
     ];
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: responsive.spacing(16),
+        vertical: responsive.spacing(8),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(_totalSteps, (index) {
@@ -395,8 +404,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
             child: Column(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: responsive.responsive(mobile: 32, tablet: 36, desktop: 40),
+                  height: responsive.responsive(mobile: 32, tablet: 36, desktop: 40),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isActive || isCompleted
@@ -405,21 +414,22 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ),
                   child: Center(
                     child: isCompleted
-                        ? Icon(Icons.check, color: theme.cardColor, size: 20)
+                        ? Icon(Icons.check, color: theme.cardColor, size: responsive.iconSize(20))
                         : Text(
                             '${index + 1}',
                             style: TextStyle(
                               color: isActive ? theme.cardColor : theme.hintColor,
                               fontWeight: FontWeight.bold,
+                              fontSize: responsive.fontSize(14),
                             ),
                           ),
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: responsive.spacing(4)),
                 Text(
                   stepNames[index],
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: responsive.fontSize(10),
                     color: isActive || isCompleted
                         ? AppTheme.primaryGreen
                         : theme.hintColor,
@@ -457,7 +467,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.responsive.spacing(16)),
             _buildDropdownField<int>(
               value: _selectedCategoryId,
               label: 'Category',
@@ -494,7 +504,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.responsive.spacing(16)),
             _buildTextField(
               controller: _pricePerDayController,
               label: 'Price Per Day',
@@ -511,7 +521,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.responsive.spacing(16)),
             _buildSwitchTile(
               title: 'Available for Sale',
               subtitle: 'Allow users to purchase this product',
@@ -523,7 +533,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               },
             ),
             if (_isForSale) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: context.responsive.spacing(16)),
               _buildTextField(
                 controller: _salePriceController,
                 label: 'Sale Price',
@@ -550,55 +560,59 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildStep2Pricing() {
+    final responsive = ResponsiveUtils(context);
     return Form(
       key: _step2FormKey,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildSectionTitle('Pricing & Rental Terms'),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _pricePerWeekController,
-              label: 'Price Per Week (Optional)',
-              hint: 'Enter weekly rental price',
-              icon: Icons.calendar_view_week,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _pricePerMonthController,
-              label: 'Price Per Month (Optional)',
-              hint: 'Enter monthly rental price',
-              icon: Icons.calendar_month,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _securityDepositController,
-              label: 'Security Deposit (Optional)',
-              hint: 'Enter security deposit amount',
-              icon: Icons.security,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _minRentalDaysController,
-              label: 'Minimum Rental Days (Optional)',
-              hint: 'e.g., 3',
-              icon: Icons.event_busy,
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _maxRentalDaysController,
-              label: 'Maximum Rental Days (Optional)',
-              hint: 'e.g., 30',
-              icon: Icons.event_available,
-              keyboardType: TextInputType.number,
-            ),
-          ],
+        padding: responsive.responsivePadding(mobile: 16, tablet: 24, desktop: 32),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildSectionTitle('Pricing & Rental Terms'),
+              SizedBox(height: responsive.spacing(16)),
+              _buildTextField(
+                controller: _pricePerWeekController,
+                label: 'Price Per Week (Optional)',
+                hint: 'Enter weekly rental price',
+                icon: Icons.calendar_view_week,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              SizedBox(height: responsive.spacing(16)),
+              _buildTextField(
+                controller: _pricePerMonthController,
+                label: 'Price Per Month (Optional)',
+                hint: 'Enter monthly rental price',
+                icon: Icons.calendar_month,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              SizedBox(height: responsive.spacing(16)),
+              _buildTextField(
+                controller: _securityDepositController,
+                label: 'Security Deposit (Optional)',
+                hint: 'Enter security deposit amount',
+                icon: Icons.security,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              SizedBox(height: responsive.spacing(16)),
+              _buildTextField(
+                controller: _minRentalDaysController,
+                label: 'Minimum Rental Days (Optional)',
+                hint: 'e.g., 3',
+                icon: Icons.event_busy,
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(height: responsive.spacing(16)),
+              _buildTextField(
+                controller: _maxRentalDaysController,
+                label: 'Maximum Rental Days (Optional)',
+                hint: 'e.g., 30',
+                icon: Icons.event_available,
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -872,10 +886,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   Widget _buildSectionTitle(String title) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Text(
       title,
       style: TextStyle(
-        fontSize: 20,
+        fontSize: responsive.fontSize(20),
         fontWeight: FontWeight.bold,
         color: theme.textTheme.titleLarge?.color,
       ),
@@ -1055,12 +1070,16 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'Add New Product (${_currentStep + 1}/$_totalSteps)',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: responsive.fontSize(18),
+          ),
         ),
         elevation: 0,
         centerTitle: true,
@@ -1090,7 +1109,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: responsive.responsivePadding(mobile: 16, tablet: 20, desktop: 24),
                   decoration: BoxDecoration(
                     color: theme.cardColor,
                     boxShadow: [
@@ -1101,60 +1120,66 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       ),
                     ],
                   ),
-                  child: Row(
-                    children: [
-                      if (_currentStep > 0)
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                    child: Row(
+                      children: [
+                        if (_currentStep > 0)
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _previousStep,
+                              style: OutlinedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(vertical: responsive.spacing(16)),
+                                side: const BorderSide(color: AppTheme.primaryGreen),
+                              ),
+                              child: Text(
+                                'Previous',
+                                style: TextStyle(fontSize: responsive.fontSize(16)),
+                              ),
+                            ),
+                          ),
+                        if (_currentStep > 0) SizedBox(width: responsive.spacing(16)),
                         Expanded(
-                          child: OutlinedButton(
-                            onPressed: _previousStep,
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              side: const BorderSide(color: AppTheme.primaryGreen),
+                          flex: _currentStep == 0 ? 1 : 1,
+                          child: ElevatedButton(
+                            onPressed: _isLoading
+                                ? null
+                                : (_currentStep == _totalSteps - 1
+                                    ? _submitProduct
+                                    : _nextStep),
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: responsive.spacing(16)),
+                              backgroundColor: AppTheme.primaryGreen,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
                             ),
-                            child: const Text('Previous'),
-                          ),
-                        ),
-                      if (_currentStep > 0) const SizedBox(width: 16),
-                      Expanded(
-                        flex: _currentStep == 0 ? 1 : 1,
-                        child: ElevatedButton(
-                          onPressed: _isLoading
-                              ? null
-                              : (_currentStep == _totalSteps - 1
-                                  ? _submitProduct
-                                  : _nextStep),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: AppTheme.primaryGreen,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
+                            child: _isLoading
+                                ? SizedBox(
+                                    height: responsive.iconSize(20),
+                                    width: responsive.iconSize(20),
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : Text(
+                                    _currentStep == _totalSteps - 1
+                                        ? 'Create Product'
+                                        : 'Next',
+                                    style: TextStyle(
+                                      fontSize: responsive.fontSize(16),
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                )
-                              : Text(
-                                  _currentStep == _totalSteps - 1
-                                      ? 'Create Product'
-                                      : 'Next',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

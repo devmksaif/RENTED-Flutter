@@ -8,6 +8,7 @@ import '../services/offer_service.dart';
 import '../models/api_error.dart';
 import '../widgets/avatar_image.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class ChatScreen extends StatefulWidget {
   final int conversationId;
@@ -223,6 +224,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     final otherUser = _conversation?['other_user'] ?? {};
 
     return Scaffold(
@@ -232,20 +234,23 @@ class _ChatScreenState extends State<ChatScreen> {
             AvatarImage(
               imageUrl: otherUser['avatar_url'],
               name: otherUser['name'] ?? 'Unknown User',
-              radius: 20,
+              radius: responsive.responsive(mobile: 20, tablet: 24, desktop: 28),
               backgroundColor: AppTheme.primaryGreen,
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: responsive.spacing(12)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(otherUser['name'] ?? 'Unknown User'),
+                  Text(
+                    otherUser['name'] ?? 'Unknown User',
+                    style: TextStyle(fontSize: responsive.fontSize(16)),
+                  ),
                   if (_conversation?['product'] != null)
                     Text(
                       _conversation!['product']['title'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(12),
                         fontWeight: FontWeight.normal,
                       ),
                     ),
@@ -266,7 +271,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     ? Center(
                         child: Text(
                           'No messages yet',
-                          style: TextStyle(color: theme.hintColor),
+                          style: TextStyle(
+                            color: theme.hintColor,
+                            fontSize: responsive.fontSize(14),
+                          ),
                         ),
                       )
                     : Column(
@@ -275,7 +283,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             child: ListView.builder(
                               reverse: true,
                               controller: _scrollController,
-                              padding: const EdgeInsets.all(16),
+                              padding: responsive.responsivePadding(mobile: 16, tablet: 20, desktop: 24),
                               itemCount: _messages.length,
                               itemBuilder: (context, index) {
                           final message = _messages[_messages.length - 1 - index];
@@ -292,10 +300,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ? Alignment.centerRight
                                 : Alignment.centerLeft,
                             child: Container(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
+                              margin: EdgeInsets.only(bottom: responsive.spacing(8)),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: responsive.spacing(16),
+                                vertical: responsive.spacing(10),
                               ),
                               decoration: BoxDecoration(
                                 color: isMe
@@ -304,7 +312,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 borderRadius: BorderRadius.circular(18),
                               ),
                               constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width * 0.7,
+                                maxWidth: responsive.screenWidth * responsive.responsive(mobile: 0.7, tablet: 0.6, desktop: 0.5),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,13 +323,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                       color: isMe 
                                           ? Colors.white 
                                           : theme.textTheme.bodyLarge?.color,
+                                      fontSize: responsive.fontSize(14),
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  SizedBox(height: responsive.spacing(4)),
                                   Text(
                                     _formatTime(message['created_at']),
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: responsive.fontSize(10),
                                       color: isMe
                                           ? Colors.white70
                                           : theme.hintColor,
@@ -337,15 +346,16 @@ class _ChatScreenState extends State<ChatScreen> {
                           // Typing indicator
                           if (_otherUserTyping)
                             Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: EdgeInsets.all(responsive.spacing(8)),
                               alignment: Alignment.centerLeft,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
                                 child: Text(
                                   'Typing...',
                                   style: TextStyle(
                                     color: theme.hintColor,
                                     fontStyle: FontStyle.italic,
+                                    fontSize: responsive.fontSize(12),
                                   ),
                                 ),
                               ),
@@ -354,7 +364,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: EdgeInsets.symmetric(
+              horizontal: responsive.spacing(8),
+              vertical: responsive.spacing(8),
+            ),
             decoration: BoxDecoration(
               color: theme.cardColor,
               boxShadow: [
@@ -368,61 +381,68 @@ class _ChatScreenState extends State<ChatScreen> {
               ],
             ),
             child: SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _messageController,
-                          decoration: InputDecoration(
-                            hintText: 'Type a message...',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(24),
-                              borderSide: BorderSide.none,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _messageController,
+                            decoration: InputDecoration(
+                              hintText: 'Type a message...',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: theme.inputDecorationTheme.fillColor,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: responsive.spacing(16),
+                                vertical: responsive.spacing(10),
+                              ),
                             ),
-                            filled: true,
-                            fillColor: theme.inputDecorationTheme.fillColor,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
+                            maxLines: null,
+                            textCapitalization: TextCapitalization.sentences,
+                            onSubmitted: (_) => _sendMessage(),
+                            style: TextStyle(fontSize: responsive.fontSize(14)),
                           ),
-                          maxLines: null,
-                          textCapitalization: TextCapitalization.sentences,
-                          onSubmitted: (_) => _sendMessage(),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: _isSending ? null : _sendMessage,
-                        icon: _isSending
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Icon(Icons.send),
-                        color: AppTheme.primaryGreen,
-                      ),
-                    ],
-                  ),
-                  // Make Offer button
-                  if (_conversation?['product'] != null)
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => _showMakeOfferDialog(),
-                        icon: const Icon(Icons.local_offer, size: 18),
-                        label: const Text('Make an Offer'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          side: const BorderSide(color: AppTheme.primaryGreen),
+                        SizedBox(width: responsive.spacing(8)),
+                        IconButton(
+                          onPressed: _isSending ? null : _sendMessage,
+                          icon: _isSending
+                              ? SizedBox(
+                                  width: responsive.iconSize(20),
+                                  height: responsive.iconSize(20),
+                                  child: const CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : Icon(Icons.send, size: responsive.iconSize(24)),
+                          color: AppTheme.primaryGreen,
                         ),
-                      ),
+                      ],
                     ),
-                ],
+                    // Make Offer button
+                    if (_conversation?['product'] != null)
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => _showMakeOfferDialog(),
+                          icon: Icon(Icons.local_offer, size: responsive.iconSize(18)),
+                          label: Text(
+                            'Make an Offer',
+                            style: TextStyle(fontSize: responsive.fontSize(14)),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: responsive.spacing(8)),
+                            side: const BorderSide(color: AppTheme.primaryGreen),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -449,8 +469,9 @@ class _ChatScreenState extends State<ChatScreen> {
         : null;
 
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Container(
-      margin: const EdgeInsets.all(8),
+      margin: EdgeInsets.all(responsive.spacing(8)),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -475,7 +496,7 @@ class _ChatScreenState extends State<ChatScreen> {
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(responsive.spacing(12)),
           child: Row(
             children: [
               // Product image
@@ -484,26 +505,26 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: firstImage != null
                     ? Image.network(
                         firstImage.toString(),
-                        width: 80,
-                        height: 80,
+                        width: responsive.responsive(mobile: 80, tablet: 100, desktop: 120),
+                        height: responsive.responsive(mobile: 80, tablet: 100, desktop: 120),
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            width: 80,
-                            height: 80,
+                            width: responsive.responsive(mobile: 80, tablet: 100, desktop: 120),
+                            height: responsive.responsive(mobile: 80, tablet: 100, desktop: 120),
                             color: theme.cardColor,
-                            child: Icon(Icons.image, color: theme.hintColor),
+                            child: Icon(Icons.image, color: theme.hintColor, size: responsive.iconSize(32)),
                           );
                         },
                       )
                     : Container(
-                        width: 80,
-                        height: 80,
+                        width: responsive.responsive(mobile: 80, tablet: 100, desktop: 120),
+                        height: responsive.responsive(mobile: 80, tablet: 100, desktop: 120),
                         color: theme.cardColor,
-                        child: Icon(Icons.image, color: theme.hintColor),
+                        child: Icon(Icons.image, color: theme.hintColor, size: responsive.iconSize(32)),
                       ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: responsive.spacing(12)),
               // Product info
               Expanded(
                 child: Column(
@@ -511,26 +532,26 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     Text(
                       product['title'] ?? 'Product',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: responsive.fontSize(14),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: responsive.spacing(4)),
                     Text(
                       '\$${product['price_per_day']?.toString() ?? '0'}/day',
                       style: TextStyle(
                         color: AppTheme.primaryGreen,
                         fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                        fontSize: responsive.fontSize(14),
                       ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: theme.hintColor),
+              Icon(Icons.chevron_right, color: theme.hintColor, size: responsive.iconSize(24)),
             ],
           ),
         ),

@@ -4,6 +4,7 @@ import '../models/purchase.dart';
 import '../models/api_error.dart';
 import '../services/purchase_service.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class MyPurchasesScreen extends StatefulWidget {
   const MyPurchasesScreen({super.key});
@@ -48,8 +49,14 @@ class _MyPurchasesScreenState extends State<MyPurchasesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('My Purchases')),
+      appBar: AppBar(
+        title: Text(
+          'My Purchases',
+          style: TextStyle(fontSize: responsive.fontSize(20)),
+        ),
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _purchases.isEmpty
@@ -57,7 +64,7 @@ class _MyPurchasesScreenState extends State<MyPurchasesScreen> {
           : RefreshIndicator(
               onRefresh: _loadPurchases,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: responsive.responsivePadding(mobile: 16, tablet: 24, desktop: 32),
                 itemCount: _purchases.length,
                 itemBuilder: (context, index) {
                   final purchase = _purchases[index];
@@ -69,24 +76,35 @@ class _MyPurchasesScreenState extends State<MyPurchasesScreen> {
   }
 
   Widget _buildEmptyState() {
+    final responsive = ResponsiveUtils(context);
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.shopping_bag_outlined, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            'No purchases yet',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Browse products to start buying',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-          ),
-        ],
+      child: Padding(
+        padding: responsive.responsivePadding(mobile: 24, tablet: 32, desktop: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.shopping_bag_outlined,
+              size: responsive.iconSize(64),
+              color: Colors.grey[400],
+            ),
+            SizedBox(height: responsive.spacing(16)),
+            Text(
+              'No purchases yet',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: responsive.fontSize(22),
+              ),
+            ),
+            SizedBox(height: responsive.spacing(8)),
+            Text(
+              'Browse products to start buying',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[600],
+                fontSize: responsive.fontSize(14),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

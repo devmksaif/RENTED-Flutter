@@ -4,6 +4,7 @@ import 'services/auth_service.dart';
 import 'services/session_manager.dart';
 import 'models/api_error.dart';
 import 'config/app_theme.dart';
+import 'utils/responsive_utils.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -74,6 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
@@ -83,8 +85,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             top: -80,
             left: -80,
             child: Container(
-              width: 200,
-              height: 200,
+              width: responsive.responsive(mobile: 200, tablet: 250, desktop: 300),
+              height: responsive.responsive(mobile: 200, tablet: 250, desktop: 300),
               decoration: BoxDecoration(
                 color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(150),
@@ -96,8 +98,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             bottom: -100,
             right: -100,
             child: Container(
-              width: 250,
-              height: 250,
+              width: responsive.responsive(mobile: 250, tablet: 300, desktop: 350),
+              height: responsive.responsive(mobile: 250, tablet: 300, desktop: 350),
               decoration: BoxDecoration(
                 color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(200),
@@ -108,7 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Center(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: responsive.responsivePadding(mobile: 20, tablet: 40, desktop: 60),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -121,9 +123,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppTheme.darkGreen,
+                              fontSize: responsive.fontSize(24),
                             ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: responsive.spacing(20)),
                       // Image
                       Container(
                         decoration: BoxDecoration(
@@ -142,23 +145,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           borderRadius: BorderRadius.circular(20),
                           child: Image.asset(
                             'assets/images/login_vec.jpg',
-                            width: 400,
-                            height: 200,
+                            width: responsive.responsive(mobile: responsive.screenWidth * 0.9, tablet: 500, desktop: 600),
+                            height: responsive.responsive(mobile: 200, tablet: 250, desktop: 300),
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Container(
-                              width: 400,
-                              height: 200,
+                              width: responsive.responsive(mobile: responsive.screenWidth * 0.9, tablet: 500, desktop: 600),
+                              height: responsive.responsive(mobile: 200, tablet: 250, desktop: 300),
                               color: theme.cardColor,
                               child: Icon(
                                 Icons.image,
-                                size: 64,
+                                size: responsive.iconSize(64),
                                 color: theme.hintColor,
                               ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: responsive.spacing(30)),
                       // Name field
                       SizedBox(
                         width: 400,
@@ -188,11 +191,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: responsive.spacing(20)),
                       // Email field
-                      SizedBox(
-                        width: 400,
-                        child: TextFormField(
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                        child: SizedBox(
+                          width: responsive.responsive(mobile: responsive.screenWidth * 0.9, tablet: 500, desktop: 600),
+                          child: TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
@@ -219,11 +224,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      // Password field
-                      SizedBox(
-                        width: 400,
-                        child: TextFormField(
+                    ),
+                    SizedBox(height: responsive.spacing(20)),
+                    // Password field
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                        child: SizedBox(
+                          width: responsive.responsive(mobile: responsive.screenWidth * 0.9, tablet: 500, desktop: 600),
+                          child: TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
@@ -263,56 +271,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      // Confirm Password field
-                      SizedBox(
-                        width: 400,
-                        child: TextFormField(
-                          controller: _confirmPasswordController,
-                          obscureText: _obscureConfirmPassword,
-                          decoration: InputDecoration(
-                            hintText: "Confirm Password",
-                            prefixIcon: Icon(
-                              Icons.lock_outlined,
-                              color: theme.hintColor,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureConfirmPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
+                    ),
+                    SizedBox(height: responsive.spacing(20)),
+                    // Confirm Password field
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                        child: SizedBox(
+                          width: responsive.responsive(mobile: responsive.screenWidth * 0.9, tablet: 500, desktop: 600),
+                          child: TextFormField(
+                            controller: _confirmPasswordController,
+                            obscureText: _obscureConfirmPassword,
+                            style: TextStyle(fontSize: responsive.fontSize(14)),
+                            decoration: InputDecoration(
+                              hintText: "Confirm Password",
+                              prefixIcon: Icon(
+                                Icons.lock_outlined,
                                 color: theme.hintColor,
+                                size: responsive.iconSize(24),
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureConfirmPassword =
-                                      !_obscureConfirmPassword;
-                                });
-                              },
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureConfirmPassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: theme.hintColor,
+                                  size: responsive.iconSize(24),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureConfirmPassword =
+                                        !_obscureConfirmPassword;
+                                  });
+                                },
+                              ),
+                              filled: true,
+                              fillColor: theme.inputDecorationTheme.fillColor,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
-                            filled: true,
-                            fillColor: theme.inputDecorationTheme.fillColor,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please confirm your password';
+                              }
+                              if (value != _passwordController.text) {
+                                return 'Passwords do not match';
+                              }
+                              return null;
+                            },
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please confirm your password';
-                            }
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match';
-                            }
-                            return null;
-                          },
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      SizedBox(height: responsive.spacing(40)),
                       // Register button
                       SizedBox(
-                        width: 300,
-                        height: 50,
+                        width: responsive.responsive(mobile: responsive.screenWidth * 0.8, tablet: 400, desktop: 500),
+                        height: responsive.responsive(mobile: 50, tablet: 55, desktop: 60),
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _performRegister,
                           style: ElevatedButton.styleFrom(

@@ -5,6 +5,7 @@ import '../models/api_error.dart';
 import '../services/auth_service.dart';
 import '../services/session_manager.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
+import '../utils/responsive_utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -119,13 +120,14 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildProfileContent(ThemeData theme) {
+    final responsive = ResponsiveUtils(context);
     return SingleChildScrollView(
       child: Column(
         children: [
           // Profile Header
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: responsive.responsivePadding(mobile: 24, tablet: 32, desktop: 40),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [AppTheme.primaryGreen, AppTheme.darkGreen],
@@ -136,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             child: Column(
               children: [
                 CircleAvatar(
-                  radius: 50,
+                  radius: responsive.responsive(mobile: 50, tablet: 60, desktop: 70),
                   backgroundColor: theme.cardColor,
                   backgroundImage: _user!.avatarUrl != null && _user!.avatarUrl!.isNotEmpty
                       ? NetworkImage(_user!.avatarUrl!)
@@ -144,32 +146,32 @@ class _ProfileScreenState extends State<ProfileScreen>
                   child: _user!.avatarUrl == null || _user!.avatarUrl!.isEmpty
                       ? Text(
                     _user!.name[0].toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 36,
+                    style: TextStyle(
+                      fontSize: responsive.fontSize(36),
                       fontWeight: FontWeight.bold,
                       color: AppTheme.primaryGreen,
                     ),
                         )
                       : null,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: responsive.spacing(16)),
                 Text(
                   _user!.name,
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: TextStyle(
+                    fontSize: responsive.fontSize(24),
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: responsive.spacing(8)),
                 Text(
                   _user!.email,
                   style: TextStyle(
-                    fontSize: 16, 
+                    fontSize: responsive.fontSize(16), 
                     color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: responsive.spacing(12)),
                 _buildVerificationBadge(),
               ],
             ),
@@ -247,7 +249,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             textColor: AppTheme.errorRed,
             iconColor: AppTheme.errorRed,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: responsive.spacing(24)),
         ],
       ),
     );
@@ -255,9 +257,13 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildVerificationBadge() {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     if (_user!.isVerified) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: responsive.spacing(16),
+          vertical: responsive.spacing(8),
+        ),
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
@@ -265,13 +271,14 @@ class _ProfileScreenState extends State<ProfileScreen>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.verified, color: AppTheme.successGreen, size: 18),
-            const SizedBox(width: 6),
+            Icon(Icons.verified, color: AppTheme.successGreen, size: responsive.iconSize(18)),
+            SizedBox(width: responsive.spacing(6)),
             Text(
               'Verified',
               style: TextStyle(
                 color: AppTheme.successGreen,
                 fontWeight: FontWeight.bold,
+                fontSize: responsive.fontSize(14),
               ),
             ),
           ],
@@ -279,7 +286,10 @@ class _ProfileScreenState extends State<ProfileScreen>
       );
     } else if (_user!.isPending) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: responsive.spacing(16),
+          vertical: responsive.spacing(8),
+        ),
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
@@ -287,13 +297,14 @@ class _ProfileScreenState extends State<ProfileScreen>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.pending, color: AppTheme.warningOrange, size: 18),
-            const SizedBox(width: 6),
+            Icon(Icons.pending, color: AppTheme.warningOrange, size: responsive.iconSize(18)),
+            SizedBox(width: responsive.spacing(6)),
             Text(
               'Pending Verification',
               style: TextStyle(
                 color: AppTheme.warningOrange,
                 fontWeight: FontWeight.bold,
+                fontSize: responsive.fontSize(14),
               ),
             ),
           ],
@@ -301,21 +312,25 @@ class _ProfileScreenState extends State<ProfileScreen>
       );
     } else {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: responsive.spacing(16),
+          vertical: responsive.spacing(8),
+        ),
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.warning, color: AppTheme.errorRed, size: 18),
-            SizedBox(width: 6),
+            Icon(Icons.warning, color: AppTheme.errorRed, size: responsive.iconSize(18)),
+            SizedBox(width: responsive.spacing(6)),
             Text(
               'Not Verified',
               style: TextStyle(
                 color: AppTheme.errorRed, 
                 fontWeight: FontWeight.bold,
+                fontSize: responsive.fontSize(14),
               ),
             ),
           ],
@@ -333,16 +348,19 @@ class _ProfileScreenState extends State<ProfileScreen>
     Color? iconColor,
   }) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return ListTile(
       leading: Icon(
         icon,
         color: iconColor ?? theme.textTheme.bodyLarge?.color,
+        size: responsive.iconSize(24),
       ),
       title: Text(
         title,
         style: TextStyle(
           color: textColor ?? theme.textTheme.bodyLarge?.color,
           fontWeight: FontWeight.w500,
+          fontSize: responsive.fontSize(16),
         ),
       ),
       trailing: trailing ??

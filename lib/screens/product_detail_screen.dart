@@ -13,6 +13,7 @@ import '../widgets/availability_calendar.dart';
 import '../widgets/avatar_image.dart';
 import '../utils/logger.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final int productId;
@@ -131,6 +132,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Widget _buildProductDetail() {
     final product = _product!;
+    final responsive = ResponsiveUtils(context);
     final images = product.images.isNotEmpty
         ? product.images
         : [product.thumbnail];
@@ -203,72 +205,81 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         // Content
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: responsive.responsivePadding(mobile: 16, tablet: 24, desktop: 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Title and Category
                 Text(
                   product.title,
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontSize: responsive.fontSize(22),
+                  ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: responsive.spacing(8)),
                 Chip(
-                  label: Text(product.category.name),
+                  label: Text(
+                    product.category.name,
+                    style: TextStyle(fontSize: responsive.fontSize(12)),
+                  ),
                   backgroundColor: AppTheme.accentGreen,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: responsive.spacing(16)),
                 // Pricing
                 Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(responsive.spacing(16)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.access_time,
-                              size: 20,
+                              size: responsive.iconSize(20),
                               color: AppTheme.primaryGreen,
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: responsive.spacing(8)),
                             Text(
                               'Rental Price',
-                              style: Theme.of(context).textTheme.titleMedium,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontSize: responsive.fontSize(16),
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: responsive.spacing(8)),
                         Text(
                           '\$${product.pricePerDay}/day',
-                          style: const TextStyle(
-                            fontSize: 24,
+                          style: TextStyle(
+                            fontSize: responsive.fontSize(24),
                             fontWeight: FontWeight.bold,
                             color: AppTheme.primaryGreen,
                           ),
                         ),
                         if (product.isForSale) ...[
-                          const Divider(height: 24),
+                          Divider(height: responsive.spacing(24)),
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.shopping_cart,
-                                size: 20,
+                                size: responsive.iconSize(20),
                                 color: AppTheme.primaryGreen,
                               ),
-                              const SizedBox(width: 8),
+                              SizedBox(width: responsive.spacing(8)),
                               Text(
                                 'Sale Price',
-                                style: Theme.of(context).textTheme.titleMedium,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: responsive.fontSize(16),
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: responsive.spacing(8)),
                           Text(
                             '\$${product.salePrice}',
-                            style: const TextStyle(
-                              fontSize: 24,
+                            style: TextStyle(
+                              fontSize: responsive.fontSize(24),
                               fontWeight: FontWeight.bold,
                               color: AppTheme.primaryGreen,
                             ),
@@ -278,18 +289,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: responsive.spacing(16)),
                 // Description
                 Text(
                   'Description',
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontSize: responsive.fontSize(20),
+                  ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: responsive.spacing(8)),
                 Text(
                   product.description,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontSize: responsive.fontSize(14),
+                  ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: responsive.spacing(16)),
                 // Owner Info
                 if (product.owner != null)
                   Card(

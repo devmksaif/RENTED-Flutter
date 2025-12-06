@@ -7,6 +7,7 @@ import 'profile_screen.dart';
 import 'conversations_screen.dart';
 import '../services/storage_service.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -32,6 +33,7 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: Container(
@@ -60,34 +62,35 @@ class _MainNavigationState extends State<MainNavigation> {
           backgroundColor: theme.cardColor,
           selectedItemColor: AppTheme.primaryGreen,
           unselectedItemColor: theme.hintColor,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
+          selectedFontSize: responsive.fontSize(12),
+          unselectedFontSize: responsive.fontSize(12),
           elevation: 0,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-          items: const [
+          selectedLabelStyle: TextStyle(fontWeight: FontWeight.w600),
+          iconSize: responsive.iconSize(24),
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
+              icon: Icon(Icons.home_outlined, size: responsive.iconSize(24)),
+              activeIcon: Icon(Icons.home, size: responsive.iconSize(24)),
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_outline),
-              activeIcon: Icon(Icons.favorite),
+              icon: Icon(Icons.favorite_outline, size: responsive.iconSize(24)),
+              activeIcon: Icon(Icons.favorite, size: responsive.iconSize(24)),
               label: 'Favorites',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_outline),
-              activeIcon: Icon(Icons.chat_bubble),
+              icon: Icon(Icons.chat_bubble_outline, size: responsive.iconSize(24)),
+              activeIcon: Icon(Icons.chat_bubble, size: responsive.iconSize(24)),
               label: 'Messages',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.inventory_2_outlined),
-              activeIcon: Icon(Icons.inventory_2),
+              icon: Icon(Icons.inventory_2_outlined, size: responsive.iconSize(24)),
+              activeIcon: Icon(Icons.inventory_2, size: responsive.iconSize(24)),
               label: 'My Products',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
+              icon: Icon(Icons.person_outline, size: responsive.iconSize(24)),
+              activeIcon: Icon(Icons.person, size: responsive.iconSize(24)),
               label: 'Profile',
             ),
           ],
@@ -118,10 +121,13 @@ class _MainNavigationState extends State<MainNavigation> {
               },
               backgroundColor: AppTheme.primaryGreen,
               foregroundColor: Colors.white,
-              icon: const Icon(Icons.add),
-              label: const Text(
+              icon: Icon(Icons.add, size: responsive.iconSize(24)),
+              label: Text(
                 'Add Product',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: responsive.fontSize(14),
+                ),
               ),
               elevation: 4,
             )

@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../services/dispute_service.dart';
 import '../models/api_error.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class DisputeDetailScreen extends StatefulWidget {
   final int disputeId;
@@ -65,187 +66,245 @@ class _DisputeDetailScreenState extends State<DisputeDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dispute Details'),
+        title: Text(
+          'Dispute Details',
+          style: TextStyle(fontSize: responsive.fontSize(20)),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _dispute == null
-              ? const Center(child: Text('Dispute not found'))
+              ? Center(
+                  child: Text(
+                    'Dispute not found',
+                    style: TextStyle(fontSize: responsive.fontSize(16)),
+                  ),
+                )
               : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Status Card
-                      Card(
-                        color: _getStatusColor(
-                          _dispute!['status'] ?? 'unknown',
-                        ).withValues(alpha: 0.1),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: _getStatusColor(
-                                  _dispute!['status'] ?? 'unknown',
+                  padding: responsive.responsivePadding(mobile: 16, tablet: 24, desktop: 32),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Status Card
+                        Card(
+                          color: _getStatusColor(
+                            _dispute!['status'] ?? 'unknown',
+                          ).withValues(alpha: 0.1),
+                          child: Padding(
+                            padding: EdgeInsets.all(responsive.spacing(16)),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  color: _getStatusColor(
+                                    _dispute!['status'] ?? 'unknown',
+                                  ),
+                                  size: responsive.iconSize(24),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Status',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      (_dispute!['status'] ?? 'unknown')
-                                          .toUpperCase(),
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: _getStatusColor(
-                                          _dispute!['status'] ?? 'unknown',
+                                SizedBox(width: responsive.spacing(12)),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Status',
+                                        style: TextStyle(
+                                          fontSize: responsive.fontSize(12),
+                                          color: Colors.grey[600],
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(height: responsive.spacing(4)),
+                                      Text(
+                                        (_dispute!['status'] ?? 'unknown')
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                          fontSize: responsive.fontSize(16),
+                                          fontWeight: FontWeight.bold,
+                                          color: _getStatusColor(
+                                            _dispute!['status'] ?? 'unknown',
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Dispute Type
-                      Text(
-                        'Type',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Chip(
-                        label: Text(
-                          (_dispute!['dispute_type'] ?? 'other')
-                              .replaceAll('_', ' ')
-                              .toUpperCase(),
-                        ),
-                        backgroundColor: AppTheme.primaryGreen.withValues(
-                          alpha: 0.2,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Description
-                      Text(
-                        'Description',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(_dispute!['description'] ?? ''),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Parties Involved
-                      Text(
-                        'Parties Involved',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      if (_dispute!['reporter'] != null)
-                        Card(
-                          child: ListTile(
-                            leading: const Icon(Icons.person),
-                            title: const Text('Reporter'),
-                            subtitle: Text(
-                              _dispute!['reporter']['name'] ?? 'Unknown',
+                              ],
                             ),
                           ),
                         ),
-                      if (_dispute!['reported_user'] != null) ...[
-                        const SizedBox(height: 8),
-                        Card(
-                          child: ListTile(
-                            leading: const Icon(Icons.person_outline),
-                            title: const Text('Reported User'),
-                            subtitle: Text(
-                              _dispute!['reported_user']['name'] ?? 'Unknown',
-                            ),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      // Resolution
-                      if (_dispute!['resolution'] != null) ...[
+                        SizedBox(height: responsive.spacing(16)),
+                        // Dispute Type
                         Text(
-                          'Resolution',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          'Type',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontSize: responsive.fontSize(18),
+                          ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: responsive.spacing(8)),
+                        Chip(
+                          label: Text(
+                            (_dispute!['dispute_type'] ?? 'other')
+                                .replaceAll('_', ' ')
+                                .toUpperCase(),
+                            style: TextStyle(fontSize: responsive.fontSize(12)),
+                          ),
+                          backgroundColor: AppTheme.primaryGreen.withValues(
+                            alpha: 0.2,
+                          ),
+                        ),
+                        SizedBox(height: responsive.spacing(16)),
+                        // Description
+                        Text(
+                          'Description',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontSize: responsive.fontSize(18),
+                          ),
+                        ),
+                        SizedBox(height: responsive.spacing(8)),
                         Card(
-                          color: Colors.green[50],
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Text(_dispute!['resolution']),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                      // Evidence
-                      if (_dispute!['evidence'] != null &&
-                          (_dispute!['evidence'] as List).isNotEmpty) ...[
-                        Text(
-                          'Evidence',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 8),
-                        ...(_dispute!['evidence'] as List).map((evidence) {
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            child: ListTile(
-                              leading: const Icon(Icons.attachment),
-                              title: const Text('Evidence File'),
-                              subtitle: Text(evidence.toString()),
-                              trailing: const Icon(Icons.chevron_right),
+                            padding: EdgeInsets.all(responsive.spacing(16)),
+                            child: Text(
+                              _dispute!['description'] ?? '',
+                              style: TextStyle(fontSize: responsive.fontSize(14)),
                             ),
-                          );
-                        }),
-                      ],
-                      const SizedBox(height: 16),
-                      // Dates
-                      Text(
-                        'Timeline',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      if (_dispute!['created_at'] != null)
-                        Card(
-                          child: ListTile(
-                            leading: const Icon(Icons.calendar_today),
-                            title: const Text('Created'),
-                            subtitle: Text(_formatDate(_dispute!['created_at'])),
                           ),
                         ),
-                      if (_dispute!['updated_at'] != null) ...[
-                        const SizedBox(height: 8),
-                        Card(
-                          child: ListTile(
-                            leading: const Icon(Icons.update),
-                            title: const Text('Last Updated'),
-                            subtitle: Text(_formatDate(_dispute!['updated_at'])),
+                        SizedBox(height: responsive.spacing(16)),
+                        // Parties Involved
+                        Text(
+                          'Parties Involved',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontSize: responsive.fontSize(18),
                           ),
                         ),
+                        SizedBox(height: responsive.spacing(8)),
+                        if (_dispute!['reporter'] != null)
+                          Card(
+                            child: ListTile(
+                              leading: Icon(Icons.person, size: responsive.iconSize(24)),
+                              title: Text(
+                                'Reporter',
+                                style: TextStyle(fontSize: responsive.fontSize(16)),
+                              ),
+                              subtitle: Text(
+                                _dispute!['reporter']['name'] ?? 'Unknown',
+                                style: TextStyle(fontSize: responsive.fontSize(14)),
+                              ),
+                            ),
+                          ),
+                        if (_dispute!['reported_user'] != null) ...[
+                          SizedBox(height: responsive.spacing(8)),
+                          Card(
+                            child: ListTile(
+                              leading: Icon(Icons.person_outline, size: responsive.iconSize(24)),
+                              title: Text(
+                                'Reported User',
+                                style: TextStyle(fontSize: responsive.fontSize(16)),
+                              ),
+                              subtitle: Text(
+                                _dispute!['reported_user']['name'] ?? 'Unknown',
+                                style: TextStyle(fontSize: responsive.fontSize(14)),
+                              ),
+                            ),
+                          ),
+                        ],
+                        SizedBox(height: responsive.spacing(16)),
+                        // Resolution
+                        if (_dispute!['resolution'] != null) ...[
+                          Text(
+                            'Resolution',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontSize: responsive.fontSize(18),
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing(8)),
+                          Card(
+                            color: Colors.green[50],
+                            child: Padding(
+                              padding: EdgeInsets.all(responsive.spacing(16)),
+                              child: Text(
+                                _dispute!['resolution'],
+                                style: TextStyle(fontSize: responsive.fontSize(14)),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing(16)),
+                        ],
+                        // Evidence
+                        if (_dispute!['evidence'] != null &&
+                            (_dispute!['evidence'] as List).isNotEmpty) ...[
+                          Text(
+                            'Evidence',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontSize: responsive.fontSize(18),
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing(8)),
+                          ...(_dispute!['evidence'] as List).map((evidence) {
+                            return Card(
+                              margin: EdgeInsets.only(bottom: responsive.spacing(8)),
+                              child: ListTile(
+                                leading: Icon(Icons.attachment, size: responsive.iconSize(24)),
+                                title: Text(
+                                  'Evidence File',
+                                  style: TextStyle(fontSize: responsive.fontSize(16)),
+                                ),
+                                subtitle: Text(
+                                  evidence.toString(),
+                                  style: TextStyle(fontSize: responsive.fontSize(14)),
+                                ),
+                                trailing: Icon(Icons.chevron_right, size: responsive.iconSize(24)),
+                              ),
+                            );
+                          }),
+                        ],
+                        SizedBox(height: responsive.spacing(16)),
+                        // Dates
+                        Text(
+                          'Timeline',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontSize: responsive.fontSize(18),
+                          ),
+                        ),
+                        SizedBox(height: responsive.spacing(8)),
+                        if (_dispute!['created_at'] != null)
+                          Card(
+                            child: ListTile(
+                              leading: Icon(Icons.calendar_today, size: responsive.iconSize(24)),
+                              title: Text(
+                                'Created',
+                                style: TextStyle(fontSize: responsive.fontSize(16)),
+                              ),
+                              subtitle: Text(
+                                _formatDate(_dispute!['created_at']),
+                                style: TextStyle(fontSize: responsive.fontSize(14)),
+                              ),
+                            ),
+                          ),
+                        if (_dispute!['updated_at'] != null) ...[
+                          SizedBox(height: responsive.spacing(8)),
+                          Card(
+                            child: ListTile(
+                              leading: Icon(Icons.update, size: responsive.iconSize(24)),
+                              title: Text(
+                                'Last Updated',
+                                style: TextStyle(fontSize: responsive.fontSize(16)),
+                              ),
+                              subtitle: Text(
+                                _formatDate(_dispute!['updated_at']),
+                                style: TextStyle(fontSize: responsive.fontSize(14)),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
     );

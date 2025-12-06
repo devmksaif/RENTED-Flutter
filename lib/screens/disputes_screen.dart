@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../services/dispute_service.dart';
 import '../models/api_error.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class DisputesScreen extends StatefulWidget {
   const DisputesScreen({super.key});
@@ -62,12 +63,16 @@ class _DisputesScreenState extends State<DisputesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Disputes'),
+        title: Text(
+          'Disputes',
+          style: TextStyle(fontSize: responsive.fontSize(20)),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: Icon(Icons.add, size: responsive.iconSize(24)),
             onPressed: () {
               // Navigate to create dispute screen
               Fluttertoast.showToast(
@@ -82,20 +87,26 @@ class _DisputesScreenState extends State<DisputesScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _disputes.isEmpty
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.gavel_outlined,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No disputes yet',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: responsive.responsivePadding(mobile: 24, tablet: 32, desktop: 40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.gavel_outlined,
+                          size: responsive.iconSize(64),
+                          color: Colors.grey[400],
+                        ),
+                        SizedBox(height: responsive.spacing(16)),
+                        Text(
+                          'No disputes yet',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: responsive.fontSize(18),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : RefreshIndicator(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -59,6 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
@@ -72,16 +74,16 @@ class _SplashScreenState extends State<SplashScreen> {
                 Text(
                   'RENTED',
                   style: TextStyle(
-                    fontSize: 48,
+                    fontSize: responsive.fontSize(48),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primaryGreen,
                     letterSpacing: 2,
                   ),
                 ),
                 Container(
-                  width: 12,
-                  height: 12,
-                  margin: const EdgeInsets.only(left: 8),
+                  width: responsive.responsive(mobile: 12, tablet: 14, desktop: 16),
+                  height: responsive.responsive(mobile: 12, tablet: 14, desktop: 16),
+                  margin: EdgeInsets.only(left: responsive.spacing(8)),
                   decoration: BoxDecoration(
                     color: AppTheme.primaryGreen,
                     shape: BoxShape.circle,
@@ -89,11 +91,11 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: responsive.spacing(16)),
             Text(
               'Rent Anything You Need',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: responsive.fontSize(16),
                 color: theme.hintColor,
                 letterSpacing: 0.5,
               ),

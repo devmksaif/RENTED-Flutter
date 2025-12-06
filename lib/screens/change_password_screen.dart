@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../config/app_theme.dart';
 import '../services/auth_service.dart';
 import '../models/api_error.dart';
+import '../utils/responsive_utils.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -81,65 +82,82 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change Password'),
+        title: Text(
+          'Change Password',
+          style: TextStyle(fontSize: responsive.fontSize(20)),
+        ),
         elevation: 0,
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Update your password',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.textTheme.titleLarge?.color,
-                          ),
+          padding: responsive.responsivePadding(mobile: 16, tablet: 24, desktop: 32),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.3 : 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Enter your current password and choose a new one',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.hintColor,
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(responsive.spacing(16)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Update your password',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: theme.textTheme.titleLarge?.color,
+                              fontSize: responsive.fontSize(18),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
+                          SizedBox(height: responsive.spacing(8)),
+                          Text(
+                            'Enter your current password and choose a new one',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.hintColor,
+                              fontSize: responsive.fontSize(14),
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing(24)),
                         // Current Password
                         TextFormField(
                           controller: _currentPasswordController,
                           obscureText: _obscureCurrentPassword,
-                          style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                          style: TextStyle(
+                            color: theme.textTheme.bodyLarge?.color,
+                            fontSize: responsive.fontSize(14),
+                          ),
                           decoration: InputDecoration(
                             labelText: 'Current Password',
-                            prefixIcon: Icon(Icons.lock_outline, color: AppTheme.primaryGreen),
+                            labelStyle: TextStyle(fontSize: responsive.fontSize(14)),
+                            prefixIcon: Icon(
+                              Icons.lock_outline,
+                              color: AppTheme.primaryGreen,
+                              size: responsive.iconSize(24),
+                            ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureCurrentPassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
                                 color: theme.hintColor,
+                                size: responsive.iconSize(24),
                               ),
                               onPressed: () {
                                 setState(() {
@@ -160,21 +178,30 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: responsive.spacing(16)),
                         // New Password
                         TextFormField(
                           controller: _newPasswordController,
                           obscureText: _obscureNewPassword,
-                          style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                          style: TextStyle(
+                            color: theme.textTheme.bodyLarge?.color,
+                            fontSize: responsive.fontSize(14),
+                          ),
                           decoration: InputDecoration(
                             labelText: 'New Password',
-                            prefixIcon: Icon(Icons.lock, color: AppTheme.primaryGreen),
+                            labelStyle: TextStyle(fontSize: responsive.fontSize(14)),
+                            prefixIcon: Icon(
+                              Icons.lock,
+                              color: AppTheme.primaryGreen,
+                              size: responsive.iconSize(24),
+                            ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureNewPassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
                                 color: theme.hintColor,
+                                size: responsive.iconSize(24),
                               ),
                               onPressed: () {
                                 setState(() {
@@ -198,21 +225,30 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: responsive.spacing(16)),
                         // Confirm Password
                         TextFormField(
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
-                          style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                          style: TextStyle(
+                            color: theme.textTheme.bodyLarge?.color,
+                            fontSize: responsive.fontSize(14),
+                          ),
                           decoration: InputDecoration(
                             labelText: 'Confirm New Password',
-                            prefixIcon: Icon(Icons.lock, color: AppTheme.primaryGreen),
+                            labelStyle: TextStyle(fontSize: responsive.fontSize(14)),
+                            prefixIcon: Icon(
+                              Icons.lock,
+                              color: AppTheme.primaryGreen,
+                              size: responsive.iconSize(24),
+                            ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureConfirmPassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
                                 color: theme.hintColor,
+                                size: responsive.iconSize(24),
                               ),
                               onPressed: () {
                                 setState(() {
@@ -236,7 +272,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: responsive.spacing(24)),
                         // Submit Button
                         SizedBox(
                           width: double.infinity,
@@ -245,39 +281,40 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppTheme.primaryGreen,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: EdgeInsets.symmetric(vertical: responsive.spacing(16)),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                             child: _isLoading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
+                                ? SizedBox(
+                                    height: responsive.iconSize(20),
+                                    width: responsive.iconSize(20),
+                                    child: const CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                     ),
                                   )
-                                : const Text(
+                                : Text(
                                     'Change Password',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: responsive.fontSize(16),
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+                      ], // End of inner Column children (Padding > Column)
+                    ), // End of inner Column
+                  ), // End of Padding
+                ), // End of Container
+                ], // End of outer Column children (Form > Column)
+              ), // End of Column
+            ), // End of Form
+          ), // End of ConstrainedBox
+        ), // End of SingleChildScrollView
+      ), // End of SafeArea
+    ); // End of Scaffold
   }
 }
 

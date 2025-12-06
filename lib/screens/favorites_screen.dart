@@ -5,6 +5,7 @@ import '../models/product.dart';
 import '../models/api_error.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -109,12 +110,16 @@ class FavoritesScreenState extends State<FavoritesScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Favorites',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: responsive.fontSize(20),
+          ),
         ),
         elevation: 0,
         centerTitle: true,
@@ -123,58 +128,61 @@ class FavoritesScreenState extends State<FavoritesScreen>
           ? const Center(child: CircularProgressIndicator())
           : _favoriteProducts.isEmpty
           ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.favorite_outline,
-                      size: 64,
-                      color: Color(0xFF4CAF50),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'No favorites yet',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: theme.textTheme.titleLarge?.color,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Save your favorite products here',
-                    style: TextStyle(fontSize: 14, color: theme.hintColor),
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/home');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryGreen,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+              child: Padding(
+                padding: responsive.responsivePadding(mobile: 24, tablet: 32, desktop: 40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(responsive.spacing(24)),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      child: Icon(
+                        Icons.favorite_outline,
+                        size: responsive.iconSize(64),
+                        color: const Color(0xFF4CAF50),
                       ),
                     ),
-                    icon: const Icon(Icons.search),
-                    label: const Text(
-                      'Browse Products',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    SizedBox(height: responsive.spacing(24)),
+                    Text(
+                      'No favorites yet',
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(22),
+                        fontWeight: FontWeight.bold,
+                        color: theme.textTheme.titleLarge?.color,
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: responsive.spacing(8)),
+                    Text(
+                      'Save your favorite products here',
+                      style: TextStyle(fontSize: 14, color: theme.hintColor),
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/home');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryGreen,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.search),
+                      label: const Text(
+                        'Browse Products',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           : RefreshIndicator(
@@ -258,7 +266,7 @@ class FavoritesScreenState extends State<FavoritesScreen>
                           fit: BoxFit.cover,
                           width: double.infinity,
                           height: double.infinity,
-                        loadingBuilder: (context, child, loadingProgress) {
+                          loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
                             width: double.infinity,

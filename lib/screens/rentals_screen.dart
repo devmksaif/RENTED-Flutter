@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../models/rental.dart';
 import '../services/rental_service.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
+import '../utils/responsive_utils.dart';
 
 class RentalsScreen extends StatefulWidget {
   const RentalsScreen({super.key});
@@ -90,11 +91,18 @@ class _RentalsScreenState extends State<RentalsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Rentals'),
+        title: Text(
+          'My Rentals',
+          style: TextStyle(fontSize: responsive.fontSize(20)),
+        ),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _loadRentals),
+          IconButton(
+            icon: Icon(Icons.refresh, size: responsive.iconSize(24)),
+            onPressed: _loadRentals,
+          ),
         ],
       ),
       body: _isLoading
@@ -102,27 +110,38 @@ class _RentalsScreenState extends State<RentalsScreen>
           : _errorMessage != null
           ? Center(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: responsive.responsivePadding(mobile: 16, tablet: 24, desktop: 32),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 64, color: Colors.red),
-                    const SizedBox(height: 16),
+                    Icon(
+                      Icons.error_outline,
+                      size: responsive.iconSize(64),
+                      color: Colors.red,
+                    ),
+                    SizedBox(height: responsive.spacing(16)),
                     Text(
                       'Error loading rentals',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontSize: responsive.fontSize(22),
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: responsive.spacing(8)),
                     Text(
                       _errorMessage!,
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: responsive.fontSize(14),
+                      ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: responsive.spacing(24)),
                     ElevatedButton.icon(
                       onPressed: _loadRentals,
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Retry'),
+                      icon: Icon(Icons.refresh, size: responsive.iconSize(20)),
+                      label: Text(
+                        'Retry',
+                        style: TextStyle(fontSize: responsive.fontSize(14)),
+                      ),
                     ),
                   ],
                 ),
@@ -130,25 +149,34 @@ class _RentalsScreenState extends State<RentalsScreen>
             )
           : _rentals.isEmpty
           ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.inbox_outlined, size: 80, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No rentals yet',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Start renting products to see them here',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
-                  ),
-                ],
+              child: Padding(
+                padding: responsive.responsivePadding(mobile: 24, tablet: 32, desktop: 40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.inbox_outlined,
+                      size: responsive.iconSize(80),
+                      color: Colors.grey[400],
+                    ),
+                    SizedBox(height: responsive.spacing(16)),
+                    Text(
+                      'No rentals yet',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.grey[600],
+                        fontSize: responsive.fontSize(22),
+                      ),
+                    ),
+                    SizedBox(height: responsive.spacing(8)),
+                    Text(
+                      'Start renting products to see them here',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[500],
+                        fontSize: responsive.fontSize(14),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           : RefreshIndicator(

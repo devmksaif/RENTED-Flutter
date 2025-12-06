@@ -5,6 +5,7 @@ import 'services/session_manager.dart';
 import 'services/social_auth_service.dart';
 import 'models/api_error.dart';
 import 'config/app_theme.dart';
+import 'utils/responsive_utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -70,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
@@ -79,8 +81,8 @@ class _LoginScreenState extends State<LoginScreen> {
             top: -80,
             left: -80,
             child: Container(
-              width: 200,
-              height: 200,
+              width: responsive.responsive(mobile: 200, tablet: 250, desktop: 300),
+              height: responsive.responsive(mobile: 200, tablet: 250, desktop: 300),
               decoration: BoxDecoration(
                 color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(150),
@@ -92,8 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
             bottom: -100,
             right: -100,
             child: Container(
-              width: 250,
-              height: 250,
+              width: responsive.responsive(mobile: 250, tablet: 300, desktop: 350),
+              height: responsive.responsive(mobile: 250, tablet: 300, desktop: 350),
               decoration: BoxDecoration(
                 color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(200),
@@ -104,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Center(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: responsive.responsivePadding(mobile: 20, tablet: 40, desktop: 60),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -117,9 +119,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             ?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppTheme.darkGreen,
+                              fontSize: responsive.fontSize(24),
                             ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: responsive.spacing(20)),
                       // Image
                       Container(
                         decoration: BoxDecoration(
@@ -138,27 +141,29 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(20),
                           child: Image.asset(
                             'assets/images/login_vec.jpg',
-                            width: 400,
-                            height: 250,
+                            width: responsive.responsive(mobile: responsive.screenWidth * 0.9, tablet: 500, desktop: 600),
+                            height: responsive.responsive(mobile: 200, tablet: 300, desktop: 350),
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Container(
-                              width: 400,
-                              height: 250,
+                              width: responsive.responsive(mobile: responsive.screenWidth * 0.9, tablet: 500, desktop: 600),
+                              height: responsive.responsive(mobile: 200, tablet: 300, desktop: 350),
                               color: theme.cardColor,
                               child: Icon(
                                 Icons.image,
-                                size: 64,
+                                size: responsive.iconSize(64),
                                 color: theme.hintColor,
                               ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: responsive.spacing(30)),
                       // Email field
-                      SizedBox(
-                        width: 400,
-                        child: TextFormField(
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                        child: SizedBox(
+                          width: responsive.responsive(mobile: responsive.screenWidth * 0.9, tablet: 500, desktop: 600),
+                          child: TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
@@ -185,11 +190,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 20),
+                    ),
+                    SizedBox(height: responsive.spacing(20)),
                       // Password field
-                      SizedBox(
-                        width: 400,
-                        child: TextFormField(
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                        child: SizedBox(
+                          width: responsive.responsive(mobile: responsive.screenWidth * 0.9, tablet: 500, desktop: 600),
+                          child: TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
@@ -229,13 +237,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 40),
+                    ),
+                    SizedBox(height: responsive.spacing(40)),
                       // Sign in button
-                      SizedBox(
-                        width: 300,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _performLogin,
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: responsive.maxContentWidth),
+                        child: SizedBox(
+                          width: responsive.responsive(mobile: responsive.screenWidth * 0.8, tablet: 400, desktop: 500),
+                          height: responsive.responsive(mobile: 50, tablet: 55, desktop: 60),
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _performLogin,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryGreen,
                             shape: RoundedRectangleBorder(
@@ -254,69 +265,78 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 )
-                              : const Text(
+                              : Text(
                                   "Sign In",
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: responsive.fontSize(18),
                                     color: Colors.white,
                                   ),
                                 ),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 15),
+                      SizedBox(height: responsive.spacing(15)),
                       // Forgot password link
                       TextButton(
                         onPressed: () =>
                             Navigator.pushNamed(context, "/forgot-password"),
-                        child: const Text(
+                        child: Text(
                           "Forgot Password?",
                           style: TextStyle(
                             color: AppTheme.primaryGreen,
+                            fontSize: responsive.fontSize(14),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: responsive.spacing(10)),
                       // Register link
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             "Don't have an account? ",
-                            style: TextStyle(color: theme.hintColor),
+                            style: TextStyle(
+                              color: theme.hintColor,
+                              fontSize: responsive.fontSize(14),
+                            ),
                           ),
                           TextButton(
                             onPressed: () =>
                                 Navigator.pushNamed(context, "/register"),
-                            child: const Text(
+                            child: Text(
                               "Create one",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.primaryGreen,
+                                fontSize: responsive.fontSize(14),
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: responsive.spacing(20)),
                       // Divider
                       Row(
                         children: [
                           Expanded(child: Divider(color: theme.dividerColor)),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
                             child: Text(
                               'OR',
-                              style: TextStyle(color: theme.hintColor),
+                              style: TextStyle(
+                                color: theme.hintColor,
+                                fontSize: responsive.fontSize(14),
+                              ),
                             ),
                           ),
                           Expanded(child: Divider(color: theme.dividerColor)),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: responsive.spacing(20)),
                       // Google Sign In Button
                       SizedBox(
-                        width: 300,
-                        height: 50,
+                        width: responsive.responsive(mobile: responsive.screenWidth * 0.8, tablet: 400, desktop: 500),
+                        height: responsive.responsive(mobile: 50, tablet: 55, desktop: 60),
                         child: OutlinedButton.icon(
                           onPressed: _isLoadingGoogle ? null : _signInWithGoogle,
                           style: OutlinedButton.styleFrom(
@@ -340,13 +360,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                     size: 24,
                                   ),
                                 ),
-                          label: const Text(
+                          label: Text(
                             'Sign in with Google',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: responsive.fontSize(16)),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: responsive.spacing(20)),
                     ],
                   ),
                 ),

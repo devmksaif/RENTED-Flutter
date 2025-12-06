@@ -4,6 +4,8 @@ import '../services/conversation_service.dart';
 import '../models/api_error.dart';
 import '../widgets/avatar_image.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
+import '../utils/responsive_utils.dart';
 
 class ConversationsScreen extends StatefulWidget {
   const ConversationsScreen({super.key});
@@ -63,16 +65,23 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Messages'),
+        title: Text(
+          'Messages',
+          style: TextStyle(fontSize: responsive.fontSize(20)),
+        ),
         actions: [
           if (_unreadCount > 0)
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(responsive.spacing(16)),
               child: Badge(
-                label: Text('$_unreadCount'),
-                child: const Icon(Icons.notifications),
+                label: Text(
+                  '$_unreadCount',
+                  style: TextStyle(fontSize: responsive.fontSize(12)),
+                ),
+                child: Icon(Icons.notifications, size: responsive.iconSize(24)),
               ),
             ),
         ],
@@ -81,20 +90,26 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _conversations.isEmpty
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.chat_bubble_outline,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No conversations yet',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: responsive.responsivePadding(mobile: 24, tablet: 32, desktop: 40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.chat_bubble_outline,
+                          size: responsive.iconSize(64),
+                          color: Colors.grey[400],
+                        ),
+                        SizedBox(height: responsive.spacing(16)),
+                        Text(
+                          'No conversations yet',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: responsive.fontSize(16),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : RefreshIndicator(
@@ -117,13 +132,14 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                         leading: AvatarImage(
                           imageUrl: otherUser['avatar_url'],
                           name: otherUser['name'] ?? 'Unknown User',
-                          radius: 25,
+                          radius: responsive.responsive(mobile: 25, tablet: 30, desktop: 35),
                           backgroundColor: AppTheme.primaryGreen,
                         ),
                         title: Text(
                           otherUser['name'] ?? 'Unknown User',
                           style: TextStyle(
                             fontWeight: hasUnread ? FontWeight.bold : FontWeight.normal,
+                            fontSize: responsive.fontSize(16),
                           ),
                         ),
                         subtitle: Column(
@@ -133,7 +149,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                               Text(
                                 conversation['product']['title'] ?? '',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: responsive.fontSize(12),
                                   color: Colors.grey[600],
                                 ),
                               ),
@@ -146,6 +162,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                                   fontWeight: hasUnread
                                       ? FontWeight.w500
                                       : FontWeight.normal,
+                                  fontSize: responsive.fontSize(14),
                                 ),
                               ),
                           ],

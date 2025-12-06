@@ -4,6 +4,7 @@ import '../services/review_service.dart';
 import '../models/api_error.dart';
 import '../utils/logger.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class MyReviewsScreen extends StatefulWidget {
   const MyReviewsScreen({super.key});
@@ -61,6 +62,7 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
   }
 
   void _showEditReviewDialog(Map<String, dynamic> review) {
+    final responsive = ResponsiveUtils(context);
     int selectedRating = review['rating'] as int? ?? 5;
     final commentController = TextEditingController(
       text: review['comment'] ?? '',
@@ -70,14 +72,20 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Edit Review'),
+          title: Text(
+            'Edit Review',
+            style: TextStyle(fontSize: responsive.fontSize(20)),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Rating'),
-                const SizedBox(height: 8),
+                Text(
+                  'Rating',
+                  style: TextStyle(fontSize: responsive.fontSize(16)),
+                ),
+                SizedBox(height: responsive.spacing(8)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(5, (index) {
@@ -87,7 +95,7 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
                             ? Icons.star
                             : Icons.star_border,
                         color: Colors.amber,
-                        size: 32,
+                        size: responsive.iconSize(32),
                       ),
                       onPressed: () {
                         setDialogState(() {
@@ -97,12 +105,14 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
                     );
                   }),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: responsive.spacing(16)),
                 TextField(
                   controller: commentController,
-                  decoration: const InputDecoration(
+                  style: TextStyle(fontSize: responsive.fontSize(14)),
+                  decoration: InputDecoration(
                     labelText: 'Comment (optional)',
-                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(fontSize: responsive.fontSize(14)),
+                    border: const OutlineInputBorder(),
                   ),
                   maxLines: 4,
                   maxLength: 1000,
@@ -113,7 +123,10 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(fontSize: responsive.fontSize(14)),
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -144,7 +157,10 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
                 backgroundColor: AppTheme.primaryGreen,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Update'),
+              child: Text(
+                'Update',
+                style: TextStyle(fontSize: responsive.fontSize(14)),
+              ),
             ),
           ],
         ),
@@ -153,15 +169,25 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
   }
 
   void _showDeleteReviewDialog(Map<String, dynamic> review) {
+    final responsive = ResponsiveUtils(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Review'),
-        content: const Text('Are you sure you want to delete this review?'),
+        title: Text(
+          'Delete Review',
+          style: TextStyle(fontSize: responsive.fontSize(20)),
+        ),
+        content: Text(
+          'Are you sure you want to delete this review?',
+          style: TextStyle(fontSize: responsive.fontSize(14)),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(fontSize: responsive.fontSize(14)),
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -186,7 +212,10 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Delete'),
+            child: Text(
+              'Delete',
+              style: TextStyle(fontSize: responsive.fontSize(14)),
+            ),
           ),
         ],
       ),
@@ -195,75 +224,88 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Reviews'),
+        title: Text(
+          'My Reviews',
+          style: TextStyle(fontSize: responsive.fontSize(20)),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _reviews.isEmpty
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.reviews_outlined,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No reviews yet',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: responsive.responsivePadding(mobile: 24, tablet: 32, desktop: 40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.reviews_outlined,
+                          size: responsive.iconSize(64),
+                          color: Colors.grey[400],
+                        ),
+                        SizedBox(height: responsive.spacing(16)),
+                        Text(
+                          'No reviews yet',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: responsive.fontSize(18),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : RefreshIndicator(
                   onRefresh: _loadReviews,
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: responsive.responsivePadding(mobile: 16, tablet: 24, desktop: 32),
                     itemCount: _reviews.length,
                     itemBuilder: (context, index) {
                       final review = _reviews[index];
                       final product = review['product'] ?? {};
 
                       return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
+                        margin: EdgeInsets.only(bottom: responsive.spacing(12)),
                         child: ListTile(
                           leading: product['thumbnail_url'] != null
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.network(
                                     product['thumbnail_url'],
-                                    width: 60,
-                                    height: 60,
+                                    width: responsive.responsive(mobile: 60, tablet: 70, desktop: 80),
+                                    height: responsive.responsive(mobile: 60, tablet: 70, desktop: 80),
                                     fit: BoxFit.cover,
                                     errorBuilder: (_, __, ___) => Container(
-                                      width: 60,
-                                      height: 60,
+                                      width: responsive.responsive(mobile: 60, tablet: 70, desktop: 80),
+                                      height: responsive.responsive(mobile: 60, tablet: 70, desktop: 80),
                                       color: Colors.grey[200],
-                                      child: const Icon(Icons.image),
+                                      child: Icon(Icons.image, size: responsive.iconSize(24)),
                                     ),
                                   ),
                                 )
                               : Container(
-                                  width: 60,
-                                  height: 60,
+                                  width: responsive.responsive(mobile: 60, tablet: 70, desktop: 80),
+                                  height: responsive.responsive(mobile: 60, tablet: 70, desktop: 80),
                                   decoration: BoxDecoration(
                                     color: Colors.grey[200],
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: const Icon(Icons.inventory_2),
+                                  child: Icon(Icons.inventory_2, size: responsive.iconSize(24)),
                                 ),
                           title: Text(
                             product['title'] ?? 'Unknown Product',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: responsive.fontSize(16),
+                            ),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 4),
+                              SizedBox(height: responsive.spacing(4)),
                               Row(
                                 children: [
                                   ...List.generate(
@@ -272,46 +314,62 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
                                       index < (review['rating'] as int? ?? 0)
                                           ? Icons.star
                                           : Icons.star_border,
-                                      size: 16,
+                                      size: responsive.iconSize(16),
                                       color: Colors.amber,
                                     ),
                                   ),
                                 ],
                               ),
                               if (review['comment'] != null) ...[
-                                const SizedBox(height: 4),
-                                Text(review['comment'] ?? ''),
+                                SizedBox(height: responsive.spacing(4)),
+                                Text(
+                                  review['comment'] ?? '',
+                                  style: TextStyle(fontSize: responsive.fontSize(14)),
+                                ),
                               ],
-                              const SizedBox(height: 4),
+                              SizedBox(height: responsive.spacing(4)),
                               Text(
                                 _formatDate(review['created_at']),
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: responsive.fontSize(12),
                                   color: Colors.grey[600],
                                 ),
                               ),
                             ],
                           ),
                           trailing: PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert),
+                            icon: Icon(Icons.more_vert, size: responsive.iconSize(24)),
                             itemBuilder: (context) => [
-                              const PopupMenuItem(
+                              PopupMenuItem(
                                 value: 'edit',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.edit, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Edit'),
+                                    Icon(Icons.edit, size: responsive.iconSize(18)),
+                                    SizedBox(width: responsive.spacing(8)),
+                                    Text(
+                                      'Edit',
+                                      style: TextStyle(fontSize: responsive.fontSize(14)),
+                                    ),
                                   ],
                                 ),
                               ),
-                              const PopupMenuItem(
+                              PopupMenuItem(
                                 value: 'delete',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.delete, size: 18, color: Colors.red),
-                                    SizedBox(width: 8),
-                                    Text('Delete', style: TextStyle(color: Colors.red)),
+                                    Icon(
+                                      Icons.delete,
+                                      size: responsive.iconSize(18),
+                                      color: Colors.red,
+                                    ),
+                                    SizedBox(width: responsive.spacing(8)),
+                                    Text(
+                                      'Delete',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: responsive.fontSize(14),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),

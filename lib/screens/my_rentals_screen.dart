@@ -5,6 +5,7 @@ import '../models/api_error.dart';
 import '../services/rental_service.dart';
 import '../config/app_theme.dart';
 import '../mixins/refresh_on_focus_mixin.dart';
+import '../utils/responsive_utils.dart';
 
 class MyRentalsScreen extends StatefulWidget {
   const MyRentalsScreen({super.key});
@@ -56,8 +57,14 @@ class _MyRentalsScreenState extends State<MyRentalsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('My Rentals')),
+      appBar: AppBar(
+        title: Text(
+          'My Rentals',
+          style: TextStyle(fontSize: responsive.fontSize(20)),
+        ),
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _rentals.isEmpty
@@ -65,7 +72,7 @@ class _MyRentalsScreenState extends State<MyRentalsScreen>
           : RefreshIndicator(
               onRefresh: _loadRentals,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: responsive.responsivePadding(mobile: 16, tablet: 24, desktop: 32),
                 itemCount: _rentals.length,
                 itemBuilder: (context, index) {
                   final rental = _rentals[index];
@@ -77,21 +84,35 @@ class _MyRentalsScreenState extends State<MyRentalsScreen>
   }
 
   Widget _buildEmptyState() {
+    final responsive = ResponsiveUtils(context);
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.access_time_outlined, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text('No rentals yet', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(
-            'Browse products to start renting',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-          ),
-        ],
+      child: Padding(
+        padding: responsive.responsivePadding(mobile: 24, tablet: 32, desktop: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.access_time_outlined,
+              size: responsive.iconSize(64),
+              color: Colors.grey[400],
+            ),
+            SizedBox(height: responsive.spacing(16)),
+            Text(
+              'No rentals yet',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: responsive.fontSize(22),
+              ),
+            ),
+            SizedBox(height: responsive.spacing(8)),
+            Text(
+              'Browse products to start renting',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[600],
+                fontSize: responsive.fontSize(14),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

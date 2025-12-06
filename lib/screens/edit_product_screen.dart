@@ -6,6 +6,7 @@ import '../models/product.dart';
 import '../models/api_error.dart';
 import '../services/product_service.dart';
 import '../config/app_theme.dart';
+import '../utils/responsive_utils.dart';
 
 class EditProductScreen extends StatefulWidget {
   final int productId;
