@@ -141,19 +141,19 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Account Verified!',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: theme.colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
                 'Your account has been successfully verified.\nYou can now list products for rent and sale.',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -219,19 +219,19 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Verification Pending',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: theme.colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
                 'Your verification documents are being reviewed.\nThis usually takes 1-3 business days.',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                 textAlign: TextAlign.center,
               ),
               if (_verificationStatus != null &&
@@ -239,7 +239,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'Submitted: ${_formatDate(_verificationStatus!['submitted_at'])}',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                  style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                 ),
               ],
               const SizedBox(height: 32),
@@ -304,12 +304,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
               child: const Icon(Icons.cancel, size: 80, color: Colors.red),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Verification Rejected',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: theme.colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -319,27 +319,27 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 margin: const EdgeInsets.symmetric(vertical: 16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.1),
+                  color: AppTheme.errorRed.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                  border: Border.all(color: AppTheme.errorRed.withValues(alpha: 0.3)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Reason for Rejection:',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                        color: AppTheme.errorRed,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       adminNotes,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -348,7 +348,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
             ] else ...[
               Text(
                 'Your verification was rejected.\nPlease resubmit with valid documents.',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -455,12 +455,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
               ),
               const SizedBox(height: 32),
               // Requirements
-              const Text(
+              Text(
                 'Requirements',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -532,47 +532,63 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   onTap: () {
                     showDialog(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Select Document Type'),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            RadioListTile<String>(
-                              title: const Text('National ID'),
-                              value: 'national_id',
-                              groupValue: _documentType,
-                              onChanged: (value) {
-                                setState(() {
-                                  _documentType = value!;
-                                });
-                                Navigator.pop(context);
-                              },
-                            ),
-                            RadioListTile<String>(
-                              title: const Text('Passport'),
-                              value: 'passport',
-                              groupValue: _documentType,
-                              onChanged: (value) {
-                                setState(() {
-                                  _documentType = value!;
-                                });
-                                Navigator.pop(context);
-                              },
-                            ),
-                            RadioListTile<String>(
-                              title: const Text('Driver License'),
-                              value: 'driver_license',
-                              groupValue: _documentType,
-                              onChanged: (value) {
-                                setState(() {
-                                  _documentType = value!;
-                                });
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
+                      builder: (context) {
+                        final dialogTheme = Theme.of(context);
+                        return AlertDialog(
+                          backgroundColor: dialogTheme.scaffoldBackgroundColor,
+                          title: Text(
+                            'Select Document Type',
+                            style: TextStyle(color: dialogTheme.colorScheme.onSurface),
+                          ),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              RadioListTile<String>(
+                                title: Text(
+                                  'National ID',
+                                  style: TextStyle(color: dialogTheme.colorScheme.onSurface),
+                                ),
+                                value: 'national_id',
+                                groupValue: _documentType,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _documentType = value!;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              RadioListTile<String>(
+                                title: Text(
+                                  'Passport',
+                                  style: TextStyle(color: dialogTheme.colorScheme.onSurface),
+                                ),
+                                value: 'passport',
+                                groupValue: _documentType,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _documentType = value!;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              RadioListTile<String>(
+                                title: Text(
+                                  'Driver License',
+                                  style: TextStyle(color: dialogTheme.colorScheme.onSurface),
+                                ),
+                                value: 'driver_license',
+                                groupValue: _documentType,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _documentType = value!;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -626,7 +642,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF3E0),
+                  color: theme.brightness == Brightness.dark
+                      ? const Color(0xFFFFA726).withValues(alpha: 0.15)
+                      : const Color(0xFFFFF3E0),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: const Color(0xFFFFA726).withValues(alpha: 0.3),
@@ -637,7 +655,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   children: [
                     Icon(
                       Icons.info_outline,
-                      color: Colors.orange[700],
+                      color: theme.brightness == Brightness.dark
+                          ? const Color(0xFFFFA726)
+                          : Colors.orange[700],
                       size: 22,
                     ),
                     const SizedBox(width: 12),
@@ -645,7 +665,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       child: Text(
                         'Verification usually takes 1-3 business days. You\'ll receive an email once your account is verified.',
                         style: TextStyle(
-                          color: Colors.orange[700],
+                          color: theme.brightness == Brightness.dark
+                              ? const Color(0xFFFFA726)
+                              : Colors.orange[700],
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
@@ -699,16 +721,19 @@ class _VerificationScreenState extends State<VerificationScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
-                    color: Colors.black87,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
                 ),
               ],
             ),
@@ -767,10 +792,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     if (imagePath != null) const SizedBox(height: 4),
@@ -779,7 +804,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         'Uploaded',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.green[700],
+                          color: AppTheme.successGreen,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -789,8 +814,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
               Icon(
                 imagePath != null ? Icons.check_circle : Icons.upload_file,
                 color: imagePath != null
-                    ? const Color(0xFF4CAF50)
-                    : Colors.grey[400],
+                    ? AppTheme.primaryGreen
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ],
           ),
@@ -803,24 +828,43 @@ class _VerificationScreenState extends State<VerificationScreen> {
     // Show image source selection dialog
     final source = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Image Source'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Camera'),
-              onTap: () => Navigator.pop(context, true),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Gallery'),
-              onTap: () => Navigator.pop(context, false),
-            ),
-          ],
-        ),
-      ),
+      builder: (context) {
+        final dialogTheme = Theme.of(context);
+        return AlertDialog(
+          backgroundColor: dialogTheme.scaffoldBackgroundColor,
+          title: Text(
+            'Select Image Source',
+            style: TextStyle(color: dialogTheme.colorScheme.onSurface),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(
+                  Icons.camera_alt,
+                  color: dialogTheme.colorScheme.onSurface,
+                ),
+                title: Text(
+                  'Camera',
+                  style: TextStyle(color: dialogTheme.colorScheme.onSurface),
+                ),
+                onTap: () => Navigator.pop(context, true),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.photo_library,
+                  color: dialogTheme.colorScheme.onSurface,
+                ),
+                title: Text(
+                  'Gallery',
+                  style: TextStyle(color: dialogTheme.colorScheme.onSurface),
+                ),
+                onTap: () => Navigator.pop(context, false),
+              ),
+            ],
+          ),
+        );
+      },
     );
 
     if (source == null) return;
