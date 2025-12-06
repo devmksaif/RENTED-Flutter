@@ -24,7 +24,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
   bool _obscurePassword = true;
-  bool _isLoadingGoogle = false;
 
   @override
   void dispose() {
@@ -333,40 +332,40 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       SizedBox(height: responsive.spacing(20)),
-                      // Google Sign In Button
-                      SizedBox(
-                        width: responsive.responsive(mobile: responsive.screenWidth * 0.8, tablet: 400, desktop: 500),
-                        height: responsive.responsive(mobile: 50, tablet: 55, desktop: 60),
-                        child: OutlinedButton.icon(
-                          onPressed: _isLoadingGoogle ? null : _signInWithGoogle,
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: theme.dividerColor),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          icon: _isLoadingGoogle
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : Image.asset(
-                                  'assets/images/google_logo.png',
-                                  width: 20,
-                                  height: 20,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.g_mobiledata,
-                                    size: 24,
-                                  ),
-                                ),
-                          label: Text(
-                            'Sign in with Google',
-                            style: TextStyle(fontSize: responsive.fontSize(16)),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: responsive.spacing(20)),
+                      // Google Sign In Button - COMMENTED OUT FOR NOW
+                      // SizedBox(
+                      //   width: responsive.responsive(mobile: responsive.screenWidth * 0.8, tablet: 400, desktop: 500),
+                      //   height: responsive.responsive(mobile: 50, tablet: 55, desktop: 60),
+                      //   child: OutlinedButton.icon(
+                      //     onPressed: _isLoadingGoogle ? null : _signInWithGoogle,
+                      //     style: OutlinedButton.styleFrom(
+                      //       side: BorderSide(color: theme.dividerColor),
+                      //       shape: RoundedRectangleBorder(
+                      //         borderRadius: BorderRadius.circular(12),
+                      //       ),
+                      //     ),
+                      //     icon: _isLoadingGoogle
+                      //         ? const SizedBox(
+                      //             width: 20,
+                      //             height: 20,
+                      //             child: CircularProgressIndicator(strokeWidth: 2),
+                      //           )
+                      //         : Image.asset(
+                      //             'assets/images/google_logo.png',
+                      //             width: 20,
+                      //             height: 20,
+                      //             errorBuilder: (_, __, ___) => const Icon(
+                      //               Icons.g_mobiledata,
+                      //               size: 24,
+                      //             ),
+                      //           ),
+                      //     label: Text(
+                      //       'Sign in with Google',
+                      //       style: TextStyle(fontSize: responsive.fontSize(16)),
+                      //     ),
+                      //   ),
+                      // ),
+                      // SizedBox(height: responsive.spacing(20)),
                     ],
                   ),
                 ),
@@ -378,108 +377,109 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _signInWithGoogle() async {
-    if (!mounted) return;
-    
-    setState(() {
-      _isLoadingGoogle = true;
-    });
-
-    try {
-      // Sign in with Google using Firebase Auth
-      final authResponse = await _socialAuthService.signInWithGoogle();
-
-      if (!mounted) return;
-
-      // Update session manager with user data
-      await _sessionManager.updateSession(authResponse.user);
-
-      if (mounted) {
-        try {
-          Fluttertoast.showToast(
-            msg: 'Login successful! Welcome ${authResponse.user.name}',
-            backgroundColor: AppTheme.successGreen,
-          );
-        } catch (e) {
-          // Ignore toast errors
-          print('Toast error: $e');
-        }
-        
-        // Small delay to ensure token is saved
-        await Future.delayed(const Duration(milliseconds: 100));
-        
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
-        }
-      }
-    } on ApiError catch (e) {
-      if (mounted) {
-        try {
-          Fluttertoast.showToast(
-            msg: e.message,
-            backgroundColor: AppTheme.errorRed,
-            toastLength: Toast.LENGTH_LONG,
-          );
-        } catch (toastError) {
-          // If toast fails, show a dialog instead
-          if (mounted) {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Sign-In Error'),
-                content: Text(e.message),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-            );
-          }
-        }
-      }
-    } catch (e, stackTrace) {
-      // Log the full error for debugging
-      print('Google Sign-In Error: $e');
-      print('Stack trace: $stackTrace');
-      
-      if (mounted) {
-        final errorMessage = e.toString().length > 100 
-            ? 'Failed to sign in with Google. Please try again.'
-            : 'Failed to sign in with Google: ${e.toString()}';
-        
-        try {
-          Fluttertoast.showToast(
-            msg: errorMessage,
-            backgroundColor: AppTheme.errorRed,
-            toastLength: Toast.LENGTH_LONG,
-          );
-        } catch (toastError) {
-          // If toast fails, show a dialog instead
-          if (mounted) {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Sign-In Error'),
-                content: Text(errorMessage),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-            );
-          }
-        }
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingGoogle = false;
-        });
-      }
-    }
-  }
+  // Google Sign-In method commented out along with the button
+  // Future<void> _signInWithGoogle() async {
+  //   if (!mounted) return;
+  //   
+  //   setState(() {
+  //     _isLoadingGoogle = true;
+  //   });
+  //
+  //   try {
+  //     // Sign in with Google using Firebase Auth
+  //     final authResponse = await _socialAuthService.signInWithGoogle();
+  //
+  //     if (!mounted) return;
+  //
+  //     // Update session manager with user data
+  //     await _sessionManager.updateSession(authResponse.user);
+  //
+  //     if (mounted) {
+  //       try {
+  //         Fluttertoast.showToast(
+  //           msg: 'Login successful! Welcome ${authResponse.user.name}',
+  //           backgroundColor: AppTheme.successGreen,
+  //         );
+  //       } catch (e) {
+  //         // Ignore toast errors
+  //         print('Toast error: $e');
+  //       }
+  //       
+  //       // Small delay to ensure token is saved
+  //       await Future.delayed(const Duration(milliseconds: 100));
+  //       
+  //       if (mounted) {
+  //         Navigator.pushReplacementNamed(context, '/home');
+  //       }
+  //     }
+  //   } on ApiError catch (e) {
+  //     if (mounted) {
+  //       try {
+  //         Fluttertoast.showToast(
+  //           msg: e.message,
+  //           backgroundColor: AppTheme.errorRed,
+  //           toastLength: Toast.LENGTH_LONG,
+  //         );
+  //       } catch (toastError) {
+  //         // If toast fails, show a dialog instead
+  //         if (mounted) {
+  //           showDialog(
+  //             context: context,
+  //             builder: (context) => AlertDialog(
+  //               title: const Text('Sign-In Error'),
+  //               content: Text(e.message),
+  //               actions: [
+  //                 TextButton(
+  //                   onPressed: () => Navigator.pop(context),
+  //                   child: const Text('OK'),
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         }
+  //       }
+  //     }
+  //   } catch (e, stackTrace) {
+  //     // Log the full error for debugging
+  //     print('Google Sign-In Error: $e');
+  //     print('Stack trace: $stackTrace');
+  //     
+  //     if (mounted) {
+  //       final errorMessage = e.toString().length > 100 
+  //           ? 'Failed to sign in with Google. Please try again.'
+  //           : 'Failed to sign in with Google: ${e.toString()}';
+  //       
+  //       try {
+  //         Fluttertoast.showToast(
+  //           msg: errorMessage,
+  //           backgroundColor: AppTheme.errorRed,
+  //           toastLength: Toast.LENGTH_LONG,
+  //         );
+  //       } catch (toastError) {
+  //         // If toast fails, show a dialog instead
+  //         if (mounted) {
+  //           showDialog(
+  //             context: context,
+  //             builder: (context) => AlertDialog(
+  //               title: const Text('Sign-In Error'),
+  //               content: Text(errorMessage),
+  //               actions: [
+  //                 TextButton(
+  //                   onPressed: () => Navigator.pop(context),
+  //                   child: const Text('OK'),
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         }
+  //       }
+  //     }
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() {
+  //         _isLoadingGoogle = false;
+  //       });
+  //     }
+  //   }
+  // }
 }

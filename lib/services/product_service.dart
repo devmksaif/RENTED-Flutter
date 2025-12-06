@@ -122,6 +122,23 @@ class ProductService {
         AppLogger.apiError(url, response.statusCode, responseData['message'] ?? 'Unknown error', errors: responseData['errors']);
         throw ApiError.fromJson(responseData, response.statusCode);
       }
+    } on SocketException catch (e, stackTrace) {
+      AppLogger.networkError('getProduct', e);
+      AppLogger.e('No internet connection', e, stackTrace);
+      throw ApiError(
+        message: 'No internet connection. Please check your network.',
+        statusCode: 0,
+      );
+    } on TimeoutException catch (e, stackTrace) {
+      AppLogger.networkError('getProduct', e);
+      AppLogger.e('Request timed out', e, stackTrace);
+      throw ApiError(
+        message: 'Request timed out. Please try again.',
+        statusCode: 0,
+      );
+    } on FormatException catch (e, stackTrace) {
+      AppLogger.e('Invalid JSON response', e, stackTrace);
+      throw ApiError(message: 'Invalid response from server.', statusCode: 0);
     } on ApiError catch (e) {
       AppLogger.apiError(url, e.statusCode, e.message, errors: e.errors);
       rethrow;
@@ -129,7 +146,7 @@ class ProductService {
       AppLogger.networkError('getProduct', e);
       AppLogger.e('Failed to load product $id', e, stackTrace);
       throw ApiError(
-        message: 'Network error. Please check your connection.',
+        message: 'Failed to load product: ${e.toString()}',
         statusCode: 0,
       );
     }
@@ -418,9 +435,9 @@ class ProductService {
         if (pricePerDay != null) body['price_per_day'] = pricePerDay;
         if (pricePerWeek != null) body['price_per_week'] = pricePerWeek;
         if (pricePerMonth != null) body['price_per_month'] = pricePerMonth;
-        if (isForSale != null) body['is_for_sale'] = isForSale;
+        if (isForSale != null) body['is_for_sale'] = isForSale ? 1 : 0;
         if (salePrice != null) body['sale_price'] = salePrice;
-        if (isAvailable != null) body['is_available'] = isAvailable;
+        if (isAvailable != null) body['is_available'] = isAvailable ? 1 : 0;
         if (locationAddress != null) body['location_address'] = locationAddress;
         if (locationCity != null) body['location_city'] = locationCity;
         if (locationState != null) body['location_state'] = locationState;

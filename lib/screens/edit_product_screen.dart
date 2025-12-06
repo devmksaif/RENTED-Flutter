@@ -6,7 +6,6 @@ import '../models/product.dart';
 import '../models/api_error.dart';
 import '../services/product_service.dart';
 import '../config/app_theme.dart';
-import '../utils/responsive_utils.dart';
 
 class EditProductScreen extends StatefulWidget {
   final int productId;
@@ -177,9 +176,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
       List<String>? imagePaths;
       if (_newImageFiles.isNotEmpty) {
         // If new images are added, we need to upload them
-        // For now, we'll use the updateProduct with newImagePaths
         imagePaths = _newImageFiles.map((f) => f.path).toList();
-      } else if (_existingImageUrls.isEmpty) {
+      }
+      // If no new images and existing images exist, pass null to keep existing images
+      // If no new images and no existing images, that's an error
+      if ((imagePaths == null || imagePaths.isEmpty) && _existingImageUrls.isEmpty) {
         Fluttertoast.showToast(
           msg: 'At least one image is required',
           backgroundColor: Colors.red,

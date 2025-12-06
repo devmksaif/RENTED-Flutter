@@ -294,7 +294,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               itemBuilder: (context, index) {
                           final message = _messages[_messages.length - 1 - index];
                           final isMe = message['sender']?['id'] ==
-                              (_conversation?['current_user_id'] ?? 0);
+                              (_conversation?['other_user']?['id'] ?? 0) ? false : true;
 
                           // Check if message has an offer
                           if (message['offer'] != null) {
@@ -838,7 +838,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _showMakeOfferDialog() {
-    final theme = Theme.of(context);
     final product = _conversation?['product'];
     if (product == null) return;
 
@@ -852,7 +851,6 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
-          final dialogTheme = Theme.of(context);
           return AlertDialog(
           title: const Text('Make an Offer'),
           content: SingleChildScrollView(
